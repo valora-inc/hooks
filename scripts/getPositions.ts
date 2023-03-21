@@ -1,3 +1,5 @@
+// Helper script to call the plugins and get the positions
+/* eslint-disable no-console */
 import { ubeswapPlugin } from '../src/ubeswap/plugin'
 import yargs from 'yargs'
 
@@ -19,8 +21,7 @@ const argv = yargs(process.argv.slice(2))
   })
   .parseSync()
 
-// script to call the plugins and get the positions
-;(async () => {
+void (async () => {
   const positions = await ubeswapPlugin.getPositions(argv.network, argv.address)
   console.log('positions', JSON.stringify(positions, null, ' '))
 

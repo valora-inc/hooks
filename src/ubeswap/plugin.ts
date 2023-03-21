@@ -80,10 +80,10 @@ export const ubeswapPlugin: AppPlugin = {
       (position: any) => position.pair.id,
     )
 
-    console.log({ pairs })
+    // console.log({ pairs })
 
     // Get base token prices
-    console.log('Getting base token prices...')
+    // console.log('Getting base token prices...')
     const baseTokensPriceManager = createNewManager({
       ...exchangesConfigs.mainnet,
       fullNodeUrl: FULL_NODE_URL,
@@ -95,7 +95,7 @@ export const ubeswapPlugin: AppPlugin = {
     })
     const baseTokenPrices = await baseTokensPriceManager.calculatecUSDPrices()
 
-    console.log('baseTokenPrices', baseTokenPrices)
+    // console.log('baseTokenPrices', baseTokenPrices)
 
     // Get all positions
     const positions = await Promise.all(
