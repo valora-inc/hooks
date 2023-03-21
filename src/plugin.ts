@@ -34,7 +34,7 @@ export interface BaseToken extends AbstractToken {
 
 export interface AppTokenPosition extends AbstractPosition, AbstractToken {
   type: 'app-token'
-  supply: number
+  supply: string
   // Price ratio between the token and underlying token(s)
   pricePerShare: number[]
 }

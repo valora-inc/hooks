@@ -1,4 +1,4 @@
-import { AppPlugin, BaseToken } from '../plugin'
+import { AppPlugin, AppTokenPosition, BaseToken } from '../plugin'
 import got from 'got'
 import { Contract, providers } from 'ethers'
 import uniswapV2PairAbi from './abis/uniswap-v2-pair.json'
@@ -25,21 +25,26 @@ const PAIRS_QUERY = `
   }
 `
 
-async function getTokenInfo(address: string, baseTokenPrices: PriceByAddress) {
+async function getTokenInfo(
+  network: string,
+  address: string,
+  baseTokenPrices: PriceByAddress,
+): Promise<Omit<BaseToken, 'balance'>> {
   const tokenContract = new Contract(address, uniswapV2PairAbi, provider)
   const symbol = await tokenContract.symbol()
   const decimals = await tokenContract.decimals()
   return {
     type: 'base-token',
+    network,
     address,
     symbol,
     decimals,
-    priceUsd: baseTokenPrices[address]?.toString(),
+    priceUsd: Number(baseTokenPrices[address]?.toString() ?? 0),
   }
 }
 
 function tokenWithUnderlyingBalance(
-  token: BaseToken,
+  token: Omit<BaseToken, 'balance'>,
   decimals: number,
   balance: string,
   pricePerShare: number,
@@ -62,7 +67,6 @@ export const ubeswapPlugin: AppPlugin = {
       description: 'Decentralized exchange on Celo',
     }
   },
-  // @ts-ignore
   async getPositions(network, address) {
     // Get the pairs from Ubeswap via The Graph
     const { data } = await got
@@ -106,10 +110,19 @@ export const ubeswapPlugin: AppPlugin = {
           return null
         }
         const decimals = await poolTokenContract.decimals()
+        const symbol = await poolTokenContract.symbol()
         const token0Address = (await poolTokenContract.token0()).toLowerCase()
         const token1Address = (await poolTokenContract.token1()).toLowerCase()
-        const token0 = await getTokenInfo(token0Address, baseTokenPrices)
-        const token1 = await getTokenInfo(token1Address, baseTokenPrices)
+        const token0 = await getTokenInfo(
+          network,
+          token0Address,
+          baseTokenPrices,
+        )
+        const token1 = await getTokenInfo(
+          network,
+          token1Address,
+          baseTokenPrices,
+        )
         const [reserve0, reserve1] = await poolTokenContract.getReserves()
         const totalSupply = await poolTokenContract.totalSupply()
         const reserves = [
@@ -123,16 +136,16 @@ export const ubeswapPlugin: AppPlugin = {
           Number(token0.priceUsd) * pricePerShare[0] +
           Number(token1.priceUsd) * pricePerShare[1]
 
-        const position = {
+        const position: AppTokenPosition = {
           type: 'app-token',
           network,
           address: pair,
+          symbol,
           decimals,
           label: `Pool: ${token0.symbol} / ${token1.symbol}`,
 
           tokens: [token0, token1].map((token, i) =>
             tokenWithUnderlyingBalance(
-              // @ts-ignore
               token,
               decimals,
               balance.toString(),
@@ -142,10 +155,7 @@ export const ubeswapPlugin: AppPlugin = {
           pricePerShare,
           priceUsd,
           balance: balance.toString(),
-          balanceUsd: (
-            (Number(balance.toString()) / 10 ** decimals) *
-            priceUsd
-          ).toString(),
+          supply: totalSupply.toString(),
         }
 
         return position
@@ -154,6 +164,6 @@ export const ubeswapPlugin: AppPlugin = {
 
     // console.log('positions', JSON.stringify(positions, null, ' '))
 
-    return positions.filter((p) => p !== null)
+    return positions.filter((p): p is Exclude<typeof p, null> => p !== null)
   },
 }
