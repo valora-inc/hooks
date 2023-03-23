@@ -49,6 +49,6 @@
   "dependencies": {
     "@valora/exchanges": "^2.0.2",
     "ethers": "^5.7.2",
-    "got": "^12.6.0"
+    "got": "^11.8.6"
   }
 }
