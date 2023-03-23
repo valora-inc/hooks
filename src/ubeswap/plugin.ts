@@ -1,17 +1,20 @@
 import { AppPlugin, AppTokenPosition, BaseToken } from '../plugin'
 import got from 'got'
-import { Contract, providers } from 'ethers'
-import uniswapV2PairAbi from './abis/uniswap-v2-pair.json'
+import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import {
   configs as exchangesConfigs,
   createNewManager,
   PriceByAddress,
 } from '@valora/exchanges'
+import { Address, createPublicClient, http } from 'viem'
+import { celo } from 'viem/chains'
 
 const FULL_NODE_URL = 'https://forno.celo.org'
 
-// Connect to the Celo network
-const provider = new providers.JsonRpcProvider(FULL_NODE_URL)
+const client = createPublicClient({
+  chain: celo,
+  transport: http(),
+})
 
 const PAIRS_QUERY = `
   query getPairs($address: ID!) {
@@ -27,12 +30,26 @@ const PAIRS_QUERY = `
 
 async function getTokenInfo(
   network: string,
-  address: string,
+  address: Address,
   baseTokenPrices: PriceByAddress,
 ): Promise<Omit<BaseToken, 'balance'>> {
-  const tokenContract = new Contract(address, uniswapV2PairAbi, provider)
-  const symbol = await tokenContract.symbol()
-  const decimals = await tokenContract.decimals()
+  const tokenContract = {
+    address,
+    abi: uniswapV2PairAbi,
+  } as const
+  const [symbol, decimals] = await client.multicall({
+    contracts: [
+      {
+        ...tokenContract,
+        functionName: 'symbol',
+      },
+      {
+        ...tokenContract,
+        functionName: 'decimals',
+      },
+    ],
+    allowFailure: false,
+  })
   return {
     type: 'base-token',
     network,
@@ -80,7 +97,7 @@ export const ubeswapPlugin: AppPlugin = {
       })
       .json<any>()
 
-    const pairs: string[] = data.user.liquidityPositions.map(
+    const pairs: Address[] = data.user.liquidityPositions.map(
       (position: any) => position.pair.id,
     )
 
@@ -104,15 +121,56 @@ export const ubeswapPlugin: AppPlugin = {
     // Get all positions
     const positions = await Promise.all(
       pairs.map(async (pair) => {
-        const poolTokenContract = new Contract(pair, uniswapV2PairAbi, provider)
-        const balance = await poolTokenContract.balanceOf(address)
+        const poolTokenContract = {
+          address: pair,
+          abi: uniswapV2PairAbi,
+        } as const
+        const [
+          balance,
+          symbol,
+          decimals,
+          token0Address,
+          token1Address,
+          [reserve0, reserve1],
+          totalSupply,
+        ] = await client.multicall({
+          contracts: [
+            {
+              ...poolTokenContract,
+              functionName: 'balanceOf',
+              args: [address as Address],
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'symbol',
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'decimals',
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'token0',
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'token1',
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'getReserves',
+            },
+            {
+              ...poolTokenContract,
+              functionName: 'totalSupply',
+            },
+          ],
+          allowFailure: false,
+        })
+
         if (Number(balance) === 0) {
           return null
         }
-        const decimals = await poolTokenContract.decimals()
-        const symbol = await poolTokenContract.symbol()
-        const token0Address = (await poolTokenContract.token0()).toLowerCase()
-        const token1Address = (await poolTokenContract.token1()).toLowerCase()
         const token0 = await getTokenInfo(
           network,
           token0Address,
@@ -123,14 +181,13 @@ export const ubeswapPlugin: AppPlugin = {
           token1Address,
           baseTokenPrices,
         )
-        const [reserve0, reserve1] = await poolTokenContract.getReserves()
-        const totalSupply = await poolTokenContract.totalSupply()
         const reserves = [
           Number(reserve0) / 10 ** token0.decimals,
           Number(reserve1) / 10 ** token1.decimals,
         ]
         const pricePerShare = reserves.map(
-          (r) => r / (totalSupply / 10 ** decimals),
+          // TODO: use BigNumber
+          (r) => r / (Number(totalSupply) / 10 ** decimals),
         )
         const priceUsd =
           Number(token0.priceUsd) * pricePerShare[0] +

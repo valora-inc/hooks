@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "private": true,
   "engines": {
-    "node": "^16"
+    "node": "^18"
   },
   "scripts": {
     "build": "tsc",
@@ -48,7 +48,7 @@
   "prettier": "@valora/prettier-config",
   "dependencies": {
     "@valora/exchanges": "^2.0.2",
-    "ethers": "^5.7.2",
-    "got": "^11.8.6"
+    "got": "^11.8.6",
+    "viem": "^0.1.22"
   }
 }
