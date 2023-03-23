@@ -17,9 +17,10 @@
     "lint:fix": "yarn lint --fix",
     "format": "prettier --loglevel error --write .",
     "format:check": "prettier --check .",
-    "test": "jest",
+    "test": "jest --selectProjects unit",
     "test:watch": "yarn test --watch",
-    "test:ci": "yarn test --ci --coverage",
+    "test:ci": "yarn jest --ci --coverage",
+    "test:e2e": "jest --selectProjects e2e",
     "supercheck": "yarn format && yarn lint:fix && yarn typecheck && yarn test",
     "getPositions": "ts-node ./scripts/getPositions.ts",
     "deploy": "echo 'Deployed!'"
