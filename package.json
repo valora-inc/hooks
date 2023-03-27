@@ -48,7 +48,7 @@
   "prettier": "@valora/prettier-config",
   "dependencies": {
     "@valora/exchanges": "^2.0.2",
-    "ethers": "^5.7.2",
+    "ethers": "^6.2.2",
     "got": "^11.8.6"
   }
 }
