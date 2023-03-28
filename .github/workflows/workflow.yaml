@@ -51,18 +51,33 @@ jobs:
       #     path: coverage/lcov-report
       # - name: 'Upload coverage to Codecov'
       #   uses: codecov/codecov-action@v3
-  deploy:
-    name: Deploy
+  publish:
+    name: Publish to NPM
     if: github.ref == 'refs/heads/main'
     needs:
+      - check-for-sh
       - lint
       - test
     runs-on: ubuntu-latest
     steps:
+      # actions/checkout MUST come before auth
       - uses: actions/checkout@v3
+      - id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.MAINNET_SERVICE_ACCOUNT_KEY }}
+      - id: google-secrets
+        uses: google-github-actions/get-secretmanager-secrets@v0
+        with:
+          secrets: |-
+            NPM_TOKEN:celo-mobile-mainnet/NPM_TOKEN
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
           check-latest: true
       - run: yarn
-      - run: yarn deploy
+      - run: yarn build
+      - run: yarn release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ steps.google-secrets.outputs.NPM_TOKEN }}
