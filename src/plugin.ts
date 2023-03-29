@@ -41,7 +41,7 @@ export interface AppTokenPosition extends AbstractPosition, AbstractToken {
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'
-
+  address: string
   // This would be derived from the underlying tokens
   balanceUsd: string
 }

@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import { ubeswapPlugin } from '../src/ubeswap/plugin'
 import yargs from 'yargs'
+import { Token } from '../src/plugin'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -21,6 +22,20 @@ const argv = yargs(process.argv.slice(2))
   })
   .parseSync()
 
+function breakdownToken(token: Token): string {
+  if (token.type === 'base-token') {
+    const priceUsd = Number(token.priceUsd)
+    const balance = Number(token.balance) / 10 ** token.decimals
+    const balanceUsd = Number(balance) * priceUsd
+    return `${balance.toFixed(2)} ${token.symbol} ($${balanceUsd.toFixed(
+      2,
+    )}) @ $${priceUsd?.toFixed(2)}`
+  } else {
+    // app-token
+    return token.tokens.map(breakdownToken).join(', ')
+  }
+}
+
 void (async () => {
   const positions = await ubeswapPlugin.getPositions(argv.network, argv.address)
   console.log('positions', JSON.stringify(positions, null, ' '))
@@ -31,25 +46,22 @@ void (async () => {
         const balanceDecimal =
           Number(position.balance) / 10 ** position.decimals
         return {
+          type: position.type,
           address: position.address,
           label: position.label,
           priceUsd: Number(position.priceUsd).toFixed(2),
           balance: balanceDecimal.toFixed(2),
           balanceUsd: (balanceDecimal * position.priceUsd).toFixed(2),
-          breakdown: position.tokens
-            .map((token) => {
-              const priceUsd = Number(token.priceUsd)
-              const balance = Number(token.balance) / 10 ** token.decimals
-              const balanceUsd = Number(balance) * priceUsd
-              return `${balance.toFixed(2)} ${
-                token.symbol
-              } ($${balanceUsd.toFixed(2)}) @ $${priceUsd?.toFixed(2)}`
-            })
-            .join(', '),
+          breakdown: position.tokens.map(breakdownToken).join(', '),
         }
       } else {
-        // TODO
-        return position
+        return {
+          type: position.type,
+          address: position.address,
+          label: position.label,
+          balanceUsd: Number(position.balanceUsd).toFixed(2),
+          breakdown: position.tokens.map(breakdownToken).join(', '),
+        }
       }
     }),
   )
