@@ -8,16 +8,9 @@ import {
 import got from 'got'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import { FarmInfoEventAbi } from './abis/farm-registry'
-import {
-  configs as exchangesConfigs,
-  createNewManager,
-  PriceByAddress,
-} from '@valora/exchanges'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../abis/erc-20'
-
-const FULL_NODE_URL = 'https://forno.celo.org'
 
 const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
 const FARM_CREATION_BLOCK = 9840049n
@@ -42,7 +35,7 @@ const PAIRS_QUERY = `
 async function getTokenInfo(
   network: string,
   address: Address,
-  baseTokenPrices: PriceByAddress,
+  baseTokensInfo: TokensInfo,
 ): Promise<Omit<BaseToken, 'balance'>> {
   const addressLower = address.toLowerCase()
   const tokenContract = {
@@ -68,7 +61,7 @@ async function getTokenInfo(
     address: addressLower,
     symbol,
     decimals,
-    priceUsd: Number(baseTokenPrices[addressLower]?.toString() ?? 0),
+    priceUsd: Number(baseTokensInfo[addressLower]?.usdPrice ?? 0),
   }
 }
 
@@ -88,28 +81,36 @@ function tokenWithUnderlyingBalance(
   }
 }
 
-let baseTokenPricesPromise: Promise<PriceByAddress> | undefined
+interface TokenInfo {
+  address: string
+  name: string
+  symbol: string
+  decimals: number
+  usdPrice?: string
+  imageUrl: string
+}
 
-async function getBaseTokenPrices() {
-  if (baseTokenPricesPromise) {
-    return baseTokenPricesPromise
+interface TokensInfo {
+  [address: string]: TokenInfo | undefined
+}
+
+let baseTokensInfoPromise: Promise<TokensInfo> | undefined
+
+async function getBaseTokensInfo() {
+  if (baseTokensInfoPromise) {
+    return baseTokensInfoPromise
   }
 
   // Get base token prices
   // console.log('Getting base token prices...')
-  const baseTokensPriceManager = createNewManager({
-    ...exchangesConfigs.mainnet,
-    fullNodeUrl: FULL_NODE_URL,
-    ubeswap: {
-      ...exchangesConfigs.mainnet.ubeswap,
-      minLiquidity: 10_000,
-      maxConcurrency: 10,
-    },
-  })
+  baseTokensInfoPromise = got
+    .get(
+      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getTokensInfo',
+    )
+    .json()
+    .then((data: any) => data?.tokens as TokensInfo)
 
-  baseTokenPricesPromise = baseTokensPriceManager.calculatecUSDPrices()
-
-  return baseTokenPricesPromise
+  return baseTokensInfoPromise
 }
 
 async function getPoolPosition(
@@ -169,9 +170,9 @@ async function getPoolPosition(
     return null
   }
   const balanceWithShare = Number(balance) * share
-  const baseTokenPrices = await getBaseTokenPrices()
-  const token0 = await getTokenInfo(network, token0Address, baseTokenPrices)
-  const token1 = await getTokenInfo(network, token1Address, baseTokenPrices)
+  const baseTokensInfo = await getBaseTokensInfo()
+  const token0 = await getTokenInfo(network, token0Address, baseTokensInfo)
+  const token1 = await getTokenInfo(network, token1Address, baseTokensInfo)
   const reserves = [
     Number(reserve0) / 10 ** token0.decimals,
     Number(reserve1) / 10 ** token1.decimals,
