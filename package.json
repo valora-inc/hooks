@@ -29,7 +29,6 @@
     "release": "semantic-release"
   },
   "dependencies": {
-    "@valora/exchanges": "^2.0.2",
     "got": "^11.8.6",
     "viem": "^0.1.22"
   },
