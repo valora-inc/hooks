@@ -28,6 +28,7 @@ const PAIRS_QUERY = `
         pair {
           id
         }
+        liquidityTokenBalance
       }
     }
   }
@@ -115,9 +116,9 @@ async function getPoolPositionDefinitions(
     })
     .json<any>()
 
-  const pairs: Address[] = data.user.liquidityPositions.map(
-    (position: any) => position.pair.id,
-  )
+  const pairs: Address[] = data.user.liquidityPositions
+    .filter((position: any) => Number(position.liquidityTokenBalance) > 0)
+    .map((position: any) => position.pair.id)
 
   // console.log({ pairs })
 
