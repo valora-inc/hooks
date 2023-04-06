@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "got": "^11.8.6",
-    "viem": "^0.1.26"
+    "viem": "^0.2.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
