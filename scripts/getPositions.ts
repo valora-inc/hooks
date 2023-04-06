@@ -1,8 +1,8 @@
 // Helper script to call the plugins and get the positions
 /* eslint-disable no-console */
-import { ubeswapPlugin } from '../src/ubeswap/plugin'
 import yargs from 'yargs'
 import { Token } from '../src/plugin'
+import { getPositions } from '../src/getPositions'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -37,7 +37,7 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await ubeswapPlugin.getPositions(argv.network, argv.address)
+  const positions = await getPositions(argv.network, argv.address)
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(

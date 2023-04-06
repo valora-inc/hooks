@@ -1,8 +1,54 @@
 // Plugin interface that authors will implement
 export interface AppPlugin {
   getInfo(): AppInfo
-  getPositions(network: string, address: string): Promise<Position[]>
+  // Get position definitions for a given address
+  getPositionDefinitions(
+    network: string,
+    address: string,
+  ): Promise<PositionDefinition[]>
+  // Get an app token definition from a token definition
+  getAppTokenDefinition(
+    tokenDefinition: TokenDefinition,
+  ): Promise<AppTokenPositionDefinition>
 }
+
+export interface TokenDefinition {
+  address: string
+  network: string
+}
+
+export interface LabelContext {
+  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+}
+
+export interface AbstractPositionDefinition {
+  network: string
+  address: string
+  label: ((context: LabelContext) => string) | string
+  tokens: TokenDefinition[]
+}
+
+export interface PricePerShareContext {
+  tokensByAddress: Record<string, Omit<AbstractToken, 'balance'>>
+}
+
+export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
+  type: 'app-token-definition'
+  pricePerShare: ((context: PricePerShareContext) => Promise<number[]>) | number[]
+}
+
+export interface BalancesContext {
+  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+}
+
+export interface ContractPositionDefinition extends AbstractPositionDefinition {
+  type: 'contract-position-definition'
+  balances: ((context: BalancesContext) => Promise<string[]>) | string[]
+}
+
+export type PositionDefinition =
+  | AppTokenPositionDefinition
+  | ContractPositionDefinition
 
 // Generic info about the app
 // Note: this could be used for dapp listing too

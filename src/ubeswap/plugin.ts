@@ -1,9 +1,10 @@
 import {
   AppPlugin,
   AppTokenPosition,
-  BaseToken,
-  ContractPosition,
-  Position,
+  AppTokenPositionDefinition,
+  ContractPositionDefinition,
+  PositionDefinition,
+  TokenDefinition,
 } from '../plugin'
 import got from 'got'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
@@ -32,120 +33,16 @@ const PAIRS_QUERY = `
   }
 `
 
-async function getTokenInfo(
-  network: string,
-  address: Address,
-  baseTokensInfo: TokensInfo,
-): Promise<Omit<BaseToken, 'balance'>> {
-  const addressLower = address.toLowerCase()
-  const tokenContract = {
-    address,
-    abi: erc20Abi,
-  } as const
-  const [symbol, decimals] = await client.multicall({
-    contracts: [
-      {
-        ...tokenContract,
-        functionName: 'symbol',
-      },
-      {
-        ...tokenContract,
-        functionName: 'decimals',
-      },
-    ],
-    allowFailure: false,
-  })
-  return {
-    type: 'base-token',
-    network,
-    address: addressLower,
-    symbol,
-    decimals,
-    priceUsd: Number(baseTokensInfo[addressLower]?.usdPrice ?? 0),
-  }
-}
-
-function tokenWithUnderlyingBalance(
-  token: Omit<BaseToken, 'balance'>,
-  decimals: number,
-  balance: string,
-  pricePerShare: number,
-) {
-  return {
-    ...token,
-    balance: (
-      (Number(balance) / 10 ** decimals) *
-      10 ** token.decimals *
-      pricePerShare
-    ).toFixed(0),
-  }
-}
-
-interface TokenInfo {
-  address: string
-  name: string
-  symbol: string
-  decimals: number
-  usdPrice?: string
-  imageUrl: string
-}
-
-interface TokensInfo {
-  [address: string]: TokenInfo | undefined
-}
-
-let baseTokensInfoPromise: Promise<TokensInfo> | undefined
-
-async function getBaseTokensInfo() {
-  if (baseTokensInfoPromise) {
-    return baseTokensInfoPromise
-  }
-
-  // Get base token prices
-  // console.log('Getting base token prices...')
-  baseTokensInfoPromise = got
-    .get(
-      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getTokensInfo',
-    )
-    .json()
-    .then((data: any) => data?.tokens as TokensInfo)
-
-  return baseTokensInfoPromise
-}
-
-async function getPoolPosition(
+async function getPoolPositionDefinition(
   network: string,
   poolAddress: Address,
-  depositorAddress: Address,
-  share = 1, // applies a share to the depositor's balance
-): Promise<AppTokenPosition | null> {
+): Promise<AppTokenPositionDefinition> {
   const poolTokenContract = {
     address: poolAddress,
     abi: uniswapV2PairAbi,
   } as const
-  const [
-    balance,
-    symbol,
-    decimals,
-    token0Address,
-    token1Address,
-    [reserve0, reserve1],
-    totalSupply,
-  ] = await client.multicall({
+  const [token0Address, token1Address] = await client.multicall({
     contracts: [
-      {
-        ...poolTokenContract,
-        functionName: 'balanceOf',
-        args: [depositorAddress],
-      },
-      {
-        ...poolTokenContract,
-        functionName: 'symbol',
-      },
-      {
-        ...poolTokenContract,
-        functionName: 'decimals',
-      },
       {
         ...poolTokenContract,
         functionName: 'token0',
@@ -154,66 +51,58 @@ async function getPoolPosition(
         ...poolTokenContract,
         functionName: 'token1',
       },
-      {
-        ...poolTokenContract,
-        functionName: 'getReserves',
-      },
-      {
-        ...poolTokenContract,
-        functionName: 'totalSupply',
-      },
     ],
     allowFailure: false,
   })
-
-  if (balance === 0n) {
-    return null
-  }
-  const balanceWithShare = Number(balance) * share
-  const baseTokensInfo = await getBaseTokensInfo()
-  const token0 = await getTokenInfo(network, token0Address, baseTokensInfo)
-  const token1 = await getTokenInfo(network, token1Address, baseTokensInfo)
-  const reserves = [
-    Number(reserve0) / 10 ** token0.decimals,
-    Number(reserve1) / 10 ** token1.decimals,
-  ]
-  const pricePerShare = reserves.map(
-    // TODO: use BigNumber
-    (r) => r / (Number(totalSupply) / 10 ** decimals),
-  )
-  const priceUsd =
-    Number(token0.priceUsd) * pricePerShare[0] +
-    Number(token1.priceUsd) * pricePerShare[1]
-
-  const position: AppTokenPosition = {
-    type: 'app-token',
+  const position: AppTokenPositionDefinition = {
+    type: 'app-token-definition',
     network,
-    address: poolAddress,
-    symbol,
-    decimals,
-    label: `Pool: ${token0.symbol} / ${token1.symbol}`,
-
-    tokens: [token0, token1].map((token, i) =>
-      tokenWithUnderlyingBalance(
-        token,
-        decimals,
-        balanceWithShare.toString(),
-        pricePerShare[i],
-      ),
-    ),
-    pricePerShare,
-    priceUsd,
-    balance: balanceWithShare.toString(),
-    supply: totalSupply.toString(),
+    address: poolAddress.toLowerCase(),
+    tokens: [token0Address, token1Address].map((token) => ({
+      address: token.toLowerCase(),
+      network,
+    })),
+    label: ({ resolvedTokens }) => {
+      const token0 = resolvedTokens[token0Address.toLowerCase()]
+      const token1 = resolvedTokens[token1Address.toLowerCase()]
+      return `Pool: ${token0.symbol} / ${token1.symbol}`
+    },
+    pricePerShare: async ({ tokensByAddress }) => {
+      const [[reserve0, reserve1], totalSupply] = await client.multicall({
+        contracts: [
+          {
+            ...poolTokenContract,
+            functionName: 'getReserves',
+          },
+          {
+            ...poolTokenContract,
+            functionName: 'totalSupply',
+          },
+        ],
+        allowFailure: false,
+      })
+      const poolToken = tokensByAddress[poolAddress.toLowerCase()]
+      const token0 = tokensByAddress[token0Address.toLowerCase()]
+      const token1 = tokensByAddress[token1Address.toLowerCase()]
+      const reserves = [
+        Number(reserve0) / 10 ** token0.decimals,
+        Number(reserve1) / 10 ** token1.decimals,
+      ]
+      const pricePerShare = reserves.map(
+        // TODO: use BigNumber
+        (r) => r / (Number(totalSupply) / 10 ** poolToken.decimals),
+      )
+      return pricePerShare
+    },
   }
 
   return position
 }
 
-async function getPoolPositions(
+async function getPoolPositionDefinitions(
   network: string,
   address: string,
-): Promise<Position[]> {
+): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
   const { data } = await got
     .post('https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap', {
@@ -235,17 +124,17 @@ async function getPoolPositions(
   // Get all positions
   const positions = await Promise.all(
     pairs.map(async (pair) => {
-      return getPoolPosition(network, pair, address as Address)
+      return getPoolPositionDefinition(network, pair)
     }),
   )
 
-  return positions.filter((p): p is Exclude<typeof p, null> => p !== null)
+  return positions
 }
 
-async function getFarmPositions(
+async function getFarmPositionDefinitions(
   network: string,
   address: string,
-): Promise<Position[]> {
+): Promise<PositionDefinition[]> {
   const farmInfoEvents = await client.getLogs({
     address: FARM_REGISTRY,
     event: FarmInfoEventAbi,
@@ -294,33 +183,46 @@ async function getFarmPositions(
 
   const positions = await Promise.all(
     userFarms.map(async (farm) => {
-      const pool = await getPoolPosition(
+      const position: ContractPositionDefinition = {
+        type: 'contract-position-definition',
         network,
-        farm.lpAddress.toLowerCase() as Address,
-        farm.stakingAddress.toLowerCase() as Address,
-        // TODO: use BigNumber
-        Number(farm.balance) / Number(farm.totalSupply),
-      )
-      if (!pool) {
-        return null
-      }
-
-      const balance = Number(pool.balance) / 10 ** pool.decimals
-      const balanceUsd = balance * pool.priceUsd
-
-      const position: ContractPosition = {
-        type: 'contract-position',
         address: farm.stakingAddress.toLowerCase(),
-        label: `Farm: ${pool.label}`,
-        tokens: [pool],
-        balanceUsd: balanceUsd.toString(),
+        tokens: [{ address: farm.lpAddress.toLowerCase(), network }],
+        label: ({ resolvedTokens }) => {
+          const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
+          return `Farm: ${(poolToken as AppTokenPosition).label}`
+        },
+        balances: async ({ resolvedTokens }) => {
+          const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
+          const share = Number(farm.balance) / Number(farm.totalSupply)
+
+          const poolContract = {
+            address: farm.lpAddress,
+            abi: erc20Abi,
+          } as const
+          const [poolBalance] = await client.multicall({
+            contracts: [
+              {
+                ...poolContract,
+                functionName: 'balanceOf',
+                args: [farm.stakingAddress],
+              },
+            ],
+            allowFailure: false,
+          })
+
+          const balance =
+            (share * Number(poolBalance)) / 10 ** poolToken.decimals
+
+          return [balance.toString()]
+        },
       }
 
       return position
     }),
   )
 
-  return positions.filter((p): p is Exclude<typeof p, null> => p !== null)
+  return positions
 }
 
 export const ubeswapPlugin: AppPlugin = {
@@ -331,11 +233,20 @@ export const ubeswapPlugin: AppPlugin = {
       description: 'Decentralized exchange on Celo',
     }
   },
-  async getPositions(network, address) {
-    // Don't yet fetch in parallel, as it ends up doing quite a few RPC calls
-    const poolPositions = await getPoolPositions(network, address)
-    const farmPositions = await getFarmPositions(network, address)
+  async getPositionDefinitions(network, address) {
+    const poolPositionDefinitions = await getPoolPositionDefinitions(
+      network,
+      address,
+    )
+    const farmPositionDefinitions = await getFarmPositionDefinitions(
+      network,
+      address,
+    )
 
-    return [...poolPositions, ...farmPositions]
+    return [...poolPositionDefinitions, ...farmPositionDefinitions]
+  },
+  getAppTokenDefinition({ network, address }: TokenDefinition) {
+    // Assume that the address is a pool address
+    return getPoolPositionDefinition(network, address as Address)
   },
 }
