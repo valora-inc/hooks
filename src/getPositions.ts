@@ -1,3 +1,5 @@
+// Allow console logs for now, since we're early in development
+/* eslint-disable no-console */
 import got from 'got'
 import { ubeswapPlugin } from './ubeswap/plugin'
 import {
@@ -251,7 +253,10 @@ async function resolveContractPosition(
 // This is the main logic to get positions
 export async function getPositions(network: string, address: string) {
   // First get all position definitions for the given address
-  const definitions = await ubeswapPlugin.getPositionDefinitions(network, address)
+  const definitions = await ubeswapPlugin.getPositionDefinitions(
+    network,
+    address,
+  )
   console.log('positions definitions', JSON.stringify(definitions, null, ' '))
 
   // Get the base tokens info
@@ -438,7 +443,9 @@ export async function getPositions(network: string, address: string) {
     const resolvedPosition = resolvedPositions[definition.address]
     // Sanity check
     if (!resolvedPosition) {
-      throw new Error(`Could not resolve ${definition.type}: ${definition.address}`)
+      throw new Error(
+        `Could not resolve ${definition.type}: ${definition.address}`,
+      )
     }
     return resolvedPosition
   })

@@ -34,7 +34,9 @@ export interface PricePerShareContext {
 
 export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
   type: 'app-token-definition'
-  pricePerShare: ((context: PricePerShareContext) => Promise<number[]>) | number[]
+  pricePerShare:
+    | ((context: PricePerShareContext) => Promise<number[]>)
+    | number[]
 }
 
 export interface BalancesContext {
