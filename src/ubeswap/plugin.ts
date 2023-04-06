@@ -235,16 +235,12 @@ export const ubeswapPlugin: AppPlugin = {
     }
   },
   async getPositionDefinitions(network, address) {
-    const poolPositionDefinitions = await getPoolPositionDefinitions(
-      network,
-      address,
-    )
-    const farmPositionDefinitions = await getFarmPositionDefinitions(
-      network,
-      address,
-    )
+    const [poolDefinitions, farmDefinitions] = await Promise.all([
+      getPoolPositionDefinitions(network, address),
+      getFarmPositionDefinitions(network, address),
+    ])
 
-    return [...poolPositionDefinitions, ...farmPositionDefinitions]
+    return [...poolDefinitions, ...farmDefinitions]
   },
   getAppTokenDefinition({ network, address }: TokenDefinition) {
     // Assume that the address is a pool address
