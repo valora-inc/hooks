@@ -9,7 +9,7 @@ import got from 'got'
 const USER_AGENT =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)'
 
-type PlayerResponse = {
+type PlayerGameResponse = {
   playerId: string
   gameId: string
   mostRecentSegmentPaid: number
@@ -107,7 +107,7 @@ export const halofiPlugin: AppPlugin = {
     }
   },
   async getPositionDefinitions(network, address) {
-    const [games, player] = await Promise.all([
+    const [games, playerGames] = await Promise.all([
       got
         .get('https://goodghosting-api.com/v1/games', {
           headers: { 'User-Agent': USER_AGENT },
@@ -121,18 +121,13 @@ export const halofiPlugin: AppPlugin = {
           },
           headers: { 'User-Agent': USER_AGENT },
         })
-        .json<PlayerResponse[]>(),
+        .json<PlayerGameResponse[]>(),
     ])
 
-    // console.log({ player })
-
-    // Find the games that the user is playing
-    const playerGames = player.map((p) => ({ ...p, game: games[p.gameId] }))
-
-    // console.log({ playerGames })
+    // console.log({ games, playerGames })
 
     return playerGames.map((playerGame) => {
-      const { game } = playerGame
+      const game = games[playerGame.gameId]
       const rewards = playerGame.rewards ?? []
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
