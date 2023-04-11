@@ -38,7 +38,11 @@ interface TokenInfo extends Omit<AbstractToken, 'balance'> {
 
 type TokensInfo = Record<string, TokenInfo | undefined>
 
-type DefinitionsByAddress = Record<string, PositionDefinition | undefined>
+type DefinitionsByAddress = Record<string, AppPositionDefinition | undefined>
+
+type AppPositionDefinition = PositionDefinition & {
+  appId: string
+}
 
 const client = createPublicClient({
   chain: celo,
@@ -144,7 +148,7 @@ function getLabel(
 
 async function resolveAppTokenPosition(
   address: string,
-  positionDefinition: AppTokenPositionDefinition,
+  positionDefinition: AppTokenPositionDefinition & { appId: string },
   tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
 ): Promise<AppTokenPosition> {
@@ -189,6 +193,7 @@ async function resolveAppTokenPosition(
     type: 'app-token',
     network: positionDefinition.network,
     address: positionDefinition.address,
+    appId: positionDefinition.appId,
     symbol: positionTokenInfo.symbol,
     decimals: positionTokenInfo.decimals,
     label: getLabel(positionDefinition, resolvedTokens),
@@ -211,7 +216,7 @@ async function resolveAppTokenPosition(
 
 async function resolveContractPosition(
   _address: string,
-  positionDefinition: ContractPositionDefinition,
+  positionDefinition: ContractPositionDefinition & { appId: string },
   _tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
 ): Promise<ContractPosition> {
@@ -243,6 +248,8 @@ async function resolveContractPosition(
   const position: ContractPosition = {
     type: 'contract-position',
     address: positionDefinition.address,
+    network: positionDefinition.network,
+    appId: positionDefinition.appId,
     label: getLabel(positionDefinition, resolvedTokens),
     tokens: tokens,
     balanceUsd: balanceUsd.toString(),
@@ -251,12 +258,22 @@ async function resolveContractPosition(
   return position
 }
 
+function addAppId<T>(definition: T, appId: string) {
+  return {
+    ...definition,
+    appId,
+  }
+}
+
 // This is the main logic to get positions
 export async function getPositions(network: string, address: string) {
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     [ubeswapPlugin, halofiPlugin].map((plugin) =>
-      plugin.getPositionDefinitions(network, address),
+      plugin.getPositionDefinitions(network, address).then((definitions) => {
+        const appId = plugin.getInfo().id
+        return definitions.map((definition) => addAppId(definition, appId))
+      }),
     ),
   ).then((definitions) => definitions.flat())
   console.log('positions definitions', JSON.stringify(definitions, null, ' '))
@@ -265,7 +282,7 @@ export async function getPositions(network: string, address: string) {
   const baseTokensInfo = await getBaseTokensInfo()
 
   let unlistedBaseTokensInfo: TokensInfo = {}
-  let definitionsToResolve: PositionDefinition[] = definitions
+  let definitionsToResolve: AppPositionDefinition[] = definitions
   const visitedDefinitions: DefinitionsByAddress = {}
   while (true) {
     // Visit each definition we haven't visited yet
@@ -312,8 +329,12 @@ export async function getPositions(network: string, address: string) {
         unresolvedTokenDefinitions.map(async (tokenDefinition) => {
           try {
             // Assume the token is an app token from the plugin
-            const appTokenDefinition =
-              await ubeswapPlugin.getAppTokenDefinition(tokenDefinition)
+            // TODO: use the right plugin
+            const appTokenDefinition = await ubeswapPlugin
+              .getAppTokenDefinition(tokenDefinition)
+              .then((definition) =>
+                addAppId(definition, ubeswapPlugin.getInfo().id),
+              )
             return appTokenDefinition
           } catch (e) {
             if (e instanceof ContractFunctionExecutionError) {

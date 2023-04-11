@@ -61,6 +61,9 @@ export interface AppInfo {
 }
 
 export interface AbstractPosition {
+  address: string // Example: 0x...
+  network: string // Example: celo
+  appId: string // Example: ubeswap
   label: string // Example: Pool
   tokens: Token[]
 }
@@ -89,7 +92,6 @@ export interface AppTokenPosition extends AbstractPosition, AbstractToken {
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'
-  address: string
   // This would be derived from the underlying tokens
   balanceUsd: string
 }

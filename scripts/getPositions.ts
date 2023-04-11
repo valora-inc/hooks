@@ -46,8 +46,10 @@ void (async () => {
         const balanceDecimal =
           Number(position.balance) / 10 ** position.decimals
         return {
+          appId: position.appId,
           type: position.type,
           address: position.address,
+          network: position.network,
           label: position.label,
           priceUsd: Number(position.priceUsd).toFixed(2),
           balance: balanceDecimal.toFixed(2),
@@ -56,8 +58,10 @@ void (async () => {
         }
       } else {
         return {
+          appId: position.appId,
           type: position.type,
           address: position.address,
+          network: position.network,
           label: position.label,
           balanceUsd: Number(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
