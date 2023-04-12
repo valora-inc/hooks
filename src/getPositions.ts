@@ -21,6 +21,7 @@ import {
   PricePerShareContext,
   Token,
 } from './plugin'
+import { halofiPlugin } from './halofi/plugin'
 
 interface RawTokenInfo {
   address: string
@@ -253,10 +254,11 @@ async function resolveContractPosition(
 // This is the main logic to get positions
 export async function getPositions(network: string, address: string) {
   // First get all position definitions for the given address
-  const definitions = await ubeswapPlugin.getPositionDefinitions(
-    network,
-    address,
-  )
+  const definitions = await Promise.all(
+    [ubeswapPlugin, halofiPlugin].map((plugin) =>
+      plugin.getPositionDefinitions(network, address),
+    ),
+  ).then((definitions) => definitions.flat())
   console.log('positions definitions', JSON.stringify(definitions, null, ' '))
 
   // Get the base tokens info
