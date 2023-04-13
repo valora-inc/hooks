@@ -28,7 +28,7 @@ describe('getPositions', () => {
       getPositions('celo', '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d', [
         'does-not-exist',
       ]),
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       /No app with id 'does-not-exist' found, available apps: \w+/,
     )
   })
