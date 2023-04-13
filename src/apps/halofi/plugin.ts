@@ -98,7 +98,7 @@ type Reward = {
   type: string
 }
 
-export const halofiPlugin: AppPlugin = {
+const plugin: AppPlugin = {
   getInfo() {
     return {
       id: 'halofi',
@@ -157,3 +157,5 @@ export const halofiPlugin: AppPlugin = {
     throw new Error('Not implemented')
   },
 }
+
+export default plugin

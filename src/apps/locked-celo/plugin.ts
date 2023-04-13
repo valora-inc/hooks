@@ -32,7 +32,7 @@ function zip<A, B>(as: readonly A[], bs: readonly B[]) {
   return res
 }
 
-export const lockedCeloPlugin: AppPlugin = {
+const plugin: AppPlugin = {
   getInfo() {
     return {
       id: 'locked-celo',
@@ -114,3 +114,5 @@ export const lockedCeloPlugin: AppPlugin = {
     throw new Error('Not implemented')
   },
 }
+
+export default plugin

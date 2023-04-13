@@ -226,7 +226,7 @@ async function getFarmPositionDefinitions(
   return positions
 }
 
-export const ubeswapPlugin: AppPlugin = {
+const plugin: AppPlugin = {
   getInfo() {
     return {
       id: 'ubeswap',
@@ -247,3 +247,5 @@ export const ubeswapPlugin: AppPlugin = {
     return getPoolPositionDefinition(network, address as Address)
   },
 }
+
+export default plugin
