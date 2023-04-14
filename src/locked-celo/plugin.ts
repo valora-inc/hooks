@@ -36,7 +36,7 @@ export const lockedCeloPlugin: AppPlugin = {
   getInfo() {
     return {
       id: 'locked-celo',
-      name: 'Locked Celo',
+      name: 'Locked CELO',
       description: '',
     }
   },
