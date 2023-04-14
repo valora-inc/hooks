@@ -22,16 +22,12 @@ const client = createPublicClient({
   transport: http(),
 })
 
-function zip<A, B, C>(
-  fn: (a: A, b: B) => C,
-  as: readonly A[],
-  bs: readonly B[],
-) {
+function zip<A, B>(as: readonly A[], bs: readonly B[]) {
   const len = Math.min(as.length, bs.length)
-  const res: C[] = []
+  const res: [A, B][] = []
 
   for (let i = 0; i < len; i++) {
-    res.push(fn(as[i], bs[i]))
+    res.push([as[i], bs[i]])
   }
   return res
 }
@@ -67,27 +63,23 @@ export const lockedCeloPlugin: AppPlugin = {
         allowFailure: false,
       })
       .catch((e) => {
+        // getPendingWithdrawals reverts if the address hasn't locked anything
+        // so we just return an empty array
         if (e instanceof ContractFunctionExecutionError) {
           return [0n, [[], []]] as const
         }
         throw e
       })
 
-    // console.log({ totalLockedCelo, pendingWithdrawalsRaw })
-
     const pendingWithdrawals = zip(
-      (time, value): PendingWithdrawal => ({
-        time,
-        value,
-      }),
       pendingWithdrawalsRaw[1],
       pendingWithdrawalsRaw[0],
-    )
+    ).map(([time, value]): PendingWithdrawal => ({ time, value }))
 
     let totalCeloUnlocking = 0n
     let totalCeloWithdrawable = 0n
 
-    const currentTime = Math.round(new Date().getTime() / 1000)
+    const currentTime = Date.now() / 1000
     for (let i = 0; i < pendingWithdrawals.length; i++) {
       const currentWithdrawal = pendingWithdrawals[i]
 
@@ -97,8 +89,6 @@ export const lockedCeloPlugin: AppPlugin = {
         totalCeloUnlocking = totalCeloUnlocking + currentWithdrawal.value
       }
     }
-
-    // console.log({ totalCeloUnlocking, totalCeloWithdrawable })
 
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
