@@ -19,6 +19,16 @@ const argv = yargs(process.argv.slice(2))
       type: 'string',
       demandOption: true,
     },
+    apps: {
+      alias: 'p',
+      describe: 'App IDs to get positions for, defaults to all',
+      type: 'array',
+      default: [],
+      // Allows comma separated values
+      coerce: (array: string[]) => {
+        return array.flatMap((v) => v.split(','))
+      },
+    },
   })
   .parseSync()
 
@@ -37,7 +47,7 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await getPositions(argv.network, argv.address)
+  const positions = await getPositions(argv.network, argv.address, argv.apps)
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(

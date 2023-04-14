@@ -1,7 +1,9 @@
 // Allow console logs for now, since we're early in development
 /* eslint-disable no-console */
+import { promises as fs } from 'fs'
+import path from 'path'
 import got from 'got'
-import { ubeswapPlugin } from './apps/ubeswap/plugin'
+import ubeswapPlugin from './apps/ubeswap/plugin'
 import {
   Address,
   ContractFunctionExecutionError,
@@ -12,6 +14,7 @@ import { celo } from '@wagmi/chains'
 import { erc20Abi } from './abis/erc-20'
 import {
   AbstractToken,
+  AppPlugin,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPosition,
@@ -21,8 +24,6 @@ import {
   PricePerShareContext,
   Token,
 } from './plugin'
-import { halofiPlugin } from './apps/halofi/plugin'
-import { lockedCeloPlugin } from './apps/locked-celo/plugin'
 
 interface RawTokenInfo {
   address: string
@@ -49,6 +50,43 @@ const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
+
+const APP_ID_PATTERN = /^[a-zA-Z0-9-]+$/
+
+async function getAllAppIds(): Promise<string[]> {
+  // Read all folders from the "apps" folder
+  const files = await fs.readdir(path.join(__dirname, 'apps'), {
+    withFileTypes: true,
+  })
+  const folders = files.filter((file) => file.isDirectory())
+  // Check that all folders are valid app ids
+  for (const folder of folders) {
+    if (!APP_ID_PATTERN.test(folder.name)) {
+      throw new Error(
+        `Invalid app id: '${folder.name}', must match ${APP_ID_PATTERN}`,
+      )
+    }
+  }
+  return folders.map((folder) => folder.name)
+}
+
+async function getPlugins(appIds: string[]): Promise<AppPlugin[]> {
+  const allAppIds = await getAllAppIds()
+  const plugins: AppPlugin[] = []
+  const appIdsToLoad = appIds.length === 0 ? allAppIds : appIds
+  for (const appId of appIdsToLoad) {
+    if (!allAppIds.includes(appId)) {
+      throw new Error(
+        `No app with id '${appId}' found, available apps: ${allAppIds.join(
+          ', ',
+        )}`,
+      )
+    }
+    const plugin = await import(`./apps/${appId}/plugin`)
+    plugins.push(plugin.default)
+  }
+  return plugins
+}
 
 async function getBaseTokensInfo(): Promise<TokensInfo> {
   // Get base tokens
@@ -267,10 +305,16 @@ function addAppId<T>(definition: T, appId: string) {
 }
 
 // This is the main logic to get positions
-export async function getPositions(network: string, address: string) {
+export async function getPositions(
+  network: string,
+  address: string,
+  appIds: string[] = [],
+) {
+  const plugins = await getPlugins(appIds)
+
   // First get all position definitions for the given address
   const definitions = await Promise.all(
-    [ubeswapPlugin, halofiPlugin, lockedCeloPlugin].map((plugin) =>
+    plugins.map((plugin) =>
       plugin.getPositionDefinitions(network, address).then((definitions) => {
         const appId = plugin.getInfo().id
         return definitions.map((definition) => addAppId(definition, appId))

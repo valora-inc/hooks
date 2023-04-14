@@ -1,8 +1,8 @@
-import { lockedCeloPlugin } from './plugin'
+import plugin from './plugin'
 
 describe('getPositionDefinitions', () => {
   it('should get the address definitions successfully', async () => {
-    const positions = await lockedCeloPlugin.getPositionDefinitions(
+    const positions = await plugin.getPositionDefinitions(
       'celo',
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
