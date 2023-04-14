@@ -1,4 +1,4 @@
-import { toDecimalNumber } from '../../numbers'
+import { toDecimalNumber, toSerializedDecimalNumber } from '../../numbers'
 import {
   AppPlugin,
   ContractPositionDefinition,

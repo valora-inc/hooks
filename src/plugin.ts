@@ -1,4 +1,4 @@
-import { DecimalNumber, Integer } from './numbers'
+import { DecimalNumber, SerializedDecimalNumber } from './numbers'
 
 // Plugin interface that authors will implement
 export interface AppPlugin {
@@ -79,8 +79,8 @@ export interface AbstractToken {
   // These would be resolved dynamically
   symbol: string // Example: cUSD
   decimals: number // Example: 18
-  priceUsd: DecimalNumber // Example: "1.5"
-  balance: Integer // Example: "2000000000000", would be negative for debt
+  priceUsd: SerializedDecimalNumber // Example: "1.5"
+  balance: SerializedDecimalNumber // Example: "200", would be negative for debt
 }
 
 export interface BaseToken extends AbstractToken {
@@ -89,15 +89,15 @@ export interface BaseToken extends AbstractToken {
 
 export interface AppTokenPosition extends AbstractPosition, AbstractToken {
   type: 'app-token'
-  supply: Integer // Example: "1000000000000000000000000"
+  supply: SerializedDecimalNumber // Example: "1000"
   // Price ratio between the token and underlying token(s)
-  pricePerShare: DecimalNumber[]
+  pricePerShare: SerializedDecimalNumber[]
 }
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'
   // This would be derived from the underlying tokens
-  balanceUsd: DecimalNumber
+  balanceUsd: SerializedDecimalNumber
 }
 
 export type Token = BaseToken | AppTokenPosition

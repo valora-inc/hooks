@@ -4,7 +4,7 @@ import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/plugin'
 import { getPositions } from '../src/getPositions'
-import { toBigDecimal } from '../src/numbers'
+import { toDecimalNumber } from '../src/numbers'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -37,7 +37,7 @@ const argv = yargs(process.argv.slice(2))
 function breakdownToken(token: Token): string {
   if (token.type === 'base-token') {
     const priceUsd = new BigNumber(token.priceUsd)
-    const balance = toBigDecimal(BigInt(token.balance), token.decimals)
+    const balance = new BigNumber(token.balance)
     const balanceUsd = balance.times(priceUsd)
     return `${balance.toFixed(2)} ${token.symbol} ($${balanceUsd.toFixed(
       2,
@@ -55,10 +55,7 @@ void (async () => {
   console.table(
     positions.map((position) => {
       if (position.type === 'app-token') {
-        const balanceDecimal = toBigDecimal(
-          BigInt(position.balance),
-          position.decimals,
-        )
+        const balance = new BigNumber(position.balance)
         return {
           appId: position.appId,
           type: position.type,
@@ -66,8 +63,8 @@ void (async () => {
           network: position.network,
           label: position.label,
           priceUsd: new BigNumber(position.priceUsd).toFixed(2),
-          balance: balanceDecimal.toFixed(2),
-          balanceUsd: balanceDecimal.times(position.priceUsd).toFixed(2),
+          balance: balance.toFixed(2),
+          balanceUsd: balance.times(position.priceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
         }
       } else {

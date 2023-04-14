@@ -3,23 +3,34 @@ import BigNumber from 'bignumber.js'
 // Branded types for numbers to avoid confusion between different number types serialized as strings
 
 // Decimal number serialized as a string
-export type DecimalNumber = string & { __decimalNumberBrand: never }
-
-// Integer number serialized as a string
-export type Integer = string & { __integerBrand: never }
-
-export function toInteger(value: bigint): Integer {
-  return value.toString() as Integer
+export type SerializedDecimalNumber = string & {
+  __serializedDecimalNumberBrand: never
 }
 
-export function toDecimalNumber(value: BigNumber.Value): DecimalNumber {
-  return new BigNumber(value).toString() as DecimalNumber
+// Decimal number stored as a BigNumber
+export type DecimalNumber = BigNumber & { __decimalNumberBrand: never }
+
+export function toSerializedDecimalNumber(
+  value: BigNumber.Value,
+): SerializedDecimalNumber {
+  return (
+    new BigNumber(value)
+      // Use a maximum of 20 decimals, to avoid very long serialized numbers
+      .decimalPlaces(20)
+      .toString() as SerializedDecimalNumber
+  )
 }
 
+export function toDecimalNumber(value: BigNumber.Value): DecimalNumber
 // Convert bigint balances from ERC20 contracts to decimal numbers
-export function toBigDecimal(
-  value: bigint,
-  decimals: number,
-): BigNumber.Instance {
-  return new BigNumber(value.toString()).div(new BigNumber(10).pow(decimals))
+export function toDecimalNumber(value: bigint, decimals: number): DecimalNumber
+export function toDecimalNumber(
+  ...args: [BigNumber.Value] | [bigint, number]
+): DecimalNumber {
+  if (args.length === 1) {
+    return new BigNumber(args[0]) as DecimalNumber
+  }
+
+  const [value, decimals] = args
+  return new BigNumber(value.toString()).shiftedBy(-decimals) as DecimalNumber
 }
