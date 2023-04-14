@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 // Branded types for numbers to avoid confusion between different number types serialized as strings
+// This means numbers (bigint,number,BigNumber) will need to be explicitly converted to match the needed type declared
 
 // Decimal number serialized as a string
 export type SerializedDecimalNumber = string & {
