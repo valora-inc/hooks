@@ -22,6 +22,7 @@ import {
   Token,
 } from './plugin'
 import { halofiPlugin } from './halofi/plugin'
+import { lockedCeloPlugin } from './locked-celo/plugin'
 
 interface RawTokenInfo {
   address: string
@@ -269,7 +270,7 @@ function addAppId<T>(definition: T, appId: string) {
 export async function getPositions(network: string, address: string) {
   // First get all position definitions for the given address
   const definitions = await Promise.all(
-    [ubeswapPlugin, halofiPlugin].map((plugin) =>
+    [ubeswapPlugin, halofiPlugin, lockedCeloPlugin].map((plugin) =>
       plugin.getPositionDefinitions(network, address).then((definitions) => {
         const appId = plugin.getInfo().id
         return definitions.map((definition) => addAppId(definition, appId))
