@@ -27,7 +27,6 @@ import {
 } from './plugin'
 import {
   DecimalNumber,
-  SerializedDecimalNumber,
   toDecimalNumber,
   toSerializedDecimalNumber,
 } from './numbers'

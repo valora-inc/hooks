@@ -4,7 +4,6 @@ import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/plugin'
 import { getPositions } from '../src/getPositions'
-import { toDecimalNumber } from '../src/numbers'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
