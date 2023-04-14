@@ -7,11 +7,13 @@ import {
   TokenDefinition,
 } from '../../plugin'
 import got from 'got'
+import BigNumber from 'bignumber.js'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import { FarmInfoEventAbi } from './abis/farm-registry'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
+import { toBigDecimal, toDecimalNumber } from '../../numbers'
 
 const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
 const FARM_CREATION_BLOCK = 9840049n
@@ -86,13 +88,11 @@ async function getPoolPositionDefinition(
       const token0 = tokensByAddress[token0Address.toLowerCase()]
       const token1 = tokensByAddress[token1Address.toLowerCase()]
       const reserves = [
-        Number(reserve0) / 10 ** token0.decimals,
-        Number(reserve1) / 10 ** token1.decimals,
+        toBigDecimal(reserve0, token0.decimals),
+        toBigDecimal(reserve1, token1.decimals),
       ]
-      const pricePerShare = reserves.map(
-        // TODO: use BigNumber
-        (r) => r / (Number(totalSupply) / 10 ** poolToken.decimals),
-      )
+      const supply = toBigDecimal(totalSupply, poolToken.decimals)
+      const pricePerShare = reserves.map((r) => toDecimalNumber(r.div(supply)))
       return pricePerShare
     },
   }
@@ -195,7 +195,9 @@ async function getFarmPositionDefinitions(
         },
         balances: async ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
-          const share = Number(farm.balance) / Number(farm.totalSupply)
+          const share = new BigNumber(farm.balance.toString()).div(
+            farm.totalSupply.toString(),
+          )
 
           const poolContract = {
             address: farm.lpAddress,
@@ -212,10 +214,11 @@ async function getFarmPositionDefinitions(
             allowFailure: false,
           })
 
-          const balance =
-            (share * Number(poolBalance)) / 10 ** poolToken.decimals
+          const balance = share.times(
+            toBigDecimal(poolBalance, poolToken.decimals),
+          )
 
-          return [balance.toString()]
+          return [toDecimalNumber(balance)]
         },
       }
 

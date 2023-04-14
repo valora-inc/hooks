@@ -3,6 +3,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import got from 'got'
+import BigNumber from 'bignumber.js'
 import ubeswapPlugin from './apps/ubeswap/plugin'
 import {
   Address,
@@ -24,6 +25,12 @@ import {
   PricePerShareContext,
   Token,
 } from './plugin'
+import {
+  DecimalNumber,
+  toBigDecimal,
+  toDecimalNumber,
+  toInteger,
+} from './numbers'
 
 interface RawTokenInfo {
   address: string
@@ -106,7 +113,7 @@ async function getBaseTokensInfo(): Promise<TokensInfo> {
       symbol: tokenInfo.symbol,
       decimals: tokenInfo.decimals,
       imageUrl: tokenInfo.imageUrl,
-      priceUsd: tokenInfo.usdPrice ? Number(tokenInfo.usdPrice) : 0,
+      priceUsd: toDecimalNumber(tokenInfo.usdPrice ?? 0),
     }
   }
   return tokensInfo
@@ -137,21 +144,16 @@ async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
     symbol: symbol,
     decimals: decimals,
     imageUrl: '',
-    priceUsd: 0, // Should we use undefined?
+    priceUsd: toDecimalNumber(0), // Should we use undefined?
   }
 }
 
 function tokenWithUnderlyingBalance<T extends Token>(
   token: Omit<T, 'balance'>,
-  decimals: number,
-  balance: string,
-  pricePerShare: number,
+  balance: DecimalNumber,
+  pricePerShare: DecimalNumber,
 ): T {
-  const underlyingBalance = (
-    (Number(balance) / 10 ** decimals) *
-    10 ** token.decimals *
-    pricePerShare
-  ).toFixed(0)
+  const underlyingBalance = new BigNumber(balance).times(pricePerShare)
 
   const appToken =
     token.type === 'app-token'
@@ -164,13 +166,18 @@ function tokenWithUnderlyingBalance<T extends Token>(
       tokens: appToken.tokens.map((underlyingToken, i) => {
         return tokenWithUnderlyingBalance(
           underlyingToken,
-          token.decimals,
-          underlyingBalance,
+          toDecimalNumber(underlyingBalance),
           appToken.pricePerShare[i],
         )
       }),
     }),
-    balance: underlyingBalance,
+    balance: toInteger(
+      BigInt(
+        underlyingBalance
+          .times(new BigNumber(10).pow(token.decimals))
+          .toFixed(0),
+      ),
+    ),
   } as T
 }
 
@@ -191,7 +198,7 @@ async function resolveAppTokenPosition(
   tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
 ): Promise<AppTokenPosition> {
-  let pricePerShare: number[]
+  let pricePerShare: DecimalNumber[]
   if (typeof positionDefinition.pricePerShare === 'function') {
     pricePerShare = await positionDefinition.pricePerShare({
       tokensByAddress,
@@ -200,11 +207,11 @@ async function resolveAppTokenPosition(
     pricePerShare = positionDefinition.pricePerShare
   }
 
-  let priceUsd = 0
+  let priceUsd = new BigNumber(0)
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
     const tokenInfo = tokensByAddress[token.address]!
-    priceUsd += Number(tokenInfo.priceUsd) * pricePerShare[i]
+    priceUsd = priceUsd.plus(tokenInfo.priceUsd).times(pricePerShare[i])
   }
 
   const positionTokenInfo = tokensByAddress[positionDefinition.address]!
@@ -239,15 +246,14 @@ async function resolveAppTokenPosition(
     tokens: positionDefinition.tokens.map((token, i) =>
       tokenWithUnderlyingBalance(
         resolvedTokens[token.address],
-        positionTokenInfo.decimals,
-        balance.toString(),
+        toDecimalNumber(toBigDecimal(balance, positionTokenInfo.decimals)),
         pricePerShare[i],
       ),
     ),
     pricePerShare,
-    priceUsd,
-    balance: balance.toString(),
-    supply: totalSupply.toString(),
+    priceUsd: toDecimalNumber(priceUsd),
+    balance: toInteger(balance),
+    supply: toInteger(totalSupply),
   }
 
   return position
@@ -259,7 +265,7 @@ async function resolveContractPosition(
   _tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
 ): Promise<ContractPosition> {
-  let balances: string[]
+  let balances: DecimalNumber[]
   if (typeof positionDefinition.balances === 'function') {
     balances = await positionDefinition.balances({
       resolvedTokens,
@@ -271,17 +277,16 @@ async function resolveContractPosition(
   const tokens = positionDefinition.tokens.map((token, i) =>
     tokenWithUnderlyingBalance(
       resolvedTokens[token.address],
-      0, // This balance is already in the correct decimals
       balances[i],
-      1,
+      toDecimalNumber(1),
     ),
   )
 
-  let balanceUsd = 0
+  let balanceUsd = new BigNumber(0)
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
     const tokenInfo = resolvedTokens[token.address]
-    balanceUsd += Number(balances[i]) * tokenInfo.priceUsd
+    balanceUsd = balanceUsd.plus(balances[i]).times(tokenInfo.priceUsd)
   }
 
   const position: ContractPosition = {
@@ -291,7 +296,7 @@ async function resolveContractPosition(
     appId: positionDefinition.appId,
     label: getLabel(positionDefinition, resolvedTokens),
     tokens: tokens,
-    balanceUsd: balanceUsd.toString(),
+    balanceUsd: toDecimalNumber(balanceUsd),
   }
 
   return position

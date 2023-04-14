@@ -1,8 +1,10 @@
 // Helper script to call the plugins and get the positions
 /* eslint-disable no-console */
 import yargs from 'yargs'
+import BigNumber from 'bignumber.js'
 import { Token } from '../src/plugin'
 import { getPositions } from '../src/getPositions'
+import { toBigDecimal } from '../src/numbers'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -34,9 +36,9 @@ const argv = yargs(process.argv.slice(2))
 
 function breakdownToken(token: Token): string {
   if (token.type === 'base-token') {
-    const priceUsd = Number(token.priceUsd)
-    const balance = Number(token.balance) / 10 ** token.decimals
-    const balanceUsd = Number(balance) * priceUsd
+    const priceUsd = new BigNumber(token.priceUsd)
+    const balance = toBigDecimal(BigInt(token.balance), token.decimals)
+    const balanceUsd = balance.times(priceUsd)
     return `${balance.toFixed(2)} ${token.symbol} ($${balanceUsd.toFixed(
       2,
     )}) @ $${priceUsd?.toFixed(2)}`
@@ -53,17 +55,19 @@ void (async () => {
   console.table(
     positions.map((position) => {
       if (position.type === 'app-token') {
-        const balanceDecimal =
-          Number(position.balance) / 10 ** position.decimals
+        const balanceDecimal = toBigDecimal(
+          BigInt(position.balance),
+          position.decimals,
+        )
         return {
           appId: position.appId,
           type: position.type,
           address: position.address,
           network: position.network,
           label: position.label,
-          priceUsd: Number(position.priceUsd).toFixed(2),
+          priceUsd: new BigNumber(position.priceUsd).toFixed(2),
           balance: balanceDecimal.toFixed(2),
-          balanceUsd: (balanceDecimal * position.priceUsd).toFixed(2),
+          balanceUsd: balanceDecimal.times(position.priceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
         }
       } else {
@@ -73,7 +77,7 @@ void (async () => {
           address: position.address,
           network: position.network,
           label: position.label,
-          balanceUsd: Number(position.balanceUsd).toFixed(2),
+          balanceUsd: new BigNumber(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
         }
       }

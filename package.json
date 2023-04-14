@@ -29,6 +29,7 @@
     "release": "semantic-release"
   },
   "dependencies": {
+    "bignumber.js": "^9.1.1",
     "got": "^11.8.6",
     "viem": "^0.2.14"
   },

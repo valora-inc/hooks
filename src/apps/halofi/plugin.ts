@@ -1,3 +1,4 @@
+import { toDecimalNumber } from '../../numbers'
 import {
   AppPlugin,
   ContractPositionDefinition,
@@ -146,7 +147,7 @@ const plugin: AppPlugin = {
             playerGame.paidAmount,
             // Some of these are claimable rewards
             ...rewards.map((reward) => reward.balance),
-          ]
+          ].map(toDecimalNumber)
         },
       }
       return position

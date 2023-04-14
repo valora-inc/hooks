@@ -7,10 +7,11 @@ import {
 } from 'viem'
 import { celo } from 'viem/chains'
 import { LockedGoldAbi } from './abis/locked-gold'
+import { toBigDecimal, toDecimalNumber } from '../../numbers'
 
 const CELO_ADDRESS = '0x471ece3750da237f93b8e339c536989b8978a438'
 const LOCKED_GOLD_ADDRESS = '0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e'
-const ONE_WEI = 1e18
+const CELO_DECIMALS = 18
 
 interface PendingWithdrawal {
   time: bigint
@@ -98,11 +99,12 @@ const plugin: AppPlugin = {
       label: 'Locked CELO',
       balances: async () => {
         return [
-          (
-            Number(
+          toDecimalNumber(
+            toBigDecimal(
               totalLockedCelo + totalCeloUnlocking + totalCeloWithdrawable,
-            ) / ONE_WEI
-          ).toString(),
+              CELO_DECIMALS,
+            ),
+          ),
         ]
       },
     }
