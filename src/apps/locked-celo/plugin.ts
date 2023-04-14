@@ -1,4 +1,4 @@
-import { AppPlugin, ContractPositionDefinition } from '../plugin'
+import { AppPlugin, ContractPositionDefinition } from '../../plugin'
 import {
   Address,
   ContractFunctionExecutionError,

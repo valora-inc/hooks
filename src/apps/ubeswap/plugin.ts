@@ -5,13 +5,13 @@ import {
   ContractPositionDefinition,
   PositionDefinition,
   TokenDefinition,
-} from '../plugin'
+} from '../../plugin'
 import got from 'got'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import { FarmInfoEventAbi } from './abis/farm-registry'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
-import { erc20Abi } from '../abis/erc-20'
+import { erc20Abi } from '../../abis/erc-20'
 
 const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
 const FARM_CREATION_BLOCK = 9840049n

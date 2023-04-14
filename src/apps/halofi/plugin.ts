@@ -2,7 +2,7 @@ import {
   AppPlugin,
   ContractPositionDefinition,
   TokenDefinition,
-} from '../plugin'
+} from '../../plugin'
 import got from 'got'
 
 // User-Agent header is required by the HaloFi API

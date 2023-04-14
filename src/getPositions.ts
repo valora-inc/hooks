@@ -1,7 +1,7 @@
 // Allow console logs for now, since we're early in development
 /* eslint-disable no-console */
 import got from 'got'
-import { ubeswapPlugin } from './ubeswap/plugin'
+import { ubeswapPlugin } from './apps/ubeswap/plugin'
 import {
   Address,
   ContractFunctionExecutionError,
@@ -21,8 +21,8 @@ import {
   PricePerShareContext,
   Token,
 } from './plugin'
-import { halofiPlugin } from './halofi/plugin'
-import { lockedCeloPlugin } from './locked-celo/plugin'
+import { halofiPlugin } from './apps/halofi/plugin'
+import { lockedCeloPlugin } from './apps/locked-celo/plugin'
 
 interface RawTokenInfo {
   address: string
