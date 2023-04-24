@@ -1,3 +1,5 @@
+import { DecimalNumber, SerializedDecimalNumber } from './numbers'
+
 // Plugin interface that authors will implement
 export interface AppPlugin {
   getInfo(): AppInfo
@@ -35,8 +37,8 @@ export interface PricePerShareContext {
 export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
   type: 'app-token-definition'
   pricePerShare:
-    | ((context: PricePerShareContext) => Promise<number[]>)
-    | number[]
+    | ((context: PricePerShareContext) => Promise<DecimalNumber[]>)
+    | DecimalNumber[]
 }
 
 export interface BalancesContext {
@@ -45,7 +47,9 @@ export interface BalancesContext {
 
 export interface ContractPositionDefinition extends AbstractPositionDefinition {
   type: 'contract-position-definition'
-  balances: ((context: BalancesContext) => Promise<string[]>) | string[]
+  balances:
+    | ((context: BalancesContext) => Promise<DecimalNumber[]>)
+    | DecimalNumber[]
 }
 
 export type PositionDefinition =
@@ -75,8 +79,8 @@ export interface AbstractToken {
   // These would be resolved dynamically
   symbol: string // Example: cUSD
   decimals: number // Example: 18
-  priceUsd: number // Example: 1.5
-  balance: string // Example: "2000000000000", would be negative for debt
+  priceUsd: SerializedDecimalNumber // Example: "1.5"
+  balance: SerializedDecimalNumber // Example: "200", would be negative for debt
 }
 
 export interface BaseToken extends AbstractToken {
@@ -85,15 +89,15 @@ export interface BaseToken extends AbstractToken {
 
 export interface AppTokenPosition extends AbstractPosition, AbstractToken {
   type: 'app-token'
-  supply: string
+  supply: SerializedDecimalNumber // Example: "1000"
   // Price ratio between the token and underlying token(s)
-  pricePerShare: number[]
+  pricePerShare: SerializedDecimalNumber[]
 }
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'
   // This would be derived from the underlying tokens
-  balanceUsd: string
+  balanceUsd: SerializedDecimalNumber
 }
 
 export type Token = BaseToken | AppTokenPosition
