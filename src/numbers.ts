@@ -22,16 +22,10 @@ export function toSerializedDecimalNumber(
   )
 }
 
-export function toDecimalNumber(value: BigNumber.Value): DecimalNumber
 // Convert bigint balances from ERC20 contracts to decimal numbers
-export function toDecimalNumber(value: bigint, decimals: number): DecimalNumber
 export function toDecimalNumber(
-  ...args: [BigNumber.Value] | [bigint, number]
+  value: bigint,
+  decimals: number,
 ): DecimalNumber {
-  if (args.length === 1) {
-    return new BigNumber(args[0]) as DecimalNumber
-  }
-
-  const [value, decimals] = args
   return new BigNumber(value.toString()).shiftedBy(-decimals) as DecimalNumber
 }

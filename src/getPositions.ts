@@ -152,9 +152,9 @@ function tokenWithUnderlyingBalance<T extends Token>(
   balance: DecimalNumber,
   pricePerShare: DecimalNumber,
 ): T {
-  const underlyingBalance = toDecimalNumber(
-    new BigNumber(balance).times(pricePerShare),
-  )
+  const underlyingBalance = new BigNumber(balance).times(
+    pricePerShare,
+  ) as DecimalNumber
 
   const appToken =
     token.type === 'app-token'
@@ -168,7 +168,7 @@ function tokenWithUnderlyingBalance<T extends Token>(
         return tokenWithUnderlyingBalance(
           underlyingToken,
           underlyingBalance,
-          toDecimalNumber(appToken.pricePerShare[i]),
+          new BigNumber(appToken.pricePerShare[i]) as DecimalNumber,
         )
       }),
     }),
@@ -279,7 +279,7 @@ async function resolveContractPosition(
     tokenWithUnderlyingBalance(
       resolvedTokens[token.address],
       balances[i],
-      toDecimalNumber(1),
+      new BigNumber(1) as DecimalNumber,
     ),
   )
 

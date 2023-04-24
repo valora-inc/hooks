@@ -1,4 +1,5 @@
-import { toDecimalNumber } from '../../numbers'
+import BigNumber from 'bignumber.js'
+import { DecimalNumber } from '../../numbers'
 import {
   AppPlugin,
   ContractPositionDefinition,
@@ -147,7 +148,7 @@ const plugin: AppPlugin = {
             playerGame.paidAmount,
             // Some of these are claimable rewards
             ...rewards.map((reward) => reward.balance),
-          ].map(toDecimalNumber)
+          ].map((value) => new BigNumber(value) as DecimalNumber)
         },
       }
       return position

@@ -13,7 +13,7 @@ import { FarmInfoEventAbi } from './abis/farm-registry'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
-import { toDecimalNumber } from '../../numbers'
+import { DecimalNumber, toDecimalNumber } from '../../numbers'
 
 const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
 const FARM_CREATION_BLOCK = 9840049n
@@ -92,7 +92,7 @@ async function getPoolPositionDefinition(
         toDecimalNumber(reserve1, token1.decimals),
       ]
       const supply = toDecimalNumber(totalSupply, poolToken.decimals)
-      const pricePerShare = reserves.map((r) => toDecimalNumber(r.div(supply)))
+      const pricePerShare = reserves.map((r) => r.div(supply) as DecimalNumber)
       return pricePerShare
     },
   }
@@ -216,9 +216,9 @@ async function getFarmPositionDefinitions(
 
           const balance = share.times(
             toDecimalNumber(poolBalance, poolToken.decimals),
-          )
+          ) as DecimalNumber
 
-          return [toDecimalNumber(balance)]
+          return [balance]
         },
       }
 
