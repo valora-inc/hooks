@@ -387,6 +387,7 @@ export async function getPositions(
         unresolvedTokenDefinitions.map(async (tokenDefinition) => {
           try {
             // Assume the token is an app token from the plugin
+            // TODO: We'll probably need to allow plugins to specify the app id themselves
             const { sourceAppId } = tokenDefinition
             const plugin = pluginsByAppId[sourceAppId]
             const appTokenDefinition = await plugin
