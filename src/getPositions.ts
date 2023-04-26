@@ -4,7 +4,6 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import ubeswapPlugin from './apps/ubeswap/plugin'
 import {
   Address,
   ContractFunctionExecutionError,
@@ -76,9 +75,11 @@ async function getAllAppIds(): Promise<string[]> {
   return folders.map((folder) => folder.name)
 }
 
-async function getPlugins(appIds: string[]): Promise<AppPlugin[]> {
+type PluginsByAppId = Record<string, AppPlugin>
+
+async function getPlugins(appIds: string[]): Promise<PluginsByAppId> {
   const allAppIds = await getAllAppIds()
-  const plugins: AppPlugin[] = []
+  const plugins: PluginsByAppId = {}
   const appIdsToLoad = appIds.length === 0 ? allAppIds : appIds
   for (const appId of appIdsToLoad) {
     if (!allAppIds.includes(appId)) {
@@ -89,7 +90,7 @@ async function getPlugins(appIds: string[]): Promise<AppPlugin[]> {
       )
     }
     const plugin = await import(`./apps/${appId}/plugin`)
-    plugins.push(plugin.default)
+    plugins[appId] = plugin.default
   }
   return plugins
 }
@@ -310,19 +311,25 @@ function addAppId<T>(definition: T, appId: string) {
   }
 }
 
+function addSourceAppId<T>(definition: T, sourceAppId: string) {
+  return {
+    ...definition,
+    sourceAppId,
+  }
+}
+
 // This is the main logic to get positions
 export async function getPositions(
   network: string,
   address: string,
   appIds: string[] = [],
 ) {
-  const plugins = await getPlugins(appIds)
+  const pluginsByAppId = await getPlugins(appIds)
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
-    plugins.map((plugin) =>
+    Object.entries(pluginsByAppId).map(([appId, plugin]) =>
       plugin.getPositionDefinitions(network, address).then((definitions) => {
-        const appId = plugin.getInfo().id
         return definitions.map((definition) => addAppId(definition, appId))
       }),
     ),
@@ -351,8 +358,8 @@ export async function getPositions(
     }
 
     // Resolve token definitions to tokens
-    const allTokenDefinitions = definitionsToResolve.flatMap(
-      (position) => position.tokens,
+    const allTokenDefinitions = definitionsToResolve.flatMap((position) =>
+      position.tokens.map((token) => addSourceAppId(token, position.appId)),
     )
 
     console.log(
@@ -380,12 +387,11 @@ export async function getPositions(
         unresolvedTokenDefinitions.map(async (tokenDefinition) => {
           try {
             // Assume the token is an app token from the plugin
-            // TODO: use the right plugin
-            const appTokenDefinition = await ubeswapPlugin
+            const { sourceAppId } = tokenDefinition
+            const plugin = pluginsByAppId[sourceAppId]
+            const appTokenDefinition = await plugin
               .getAppTokenDefinition(tokenDefinition)
-              .then((definition) =>
-                addAppId(definition, ubeswapPlugin.getInfo().id),
-              )
+              .then((definition) => addAppId(definition, sourceAppId))
             return appTokenDefinition
           } catch (e) {
             if (e instanceof ContractFunctionExecutionError) {
