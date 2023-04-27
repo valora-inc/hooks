@@ -75,11 +75,11 @@ async function getAllAppIds(): Promise<string[]> {
   return folders.map((folder) => folder.name)
 }
 
-type PluginsByAppId = Record<string, AppPlugin>
-
-async function getPlugins(appIds: string[]): Promise<PluginsByAppId> {
+async function getPlugins(
+  appIds: string[],
+): Promise<Record<string, AppPlugin>> {
   const allAppIds = await getAllAppIds()
-  const plugins: PluginsByAppId = {}
+  const plugins: Record<string, AppPlugin> = {}
   const appIdsToLoad = appIds.length === 0 ? allAppIds : appIds
   for (const appId of appIdsToLoad) {
     if (!allAppIds.includes(appId)) {
