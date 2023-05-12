@@ -1,91 +1,31 @@
-# typescript-app-starter
+# Valora Hooks
 
-A starter template for Valora TypeScript projects with best practices.
+Valora Hooks allows developers to extend Valora's functionality by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide Valora with additional information and features.
 
-## What's in the stack?
+Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks/overview) for more information.
 
-- [TypeScript](https://www.typescriptlang.org/)
-- Unit testing with [Jest](https://jestjs.io)
-- Linting with [ESLint](https://eslint.org/), configured with [@valora/eslint-config-typescript](https://github.com/valora-inc/eslint-config-typescript)
-- Automatic code formating with [Prettier](https://prettier.io/), configured with [@valora/prettier-config](https://github.com/valora-inc/prettier-config)
-- Scripts using [ShellJS](https://github.com/shelljs/shelljs)
-  - Linted and statically checked with [TypeScript](https://www.typescriptlang.org/)
-- CI/CD with [GitHub Actions](https://docs.github.com/en/actions)
-  - Semantic PR title enforcement with [semantic-pull-request](https://github.com/amannn/action-semantic-pull-request)
-- Automated dependency updates with [Renovate](https://renovatebot.com/), configured with [valora-inc/renovate-config](https://github.com/valora-inc/renovate-config)
+Currently, this repository contains position pricing hooks.
 
-## How to use this?
+> :warning: It is an experimental feature and is not fully supported yet.
 
-Above the file list, click the big green button: `Use this template`.
+## Developing Hooks
 
-Or using [GitHub CLI](https://cli.github.com/):
+To develop hooks, you will need to have Node.js installed on your computer.
 
-```sh
-gh repo create --template valora-inc/typescript-app-starter valora-inc/new-repo
-```
+### Setup
 
-## Structure
+1. Clone this repository to your local machine.
+2. Run `yarn install` to install the necessary dependencies.
 
-Here's the recommended structure:
+### Position Pricing
 
-- [`src`](src): source code
-  - [`index.ts`](src/index.ts): example source file
-  - [`index.test.ts`](src/index.test.ts): unit tests for `index.ts`
-- [`scripts`](scripts): more complex scripts in TypeScript
-  - [`example.ts`](scripts/example.ts): example script using [ShellJS](https://github.com/shelljs/shelljs)
+See the [documentation](docs/position-pricing-hooks.md) for developing position pricing hooks.
 
-## Type Checking
+## Contributing
 
-This project uses [TypeScript](https://www.typescriptlang.org/). It's recommended to get TypeScript set up for your editor to get a really great in-editor experience with type checking and auto-complete. To run type checking across the whole project, run `yarn typecheck`.
+Do you have ideas for more types of hooks that would be useful for Valora users?
+Please reach out to us on the [Discord](https://discord.com/invite/J5XMtMkwC4).
 
-## Testing
+<!-- TODO If you'd like to contribute to this repository, please follow the [Contributing Guidelines](CONTRIBUTING.md).-->
 
-For lower level tests of utilities and individual modules, we use [Jest](https://jestjs.io).
-
-## Test coverage checks
-
-### For private repos
-
-For private repos, Jest can be configured to terminate with an error status if there is less coverage than some configurable threshold.
-This project applies coverage thresholds for `yarn test:ci`, so CI checks will fail if there is insufficient test coverage.
-
-Make sure to add fixture data, mocks, or other files and file paths that you don't want to count towards your coverage thresholds
-to `coveragePathIgnorePatterns` in [`jest.config.js`](jest.config.js).
-
-### For public repos
-
-For public repos, [Codecov](https://codecov.io) is free. The tool offers two nice features that Jest doesn't offer out of the box:
-
-- "auto" coverage targets, which track the current coverage of the `main` branch. This lets you guarantee that test coverage increases over time.
-- "patch" coverage, counting only the lines modified by the current PR
-
-Here's how to set it up:
-
-Uncomment the `Upload Coverage Report` and `Upload coverage to Codecov` steps in [`workflow.yaml`](.github/workflows/workflow.yaml). No token is needed for public repos uploading via GitHub Actions.
-
-If you set up Codecov, you may consider turning off Jest coverage checks for simplicity. You can do this by removing the
-`coverageThreshold` parameter from [`jest.config.js`](jest.config.js).
-
-## Linting
-
-This project uses [ESLint](https://eslint.org/) for linting. That is configured in [`.eslintrc.js`](.eslintrc.js).
-
-## Formatting
-
-We use [Prettier](https://prettier.io) for auto-formatting. It's recommended to install an editor plugin (like the [VSCode Prettier plugin](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)) to get auto-formatting on save. There's also a `yarn format` script you can run to format all files in the project.
-
-## Scripts
-
-We use TypeScript instead of shell scripts. This is it to avoid the many pitfalls of shell scripts.
-
-To run external commands we recommend using [ShellJS](https://github.com/shelljs/shelljs).
-
-## GitHub Actions
-
-We use [GitHub Actions](https://docs.github.com/en/actions) for continuous integration and deployment (CI/CD). Anything that gets into the `main` branch will be deployed using `yarn deploy` after running tests/build/etc.
-
-Also, we use [semantic-pull-request](https://github.com/amannn/action-semantic-pull-request) to ensure PR titles match the [Conventional Commits spec](https://www.conventionalcommits.org/). It can be used in combination with [semantic-release](https://github.com/semantic-release/semantic-release) to automate releases and changelogs.
-
-## Renovate
-
-[Renovate](https://renovatebot.com/) ensures our dependencies are kept up to date. It's configured with our shared config in [`renovate.json5`](renovate.json5).
+We welcome bug reports, feature requests, and code contributions.
