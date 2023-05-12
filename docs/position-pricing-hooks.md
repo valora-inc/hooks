@@ -4,13 +4,13 @@ A user's Valora wallet invokes position hooks when determining the types, quanti
 
 ## Concepts
 
-Position pricing hooks main job is to return user owned positions and to break them down into underlying base tokens (with factors). The pricing of base tokens is done separately and not needed by hooks authors.
+Position pricing hooks main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
 
 Terms:
 
-- _Base Tokens_: base assets which have a token to represent them (ERC20, ERC721, etc). Examples: CELO, cUSD, cEUR, UBE, MOO, etc.
-- _App Tokens_: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked position.
-- _Contract Positions_: things that are not represented by a token (example: locked CELO, farming positions, claimable tokens).
+- **Base Tokens**: base assets which have a token to represent them (ERC20, ERC721, etc). Examples: CELO, cUSD, cEUR, UBE, MOO, etc.
+- **App Tokens**: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked position.
+- **Contract Positions**: things that are not represented by a token (example: locked CELO, farming positions, claimable tokens).
 
 For example, a position hook detects that a user owns a position in a liquidity pool. It then provides information about the pool's assets and the user's share of the pool's assets.
 
@@ -118,5 +118,11 @@ This is all that is needed for Valora to show the user the value of their locked
 To test your position pricing hook, you can call it with the `getPositions` script.
 
 ```sh
-yarn getPositions --address <address> --app <app-name>
+yarn getPositions --network <network> --address <address> --apps <app-name>[,<app-name2>]
+```
+
+Example for locked-celo:
+
+```sh
+yarn getPositions --network celo --address 0x2b8441ef13333ffa955c9ea5ab5b3692da95260d --apps locked-celo
 ```
