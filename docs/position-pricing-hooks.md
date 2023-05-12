@@ -4,7 +4,7 @@ A user's Valora wallet invokes position hooks when determining the types, quanti
 
 ## Principle
 
-Position pricing hooks main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
+A position pricing hook's main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
 
 Terms:
 
