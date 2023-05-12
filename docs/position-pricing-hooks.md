@@ -59,7 +59,7 @@ It should return an array of [`PositionDefinition`](../src/plugin.ts) objects.
 
 The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
-#### App Position Definition
+#### App Token Position Definition
 
 TODO
 
