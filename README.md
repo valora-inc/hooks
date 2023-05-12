@@ -24,7 +24,7 @@ See the [documentation](docs/position-pricing-hooks.md) for developing position 
 ## Contributing
 
 Do you have ideas for more types of hooks that would be useful for Valora users?
-Please reach out to us on the [Discord](https://discord.com/invite/J5XMtMkwC4).
+Please reach out to us on [Discord](https://discord.com/invite/J5XMtMkwC4).
 
 <!-- TODO If you'd like to contribute to this repository, please follow the [Contributing Guidelines](CONTRIBUTING.md).-->
 
