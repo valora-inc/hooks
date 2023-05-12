@@ -2,7 +2,7 @@
 
 A user's Valora wallet invokes position hooks when determining the types, quantity, and value of assets a user owns. If a position hook detects a user owns one or more positions, it provides information about the positions for Valora to show to the user.
 
-## Concepts
+## Principle
 
 Position pricing hooks main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
 
@@ -19,7 +19,7 @@ For example, a position hook detects that a user owns a position in a liquidity 
 
 From the information provided by the hook, Valora can show the user the value of their position in the pool.
 
-## Developing Position Pricing Hooks
+## Developing a Position Pricing Hook
 
 ### Structure
 
@@ -57,7 +57,7 @@ It receives the following arguments:
 
 It should return an array of [`PositionDefinition`](../src/plugin.ts) objects.
 
-The `PositionDefinition` is either a `AppPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
+The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
 #### App Position Definition
 
@@ -113,7 +113,7 @@ This is how it fulfills the job of a position pricing hook, by declaratively def
 
 This is all that is needed for Valora to show the user the value of their locked CELO.
 
-### Testing Position Pricing Hooks
+### Testing a Position Pricing Hook
 
 To test your position pricing hook, you can call it with the `getPositions` script.
 
