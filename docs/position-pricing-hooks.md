@@ -23,9 +23,9 @@ From the information provided by the hook, Valora can show the user the value of
 
 ### Structure
 
-Hooks are organized by application. For instance the Ubeswap hook is located in [`src/apps/ubeswap`](../src/apps/ubeswap).
+Hooks are organized by application. For instance the Ubeswap hook is located in [`https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap`](https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap).
 
-They must implement the [`AppPlugin`](../src/plugin.ts) TypeScript interface.
+They must implement the [`AppPlugin`](https://github.com/valora-inc/hooks/blob/main/src/plugin.ts) TypeScript interface.
 
 ### Creating a Position Pricing Hook
 
@@ -55,7 +55,7 @@ It receives the following arguments:
 - `network`: the network for which the positions should be returned.
 - `address`: the address of the user for which the positions should be returned.
 
-It should return an array of [`PositionDefinition`](../src/plugin.ts) objects.
+It should return an array of [`PositionDefinition`](https://github.com/valora-inc/hooks/blob/main/src/plugin.ts) objects.
 
 The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
@@ -69,7 +69,7 @@ TODO
 
 Here's a simplified example of a `getPositionDefinitions` implementation for representing locked CELO owned by a user.
 
-Please take a look at the [full implementation](../src/apps/locked-celo/plugin.ts) for more details.
+Please take a look at the [full implementation](https://github.com/valora-inc/hooks/blob/main/src/apps/locked-celo/plugin.ts) for more details.
 
 ```ts
 const plugin: AppPlugin = {
