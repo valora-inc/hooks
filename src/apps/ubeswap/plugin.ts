@@ -14,6 +14,7 @@ import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber, toDecimalNumber } from '../../numbers'
+import { stakingRewardsAbi } from './abis/staking-rewards'
 
 const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
 const FARM_CREATION_BLOCK = 9840049n
@@ -152,16 +153,24 @@ async function getFarmPositionDefinitions(
     contracts: farmInfo.flatMap((farm) => [
       {
         address: farm.stakingAddress,
-        // The farms aren't ERC20, but they have a similar interface
-        abi: erc20Abi,
+        abi: stakingRewardsAbi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
         address: farm.stakingAddress,
-        // The farms aren't ERC20, but they have a similar interface
-        abi: erc20Abi,
+        abi: stakingRewardsAbi,
         functionName: 'totalSupply',
+      },
+      {
+        address: farm.stakingAddress,
+        abi: stakingRewardsAbi,
+        functionName: 'rewardsToken',
+      },
+      {
+        address: farm.stakingAddress,
+        abi: stakingRewardsAbi,
+        functionName: 'earned',
       },
     ]),
     allowFailure: false,
@@ -175,8 +184,10 @@ async function getFarmPositionDefinitions(
   const userFarms = farmInfo
     .map((farm, i) => ({
       ...farm,
-      balance: data[2 * i],
-      totalSupply: data[2 * i + 1],
+      balance: data[4 * i] as bigint,
+      totalSupply: data[4 * i + 1] as bigint,
+      rewardsTokenAddress: data[4 * i + 2] as Address,
+      rewardsEarned: data[4 * i + 3] as bigint,
     }))
     .filter((farm) => farm.balance > 0)
 
@@ -188,7 +199,13 @@ async function getFarmPositionDefinitions(
         type: 'contract-position-definition',
         network,
         address: farm.stakingAddress.toLowerCase(),
-        tokens: [{ address: farm.lpAddress.toLowerCase(), network }],
+        tokens: [
+          { address: farm.lpAddress.toLowerCase(), network },
+          {
+            address: farm.rewardsTokenAddress.toLowerCase(),
+            network,
+          },
+        ],
         label: ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
           return `Farm: ${(poolToken as AppTokenPosition).label}`
@@ -218,7 +235,14 @@ async function getFarmPositionDefinitions(
             toDecimalNumber(poolBalance, poolToken.decimals),
           ) as DecimalNumber
 
-          return [balance]
+          const rewardsToken =
+            resolvedTokens[farm.rewardsTokenAddress.toLowerCase()]
+          const rewardsBalance = toDecimalNumber(
+            farm.rewardsEarned,
+            rewardsToken.decimals,
+          )
+
+          return [balance, rewardsBalance]
         },
       }
 
