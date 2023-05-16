@@ -10,7 +10,7 @@ const hook: ShortcutsHook = {
         networks: ['celo'],
         category: 'claim',
         async onTrigger(_network, _address, _positionAddress) {
-          // TODO
+          // TODO: return the unsigned transaction to claim the reward
           return []
         },
       },
