@@ -171,6 +171,7 @@ async function getFarmPositionDefinitions(
         address: farm.stakingAddress,
         abi: stakingRewardsAbi,
         functionName: 'earned',
+        args: [address as Address],
       },
     ]),
     allowFailure: false,
