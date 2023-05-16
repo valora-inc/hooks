@@ -196,6 +196,7 @@ async function getFarmPositionDefinitions(
           {
             address: farm.rewardsTokenAddress.toLowerCase(),
             network,
+            category: 'claimable',
           },
         ],
         displayProps: ({ resolvedTokens }) => {
