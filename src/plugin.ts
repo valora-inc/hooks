@@ -75,6 +75,10 @@ export interface AbstractPosition {
   network: string // Example: celo
   appId: string // Example: ubeswap
   appName: string // Example: Ubeswap
+  /**
+   * @deprecated replaced by displayProps
+   */
+  label: string // Example: Pool
   tokens: Token[]
   displayProps: DisplayProps
 }

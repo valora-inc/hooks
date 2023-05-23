@@ -236,6 +236,8 @@ async function resolveAppTokenPosition(
     allowFailure: false,
   })
 
+  const displayProps = getDisplayProps(positionDefinition, resolvedTokens);
+
   const position: AppTokenPosition = {
     type: 'app-token',
     network: positionDefinition.network,
@@ -244,7 +246,8 @@ async function resolveAppTokenPosition(
     appName: appInfo.name,
     symbol: positionTokenInfo.symbol,
     decimals: positionTokenInfo.decimals,
-    displayProps: getDisplayProps(positionDefinition, resolvedTokens),
+    label: displayProps.title,
+    displayProps,
     tokens: positionDefinition.tokens.map((token, i) =>
       tokenWithUnderlyingBalance(
         resolvedTokens[token.address],
@@ -296,13 +299,16 @@ async function resolveContractPosition(
     balanceUsd = balanceUsd.plus(balances[i]).times(tokenInfo.priceUsd)
   }
 
+  const displayProps = getDisplayProps(positionDefinition, resolvedTokens)
+
   const position: ContractPosition = {
     type: 'contract-position',
     address: positionDefinition.address,
     network: positionDefinition.network,
     appId: positionDefinition.appId,
     appName: appInfo.name,
-    displayProps: getDisplayProps(positionDefinition, resolvedTokens),
+    label: displayProps.title,
+    displayProps,
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
   }
