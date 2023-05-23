@@ -145,7 +145,7 @@ const plugin: AppPlugin = {
         displayProps: {
           title: game.gameNameShort,
           description: 'Challenge',
-          iconUrl: '', // TODO
+          imageUrl: '', // TODO
         },
         balances: async () => {
           return [

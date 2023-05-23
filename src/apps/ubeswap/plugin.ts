@@ -71,7 +71,7 @@ async function getPoolPositionDefinition(
       return {
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
-        iconUrl: '', // TODO
+        imageUrl: '', // TODO
       }
     },
     pricePerShare: async ({ tokensByAddress }) => {
@@ -200,7 +200,7 @@ async function getFarmPositionDefinitions(
           return {
             title: poolToken.displayProps.title,
             description: 'Farm',
-            iconUrl: poolToken.displayProps.iconUrl,
+            imageUrl: poolToken.displayProps.imageUrl,
           }
         },
         balances: async ({ resolvedTokens }) => {

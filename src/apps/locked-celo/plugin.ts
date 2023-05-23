@@ -99,7 +99,7 @@ const plugin: AppPlugin = {
       displayProps: {
         title: 'Locked CELO',
         description: '', // TODO
-        iconUrl: '', // TODO
+        imageUrl: '', // TODO
       },
       balances: async () => {
         return [

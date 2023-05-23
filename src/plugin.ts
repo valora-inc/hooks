@@ -26,7 +26,7 @@ export interface DisplayPropsContext {
 export interface DisplayProps {
   title: string // Example: CELO / cUSD
   description: string // Example: Pool
-  iconUrl: string // Example: https://...
+  imageUrl: string // Example: https://...
 }
 
 export interface AbstractPositionDefinition {
