@@ -236,7 +236,7 @@ async function resolveAppTokenPosition(
     allowFailure: false,
   })
 
-  const displayProps = getDisplayProps(positionDefinition, resolvedTokens);
+  const displayProps = getDisplayProps(positionDefinition, resolvedTokens)
 
   const position: AppTokenPosition = {
     type: 'app-token',
