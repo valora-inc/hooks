@@ -9,14 +9,12 @@ import {
 import got from 'got'
 import BigNumber from 'bignumber.js'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
-import { FarmInfoEventAbi } from './abis/farm-registry'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber, toDecimalNumber } from '../../numbers'
-
-const FARM_REGISTRY = '0xa2bf67e12EeEDA23C7cA1e5a34ae2441a17789Ec'
-const FARM_CREATION_BLOCK = 9840049n
+import { stakingRewardsAbi } from './abis/staking-rewards'
+import farms from './data/farms.json'
 
 const client = createPublicClient({
   chain: celo,
@@ -140,32 +138,30 @@ async function getFarmPositionDefinitions(
   network: string,
   address: string,
 ): Promise<PositionDefinition[]> {
-  const farmInfoEvents = await client.getLogs({
-    address: FARM_REGISTRY,
-    event: FarmInfoEventAbi,
-    fromBlock: FARM_CREATION_BLOCK,
-  })
-  // console.log({ farmInfoEvents })
-
-  const farmInfo = farmInfoEvents.map((e) => e.args)
-
-  // console.log({ farmInfo })
-
   // Call balanceOf and totalSupply for each farm stakingAddress
   const data = await client.multicall({
-    contracts: farmInfo.flatMap((farm) => [
+    contracts: farms.flatMap((farm) => [
       {
-        address: farm.stakingAddress,
-        // The farms aren't ERC20, but they have a similar interface
-        abi: erc20Abi,
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
         functionName: 'balanceOf',
         args: [address as Address],
       },
       {
-        address: farm.stakingAddress,
-        // The farms aren't ERC20, but they have a similar interface
-        abi: erc20Abi,
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
         functionName: 'totalSupply',
+      },
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'rewardsToken',
+      },
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'earned',
+        args: [address as Address],
       },
     ]),
     allowFailure: false,
@@ -176,11 +172,13 @@ async function getFarmPositionDefinitions(
   // but there are dual and triple reward farms as well
   // which I haven't wrapped my head around yet
   // See https://github.com/Ubeswap/ubeswap-interface/blob/48049267f7160441070ff21ea6c9fedc3a55cfef/src/state/stake/hooks.ts#L144-L171
-  const userFarms = farmInfo
+  const userFarms = farms
     .map((farm, i) => ({
       ...farm,
-      balance: data[2 * i],
-      totalSupply: data[2 * i + 1],
+      balance: data[4 * i] as bigint,
+      totalSupply: data[4 * i + 1] as bigint,
+      rewardsTokenAddress: data[4 * i + 2] as Address,
+      rewardsEarned: data[4 * i + 3] as bigint,
     }))
     .filter((farm) => farm.balance > 0)
 
@@ -192,7 +190,13 @@ async function getFarmPositionDefinitions(
         type: 'contract-position-definition',
         network,
         address: farm.stakingAddress.toLowerCase(),
-        tokens: [{ address: farm.lpAddress.toLowerCase(), network }],
+        tokens: [
+          { address: farm.lpAddress.toLowerCase(), network },
+          {
+            address: farm.rewardsTokenAddress.toLowerCase(),
+            network,
+          },
+        ],
         displayProps: ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[
             farm.lpAddress.toLowerCase()
@@ -203,6 +207,7 @@ async function getFarmPositionDefinitions(
             imageUrl: poolToken.displayProps.imageUrl,
           }
         },
+
         balances: async ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
           const share = new BigNumber(farm.balance.toString()).div(
@@ -210,7 +215,7 @@ async function getFarmPositionDefinitions(
           )
 
           const poolContract = {
-            address: farm.lpAddress,
+            address: farm.lpAddress as Address,
             abi: erc20Abi,
           } as const
           const [poolBalance] = await client.multicall({
@@ -218,7 +223,7 @@ async function getFarmPositionDefinitions(
               {
                 ...poolContract,
                 functionName: 'balanceOf',
-                args: [farm.stakingAddress],
+                args: [farm.stakingAddress as Address],
               },
             ],
             allowFailure: false,
@@ -228,7 +233,14 @@ async function getFarmPositionDefinitions(
             toDecimalNumber(poolBalance, poolToken.decimals),
           ) as DecimalNumber
 
-          return [balance]
+          const rewardsToken =
+            resolvedTokens[farm.rewardsTokenAddress.toLowerCase()]
+          const rewardsBalance = toDecimalNumber(
+            farm.rewardsEarned,
+            rewardsToken.decimals,
+          )
+
+          return [balance, rewardsBalance]
         },
       }
 

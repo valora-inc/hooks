@@ -296,7 +296,7 @@ async function resolveContractPosition(
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
     const tokenInfo = resolvedTokens[token.address]
-    balanceUsd = balanceUsd.plus(balances[i]).times(tokenInfo.priceUsd)
+    balanceUsd = balanceUsd.plus(balances[i].times(tokenInfo.priceUsd))
   }
 
   const displayProps = getDisplayProps(positionDefinition, resolvedTokens)
