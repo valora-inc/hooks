@@ -1,7 +1,8 @@
 // Update the farms.json file with the latest farm info
 // This is a temporary solution as querying farm info from the blockchain is too slow
-// Medium term solution is to index farms using TheGraph
+// Medium term solution is to index farms using The Graph
 // Usage: yarn ts-node ./src/apps/ubeswap/scripts/updateFarms.ts
+/* eslint-disable no-console */
 import fs from 'fs'
 import path from 'path'
 import { FarmInfoEventAbi } from '../abis/farm-registry'
@@ -31,11 +32,7 @@ void (async () => {
     fromBlock += BLOCKS_PER_QUERY
   ) {
     const toBlock = fromBlock + BLOCKS_PER_QUERY
-    console.log(
-      'Querying blocks range',
-      fromBlock,
-      toBlock,
-    )
+    console.log('Querying blocks range', fromBlock, toBlock)
     const events = await client.getLogs({
       address: FARM_REGISTRY,
       event: FarmInfoEventAbi,
