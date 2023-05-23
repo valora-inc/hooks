@@ -96,7 +96,11 @@ const plugin: AppPlugin = {
       network,
       address: LOCKED_GOLD_ADDRESS,
       tokens: [{ address: CELO_ADDRESS, network }],
-      label: 'Locked CELO',
+      displayProps: {
+        title: 'Locked CELO',
+        description: '', // TODO
+        imageUrl: '', // TODO
+      },
       balances: async () => {
         return [
           toDecimalNumber(

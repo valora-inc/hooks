@@ -19,14 +19,20 @@ export interface TokenDefinition {
   network: string
 }
 
-export interface LabelContext {
+export interface DisplayPropsContext {
   resolvedTokens: Record<string, Omit<Token, 'balance'>>
+}
+
+export interface DisplayProps {
+  title: string // Example: CELO / cUSD
+  description: string // Example: Pool
+  imageUrl: string // Example: https://...
 }
 
 export interface AbstractPositionDefinition {
   network: string
   address: string
-  label: ((context: LabelContext) => string) | string
+  displayProps: ((context: DisplayPropsContext) => DisplayProps) | DisplayProps
   tokens: TokenDefinition[]
 }
 
@@ -68,8 +74,13 @@ export interface AbstractPosition {
   address: string // Example: 0x...
   network: string // Example: celo
   appId: string // Example: ubeswap
+  appName: string // Example: Ubeswap
+  /**
+   * @deprecated replaced by displayProps
+   */
   label: string // Example: Pool
   tokens: Token[]
+  displayProps: DisplayProps
 }
 
 export interface AbstractToken {
