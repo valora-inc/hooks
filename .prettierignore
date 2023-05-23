@@ -3,3 +3,6 @@ package.json
 
 # Ignore generated dist folder
 dist
+
+# Ignore generated files
+src/apps/ubeswap/data/farms.json

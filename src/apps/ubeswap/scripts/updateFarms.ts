@@ -49,6 +49,6 @@ void (async () => {
   // Write farm info to file
   fs.writeFileSync(
     path.join(__dirname, '../data/farms.json'),
-    JSON.stringify(farmInfo, null, ' '),
+    JSON.stringify(farmInfo, null, '  '),
   )
 })()
