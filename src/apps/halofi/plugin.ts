@@ -142,7 +142,11 @@ const plugin: AppPlugin = {
             network,
           })),
         ],
-        label: game.gameName,
+        displayProps: {
+          title: game.gameNameShort,
+          description: 'Challenge',
+          iconUrl: '', // TODO
+        },
         balances: async () => {
           return [
             playerGame.paidAmount,

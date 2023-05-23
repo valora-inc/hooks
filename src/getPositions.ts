@@ -14,11 +14,13 @@ import { celo } from '@wagmi/chains'
 import { erc20Abi } from './abis/erc-20'
 import {
   AbstractToken,
+  AppInfo,
   AppPlugin,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPosition,
   ContractPositionDefinition,
+  DisplayProps,
   Position,
   PositionDefinition,
   PricePerShareContext,
@@ -179,14 +181,14 @@ function tokenWithUnderlyingBalance<T extends Token>(
   } as T
 }
 
-function getLabel(
+function getDisplayProps(
   positionDefinition: PositionDefinition,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
-): string {
-  if (typeof positionDefinition.label === 'function') {
-    return positionDefinition.label({ resolvedTokens })
+): DisplayProps {
+  if (typeof positionDefinition.displayProps === 'function') {
+    return positionDefinition.displayProps({ resolvedTokens })
   } else {
-    return positionDefinition.label
+    return positionDefinition.displayProps
   }
 }
 
@@ -195,6 +197,7 @@ async function resolveAppTokenPosition(
   positionDefinition: AppTokenPositionDefinition & { appId: string },
   tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
+  appInfo: AppInfo,
 ): Promise<AppTokenPosition> {
   let pricePerShare: DecimalNumber[]
   if (typeof positionDefinition.pricePerShare === 'function') {
@@ -238,9 +241,10 @@ async function resolveAppTokenPosition(
     network: positionDefinition.network,
     address: positionDefinition.address,
     appId: positionDefinition.appId,
+    appName: appInfo.name,
     symbol: positionTokenInfo.symbol,
     decimals: positionTokenInfo.decimals,
-    label: getLabel(positionDefinition, resolvedTokens),
+    displayProps: getDisplayProps(positionDefinition, resolvedTokens),
     tokens: positionDefinition.tokens.map((token, i) =>
       tokenWithUnderlyingBalance(
         resolvedTokens[token.address],
@@ -266,6 +270,7 @@ async function resolveContractPosition(
   positionDefinition: ContractPositionDefinition & { appId: string },
   _tokensByAddress: TokensInfo,
   resolvedTokens: Record<string, Omit<Token, 'balance'>>,
+  appInfo: AppInfo,
 ): Promise<ContractPosition> {
   let balances: DecimalNumber[]
   if (typeof positionDefinition.balances === 'function') {
@@ -296,7 +301,8 @@ async function resolveContractPosition(
     address: positionDefinition.address,
     network: positionDefinition.network,
     appId: positionDefinition.appId,
-    label: getLabel(positionDefinition, resolvedTokens),
+    appName: appInfo.name,
+    displayProps: getDisplayProps(positionDefinition, resolvedTokens),
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
   }
@@ -493,6 +499,8 @@ export async function getPositions(
 
     console.log('Resolving definition', type, positionDefinition.address)
 
+    const appInfo = pluginsByAppId[positionDefinition.appId].getInfo()
+
     let position: Position
     switch (type) {
       case 'app-token-definition':
@@ -501,6 +509,7 @@ export async function getPositions(
           positionDefinition,
           tokensByAddress,
           resolvedTokens,
+          appInfo,
         )
         resolvedTokens[positionDefinition.address] = position
         break
@@ -510,6 +519,7 @@ export async function getPositions(
           positionDefinition,
           tokensByAddress,
           resolvedTokens,
+          appInfo,
         )
         break
       default:

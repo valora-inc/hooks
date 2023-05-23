@@ -60,7 +60,7 @@ void (async () => {
           type: position.type,
           address: position.address,
           network: position.network,
-          label: position.label,
+          title: `${position.displayProps.title} (${position.displayProps.description})`,
           priceUsd: new BigNumber(position.priceUsd).toFixed(2),
           balance: balance.toFixed(2),
           balanceUsd: balance.times(position.priceUsd).toFixed(2),
@@ -72,7 +72,7 @@ void (async () => {
           type: position.type,
           address: position.address,
           network: position.network,
-          label: position.label,
+          title: `${position.displayProps.title} (${position.displayProps.description})`,
           balanceUsd: new BigNumber(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
         }

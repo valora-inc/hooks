@@ -65,10 +65,14 @@ async function getPoolPositionDefinition(
       address: token.toLowerCase(),
       network,
     })),
-    label: ({ resolvedTokens }) => {
+    displayProps: ({ resolvedTokens }) => {
       const token0 = resolvedTokens[token0Address.toLowerCase()]
       const token1 = resolvedTokens[token1Address.toLowerCase()]
-      return `Pool: ${token0.symbol} / ${token1.symbol}`
+      return {
+        title: `${token0.symbol} / ${token1.symbol}`,
+        description: 'Pool',
+        iconUrl: '', // TODO
+      }
     },
     pricePerShare: async ({ tokensByAddress }) => {
       const [[reserve0, reserve1], totalSupply] = await client.multicall({
@@ -189,9 +193,15 @@ async function getFarmPositionDefinitions(
         network,
         address: farm.stakingAddress.toLowerCase(),
         tokens: [{ address: farm.lpAddress.toLowerCase(), network }],
-        label: ({ resolvedTokens }) => {
-          const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
-          return `Farm: ${(poolToken as AppTokenPosition).label}`
+        displayProps: ({ resolvedTokens }) => {
+          const poolToken = resolvedTokens[
+            farm.lpAddress.toLowerCase()
+          ] as AppTokenPosition
+          return {
+            title: poolToken.displayProps.title,
+            description: 'Farm',
+            iconUrl: poolToken.displayProps.iconUrl,
+          }
         },
         balances: async ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
