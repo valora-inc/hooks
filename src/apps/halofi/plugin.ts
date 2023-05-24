@@ -145,7 +145,8 @@ const plugin: AppPlugin = {
         displayProps: {
           title: game.gameNameShort,
           description: 'Challenge',
-          imageUrl: '', // TODO
+          imageUrl:
+            'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/halofi.png',
         },
         balances: async () => {
           return [
