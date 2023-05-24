@@ -99,7 +99,8 @@ const plugin: AppPlugin = {
       displayProps: {
         title: 'Locked CELO',
         description: '', // TODO
-        imageUrl: '', // TODO
+        imageUrl:
+          'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
       },
       balances: async () => {
         return [
