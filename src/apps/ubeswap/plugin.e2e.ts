@@ -9,4 +9,12 @@ describe('getPositionDefinitions', () => {
     // Simple check to make sure we got some definitions
     expect(positions.length).toBeGreaterThan(0)
   })
+
+  it('should get no definitions for an address with no blockchain interaction', async () => {
+    const positions = await plugin.getPositionDefinitions(
+      'celo',
+      '0x0000000000000000000000000000000000007E57',
+    )
+    expect(positions.length).toBe(0)
+  })
 })
