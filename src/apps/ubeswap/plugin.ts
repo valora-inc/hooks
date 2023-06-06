@@ -119,7 +119,7 @@ async function getPoolPositionDefinitions(
     })
     .json<any>()
 
-  const pairs: Address[] = data.user.liquidityPositions
+  const pairs: Address[] = (data.user?.liquidityPositions ?? [])
     .filter((position: any) => Number(position.liquidityTokenBalance) > 0)
     .map((position: any) => position.pair.id)
 
