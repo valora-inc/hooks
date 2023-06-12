@@ -31,7 +31,7 @@
   "dependencies": {
     "bignumber.js": "^9.1.1",
     "got": "^11.8.6",
-    "viem": "^1.0.1"
+    "viem": "^1.0.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.2",
