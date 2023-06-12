@@ -6485,10 +6485,10 @@ validate-npm-package-name@^5.0.0:
   dependencies:
     builtins "^5.0.0"
 
-viem@^1.0.1:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-1.0.3.tgz#6fb07989c9c0c9df932ca2fecf87641430a0dad6"
-  integrity sha512-WICDQqWTTVRRkhOC93uiorLPq9aKeM4gCZpUGLInarT3AbtI1dSrturPZRskGbA1sHnTdvrR5Or+GsA/WHszwQ==
+viem@^1.0.2:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-1.0.5.tgz#e796ef944b9d5f6239de5fb5fea1d69774c8f437"
+  integrity sha512-PvCPjvgk/H0S9bEA2tBoeNoTBHuJ7Ocs++BIcl8AO5djxlkjdbkPq73d/PJ8KnU7+o3PeX+tLmozxS/upiNUnQ==
   dependencies:
     "@adraffy/ens-normalize" "1.9.0"
     "@noble/curves" "1.0.0"
