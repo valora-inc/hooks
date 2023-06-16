@@ -91,6 +91,12 @@ const plugin: AppPlugin = {
       }
     }
 
+    const totalCelo =
+      totalLockedCelo + totalCeloUnlocking + totalCeloWithdrawable
+    if (totalCelo === 0n) {
+      return []
+    }
+
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
       network,
@@ -103,12 +109,7 @@ const plugin: AppPlugin = {
           'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
       },
       balances: async () => {
-        return [
-          toDecimalNumber(
-            totalLockedCelo + totalCeloUnlocking + totalCeloWithdrawable,
-            CELO_DECIMALS,
-          ),
-        ]
+        return [toDecimalNumber(totalCelo, CELO_DECIMALS)]
       },
     }
 
