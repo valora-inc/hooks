@@ -87,7 +87,7 @@ export interface AbstractPosition {
   label: string // Example: Pool
   displayProps: DisplayProps
   tokens: (Token & { category?: TokenCategory })[]
-  availableShortcutIds?: string[] // Allows to apply shortcuts to positions
+  availableShortcutIds: string[] // Allows to apply shortcuts to positions
 }
 
 export interface AbstractToken {

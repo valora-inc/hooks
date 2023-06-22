@@ -65,6 +65,7 @@ void (async () => {
           balance: balance.toFixed(2),
           balanceUsd: balance.times(position.priceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
+          availableShortcutIds: position.availableShortcutIds,
         }
       } else {
         return {
@@ -75,6 +76,7 @@ void (async () => {
           title: `${position.displayProps.title} (${position.displayProps.description})`,
           balanceUsd: new BigNumber(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
+          availableShortcutIds: position.availableShortcutIds,
         }
       }
     }),
