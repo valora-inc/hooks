@@ -196,6 +196,7 @@ async function getFarmPositionDefinitions(
           {
             address: farm.rewardsTokenAddress.toLowerCase(),
             network,
+            category: 'claimable',
           },
         ],
         displayProps: ({ resolvedTokens }) => {
@@ -208,7 +209,7 @@ async function getFarmPositionDefinitions(
             imageUrl: poolToken.displayProps.imageUrl,
           }
         },
-
+        availableShortcutIds: ['claim-reward'],
         balances: async ({ resolvedTokens }) => {
           const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
           const share = new BigNumber(farm.balance.toString()).div(

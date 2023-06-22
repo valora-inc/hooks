@@ -263,6 +263,7 @@ async function resolveAppTokenPosition(
     supply: toSerializedDecimalNumber(
       toDecimalNumber(totalSupply, positionTokenInfo.decimals),
     ),
+    availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
   }
 
   return position
@@ -286,7 +287,10 @@ async function resolveContractPosition(
 
   const tokens = positionDefinition.tokens.map((token, i) =>
     tokenWithUnderlyingBalance(
-      resolvedTokens[token.address],
+      {
+        ...resolvedTokens[token.address],
+        ...(token.category && { category: token.category }),
+      },
       balances[i],
       new BigNumber(1) as DecimalNumber,
     ),
@@ -311,6 +315,7 @@ async function resolveContractPosition(
     displayProps,
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
+    availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
   }
 
   return position

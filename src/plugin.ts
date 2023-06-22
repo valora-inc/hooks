@@ -19,6 +19,8 @@ export interface TokenDefinition {
   network: string
 }
 
+export type TokenCategory = 'claimable' // We could add more categories later
+
 export interface DisplayPropsContext {
   resolvedTokens: Record<string, Omit<Token, 'balance'>>
 }
@@ -33,7 +35,11 @@ export interface AbstractPositionDefinition {
   network: string
   address: string
   displayProps: ((context: DisplayPropsContext) => DisplayProps) | DisplayProps
-  tokens: TokenDefinition[]
+  tokens: (TokenDefinition & {
+    category?: TokenCategory
+  })[]
+
+  availableShortcutIds?: string[] // Allows to apply shortcuts to positions
 }
 
 export interface PricePerShareContext {
@@ -79,8 +85,9 @@ export interface AbstractPosition {
    * @deprecated replaced by displayProps
    */
   label: string // Example: Pool
-  tokens: Token[]
   displayProps: DisplayProps
+  tokens: (Token & { category?: TokenCategory })[]
+  availableShortcutIds: string[] // Allows to apply shortcuts to positions
 }
 
 export interface AbstractToken {
