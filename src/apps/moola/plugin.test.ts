@@ -22,14 +22,28 @@ describe('getPositionDefinitions', () => {
       0n, // 0 cEUR stable debt
       0n, // 0 cUSD stable debt
       0n, // 0 cREAL stable debt
-      0n, // 0 CELO stable debt
+      2n * 10n ** 18n, // 2 CELO stable debt
     ])
     const positions = await plugin.getPositionDefinitions(
       mockNetwork,
       mockAddress,
     )
 
-    expect(positions.length).toBe(1)
+    expect(positions.length).toBe(2)
+    expect(positions.map((p) => p.displayProps)).toMatchInlineSnapshot(`
+      [
+        {
+          "description": "Moola variable debt",
+          "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mcEUR.png",
+          "title": "cEUR debt",
+        },
+        {
+          "description": "Moola stable debt",
+          "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mCELO.png",
+          "title": "CELO debt",
+        },
+      ]
+    `)
   })
 
   it('should return no debt token positions when user has no debt', async () => {

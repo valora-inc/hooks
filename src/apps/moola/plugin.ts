@@ -59,28 +59,32 @@ const debtTokensInfo: DebtTokensInfo[] = [
   {
     tokenAddress: '0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73',
     debtTokenAddress: '0x612599d8421f36b7da4ddba201a3854ff55e3d03',
-    imageUrl: '',
+    imageUrl:
+      'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mcEUR.png',
     description: 'Moola stable debt',
     title: 'cEUR debt',
   },
   {
     tokenAddress: '0x765de816845861e75a25fca122bb6898b8b1282a',
     debtTokenAddress: '0xa9f50d9f7c03e8b48b2415218008822ea3334adb',
-    imageUrl: '',
+    imageUrl:
+      'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mcUSD.png',
     description: 'Moola stable debt',
     title: 'cUSD debt',
   },
   {
     tokenAddress: '0xe8537a3d056da446677b9e9d6c5db704eaab4787',
     debtTokenAddress: '0x0d00d9a02b85e9274f60a082609f44f7c57f373d',
-    imageUrl: '',
+    imageUrl:
+      'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mcREAL.png',
     description: 'Moola stable debt',
     title: 'cREAL debt',
   },
   {
     tokenAddress: '0x471ece3750da237f93b8e339c536989b8978a438',
     debtTokenAddress: '0x02661dd90c6243fe5cdf88de3e8cb74bcc3bd25e',
-    imageUrl: '',
+    imageUrl:
+      'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mCELO.png',
     description: 'Moola stable debt',
     title: 'CELO debt',
   },
