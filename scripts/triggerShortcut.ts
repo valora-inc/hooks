@@ -1,7 +1,7 @@
 // Helper script to trigger a shortcut
 /* eslint-disable no-console */
 import yargs from 'yargs'
-import { Address, createWalletClient, http } from 'viem'
+import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 import { celo } from 'viem/chains'
 import { getShortcuts } from '../src/getShortcuts'
@@ -98,18 +98,26 @@ void (async () => {
     )
   }
 
-  const client = createWalletClient({
+  const wallet = createWalletClient({
     account,
+    chain: celo,
+    transport: http(),
+  })
+  const client = createPublicClient({
     chain: celo,
     transport: http(),
   })
 
   for (const transaction of result) {
-    const tx = await client.sendTransaction({
+    const txHash = await wallet.sendTransaction({
       // from: transaction.from as Address,
       to: transaction.to as Address,
       data: transaction.data as `0x${string}`,
     })
-    console.log('Transaction sent:', tx)
+    console.log(`Transaction sent, waiting for receipt: ${txHash}`)
+
+    const receipt = await client.waitForTransactionReceipt({ hash: txHash })
+
+    console.log('Transaction receipt:', receipt)
   }
 })()
