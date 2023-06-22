@@ -15,5 +15,9 @@ export interface ShortcutDefinition {
   ) => Promise<Transaction[]> // 0, 1 or more transactions to sign by the user
 }
 
-// TODO: define a transaction type
-type Transaction = any
+export type Transaction = {
+  network: string
+  from: string
+  to: string
+  data: string
+}
