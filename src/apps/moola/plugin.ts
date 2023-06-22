@@ -1,7 +1,4 @@
-import {
-  AppPlugin,
-  AppTokenPositionDefinition,
-} from '../../plugin'
+import { AppPlugin, AppTokenPositionDefinition } from '../../plugin'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
@@ -51,14 +48,10 @@ const plugin: AppPlugin = {
       allowFailure: false,
     })
 
-    return MOOLA_DEBT_TOKENS
-      .filter((_, i) => debtTokenBalances[i])
-      .map((debtTokenDefinition) =>
-        getAppTokenPositionDefinition(
-          debtTokenDefinition,
-          network
-        ),
-      )
+    return MOOLA_DEBT_TOKENS.filter((_, i) => debtTokenBalances[i]).map(
+      (debtTokenDefinition) =>
+        getAppTokenPositionDefinition(debtTokenDefinition, network),
+    )
   },
   getAppTokenDefinition(_) {
     // We don't need this for now, since there are no intermediary tokens
