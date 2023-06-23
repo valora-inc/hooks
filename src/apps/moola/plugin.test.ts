@@ -34,12 +34,12 @@ describe('getPositionDefinitions', () => {
       [
         {
           "description": "Moola variable debt",
-          "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mcEUR.png",
+          "imageUrl": "https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/moola.png",
           "title": "cEUR debt",
         },
         {
           "description": "Moola stable debt",
-          "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/mCELO.png",
+          "imageUrl": "https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/moola.png",
           "title": "CELO debt",
         },
       ]
