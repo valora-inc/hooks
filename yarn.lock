@@ -1437,10 +1437,10 @@ abbrev@^2.0.0:
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-2.0.0.tgz#cf59829b8b4f03f89dda2771cb7f3653828c89bf"
   integrity sha512-6/mh1E2u2YgEsCHdY0Yx5oW+61gZU+1vXaoiHHrpKeuRNNgFvS+/jrwHiQhB5apAf5oB7UB7E19ol2R2LKH8hQ==
 
-abitype@0.8.7:
-  version "0.8.7"
-  resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.8.7.tgz#e4b3f051febd08111f486c0cc6a98fa72d033622"
-  integrity sha512-wQ7hV8Yg/yKmGyFpqrNZufCxbszDe5es4AZGYPBitocfSqXtjrTG9JMWFcc4N30ukl2ve48aBTwt7NJxVQdU3w==
+abitype@0.8.11:
+  version "0.8.11"
+  resolved "https://registry.yarnpkg.com/abitype/-/abitype-0.8.11.tgz#66e1cf2cbf46f48d0e57132d7c1c392447536cc1"
+  integrity sha512-bM4v2dKvX08sZ9IU38IN5BKmN+ZkOSd2oI4a9f0ejHYZQYV6cDr7j+d95ga0z2XHG36Y4jzoG5Z7qDqxp7fi/A==
 
 abort-controller@^3.0.0:
   version "3.0.0"
@@ -6483,10 +6483,10 @@ validate-npm-package-name@^5.0.0:
   dependencies:
     builtins "^5.0.0"
 
-viem@^1.1.7:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-1.2.1.tgz#88ea214b50ce6c74b0173c1cdfb5bb4bc7f6134d"
-  integrity sha512-45eyE1QsPzUTJqslOD8SVAF3Nn3QMLZIKTu/YzaPPe8UuDMwrmvAWlfDole2kBzFAM8B6sXsQeZBQKYwtb7dVQ==
+viem@^1.1.8:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-1.2.6.tgz#aa205be5eea4153623ad8cd732fb0477efc55e0f"
+  integrity sha512-3tWiUb0D8dbFj66rUGLg6TKJjH98ZziomkyCyI0evqJFYdNfiEG0K2Ns07MlOXZZF4sGe+a5Mj15DaDOwm7sgw==
   dependencies:
     "@adraffy/ens-normalize" "1.9.0"
     "@noble/curves" "1.0.0"
@@ -6494,7 +6494,7 @@ viem@^1.1.7:
     "@scure/bip32" "1.3.0"
     "@scure/bip39" "1.2.0"
     "@wagmi/chains" "1.2.0"
-    abitype "0.8.7"
+    abitype "0.8.11"
     isomorphic-ws "5.0.0"
     ws "8.12.0"
 
