@@ -1,4 +1,4 @@
-import { AppPlugin, AppTokenPositionDefinition } from '../../plugin'
+import { PositionsHook, AppTokenPositionDefinition } from '../../positions'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
@@ -29,7 +29,7 @@ function getAppTokenPositionDefinition(
   }
 }
 
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return {
       id: 'moola',
@@ -59,4 +59,4 @@ const plugin: AppPlugin = {
   },
 }
 
-export default plugin
+export default hook

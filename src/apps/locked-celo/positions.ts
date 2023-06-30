@@ -1,4 +1,4 @@
-import { AppPlugin, ContractPositionDefinition } from '../../plugin'
+import { PositionsHook, ContractPositionDefinition } from '../../positions'
 import {
   Address,
   ContractFunctionExecutionError,
@@ -33,7 +33,7 @@ function zip<A, B>(as: readonly A[], bs: readonly B[]) {
   return res
 }
 
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return {
       id: 'locked-celo',
@@ -121,4 +121,4 @@ const plugin: AppPlugin = {
   },
 }
 
-export default plugin
+export default hook

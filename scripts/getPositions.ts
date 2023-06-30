@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
-import { Token } from '../src/plugin'
+import { Token } from '../src/positions'
 import { getPositions } from '../src/getPositions'
 
 const argv = yargs(process.argv.slice(2))
