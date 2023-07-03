@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { DecimalNumber } from '../../numbers'
 import {
-  AppPlugin,
+  PositionsHook,
   ContractPositionDefinition,
   TokenDefinition,
-} from '../../plugin'
+} from '../../positions'
 import got from 'got'
 
 // User-Agent header is required by the HaloFi API
@@ -100,7 +100,7 @@ type Reward = {
   type: string
 }
 
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return {
       id: 'halofi',
@@ -165,4 +165,4 @@ const plugin: AppPlugin = {
   },
 }
 
-export default plugin
+export default hook

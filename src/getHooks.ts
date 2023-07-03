@@ -1,12 +1,12 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import { AppPlugin } from './plugin'
+import { PositionsHook } from './positions'
 import { ShortcutsHook } from './shortcuts'
 
 type HookTypeName = 'positions' | 'shortcuts'
 
 type HookType<T> = T extends 'positions'
-  ? AppPlugin
+  ? PositionsHook
   : T extends 'shortcuts'
   ? ShortcutsHook
   : never
@@ -35,7 +35,7 @@ export async function getHooks<T extends HookTypeName>(
   hookType: T,
 ): Promise<Record<string, HookType<T>>> {
   const allAppIds = await getAllAppIds()
-  const plugins: Record<string, HookType<T>> = {}
+  const hooks: Record<string, HookType<T>> = {}
   const appIdsToLoad = appIds.length === 0 ? allAppIds : appIds
   for (const appId of appIdsToLoad) {
     if (!allAppIds.includes(appId)) {
@@ -46,9 +46,9 @@ export async function getHooks<T extends HookTypeName>(
       )
     }
 
-    let plugin: any
+    let hook: any
     try {
-      plugin = await import(`./apps/${appId}/${hookType}`)
+      hook = await import(`./apps/${appId}/${hookType}`)
     } catch (e) {
       if (appIds.includes(appId)) {
         if ((e as any).code === 'MODULE_NOT_FOUND') {
@@ -59,9 +59,9 @@ export async function getHooks<T extends HookTypeName>(
         throw e
       }
     }
-    if (plugin?.default) {
-      plugins[appId] = plugin.default
+    if (hook?.default) {
+      hooks[appId] = hook.default
     }
   }
-  return plugins
+  return hooks
 }

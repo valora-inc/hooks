@@ -1,11 +1,11 @@
 import {
-  AppPlugin,
+  PositionsHook,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPositionDefinition,
   PositionDefinition,
   TokenDefinition,
-} from '../../plugin'
+} from '../../positions'
 import got from 'got'
 import BigNumber from 'bignumber.js'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
@@ -253,7 +253,7 @@ async function getFarmPositionDefinitions(
   return positions
 }
 
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return {
       id: 'ubeswap',
@@ -275,4 +275,4 @@ const plugin: AppPlugin = {
   },
 }
 
-export default plugin
+export default hook

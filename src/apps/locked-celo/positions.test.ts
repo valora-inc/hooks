@@ -1,4 +1,4 @@
-import plugin from './plugin'
+import hook from './positions'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -15,7 +15,7 @@ describe('getPositionDefinitions', () => {
       12n * 10n ** 18n, // 12 locked celo
       [[], []], // pending withdrawals
     ])
-    const positions = await plugin.getPositionDefinitions(
+    const positions = await hook.getPositionDefinitions(
       'celo',
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
@@ -28,7 +28,7 @@ describe('getPositionDefinitions', () => {
       0n, // 0 locked celo
       [[], []], // pending withdrawals
     ])
-    const positions = await plugin.getPositionDefinitions(
+    const positions = await hook.getPositionDefinitions(
       'celo',
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )

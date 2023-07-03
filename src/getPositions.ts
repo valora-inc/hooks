@@ -1,7 +1,5 @@
 // Allow console logs for now, since we're early in development
 /* eslint-disable no-console */
-import { promises as fs } from 'fs'
-import path from 'path'
 import got from 'got'
 import BigNumber from 'bignumber.js'
 import {
@@ -15,7 +13,6 @@ import { erc20Abi } from './abis/erc-20'
 import {
   AbstractToken,
   AppInfo,
-  AppPlugin,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPosition,
@@ -25,12 +22,13 @@ import {
   PositionDefinition,
   PricePerShareContext,
   Token,
-} from './plugin'
+} from './positions'
 import {
   DecimalNumber,
   toDecimalNumber,
   toSerializedDecimalNumber,
 } from './numbers'
+import { getHooks } from './getHooks'
 
 interface RawTokenInfo {
   address: string
@@ -57,45 +55,6 @@ const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
-
-const APP_ID_PATTERN = /^[a-zA-Z0-9-]+$/
-
-async function getAllAppIds(): Promise<string[]> {
-  // Read all folders from the "apps" folder
-  const files = await fs.readdir(path.join(__dirname, 'apps'), {
-    withFileTypes: true,
-  })
-  const folders = files.filter((file) => file.isDirectory())
-  // Check that all folders are valid app ids
-  for (const folder of folders) {
-    if (!APP_ID_PATTERN.test(folder.name)) {
-      throw new Error(
-        `Invalid app id: '${folder.name}', must match ${APP_ID_PATTERN}`,
-      )
-    }
-  }
-  return folders.map((folder) => folder.name)
-}
-
-async function getPlugins(
-  appIds: string[],
-): Promise<Record<string, AppPlugin>> {
-  const allAppIds = await getAllAppIds()
-  const plugins: Record<string, AppPlugin> = {}
-  const appIdsToLoad = appIds.length === 0 ? allAppIds : appIds
-  for (const appId of appIdsToLoad) {
-    if (!allAppIds.includes(appId)) {
-      throw new Error(
-        `No app with id '${appId}' found, available apps: ${allAppIds.join(
-          ', ',
-        )}`,
-      )
-    }
-    const plugin = await import(`./apps/${appId}/plugin`)
-    plugins[appId] = plugin.default
-  }
-  return plugins
-}
 
 async function getBaseTokensInfo(): Promise<TokensInfo> {
   // Get base tokens
@@ -341,11 +300,11 @@ export async function getPositions(
   address: string,
   appIds: string[] = [],
 ) {
-  const pluginsByAppId = await getPlugins(appIds)
+  const hooksByAppId = await getHooks(appIds, 'positions')
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
-    Object.entries(pluginsByAppId).map(([appId, plugin]) =>
+    Object.entries(hooksByAppId).map(([appId, plugin]) =>
       plugin.getPositionDefinitions(network, address).then((definitions) => {
         return definitions.map((definition) => addAppId(definition, appId))
       }),
@@ -406,7 +365,7 @@ export async function getPositions(
             // Assume the token is an app token from the plugin
             // TODO: We'll probably need to allow plugins to specify the app id themselves
             const { sourceAppId } = tokenDefinition
-            const plugin = pluginsByAppId[sourceAppId]
+            const plugin = hooksByAppId[sourceAppId]
             const appTokenDefinition = await plugin
               .getAppTokenDefinition(tokenDefinition)
               .then((definition) => addAppId(definition, sourceAppId))
@@ -510,7 +469,7 @@ export async function getPositions(
 
     console.log('Resolving definition', type, positionDefinition.address)
 
-    const appInfo = pluginsByAppId[positionDefinition.appId].getInfo()
+    const appInfo = hooksByAppId[positionDefinition.appId].getInfo()
 
     let position: Position
     switch (type) {

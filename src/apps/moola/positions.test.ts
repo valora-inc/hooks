@@ -1,4 +1,4 @@
-import plugin from './plugin'
+import hook from './positions'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -24,7 +24,7 @@ describe('getPositionDefinitions', () => {
       0n, // 0 cREAL stable debt
       2n * 10n ** 18n, // 2 CELO stable debt
     ])
-    const positions = await plugin.getPositionDefinitions(
+    const positions = await hook.getPositionDefinitions(
       mockNetwork,
       mockAddress,
     )
@@ -57,7 +57,7 @@ describe('getPositionDefinitions', () => {
       0n, // 0 cREAL stable debt
       0n, // 0 CELO stable debt
     ])
-    const positions = await plugin.getPositionDefinitions(
+    const positions = await hook.getPositionDefinitions(
       mockNetwork,
       mockAddress,
     )
