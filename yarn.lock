@@ -6483,7 +6483,7 @@ validate-npm-package-name@^5.0.0:
   dependencies:
     builtins "^5.0.0"
 
-viem@^1.2.6:
+viem@^1.2.7:
   version "1.2.9"
   resolved "https://registry.yarnpkg.com/viem/-/viem-1.2.9.tgz#8ccf786cd00d28b14b644f2b9fe35fc6bf2bdc41"
   integrity sha512-EnEbTuAAHv43unUgMISdQXbD9mrhZLvOdmf6eRGbDFl+XwP/PEzZAT79RaWAuDPnLXGMP1gBCJF++NFjSMukUw==
