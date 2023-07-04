@@ -4,7 +4,7 @@ import yargs from 'yargs'
 import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 import { celo } from 'viem/chains'
-import { getShortcuts } from '../src/getShortcuts'
+import { getShortcuts } from '../src/runtime/getShortcuts'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 

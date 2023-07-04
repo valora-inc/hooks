@@ -5,14 +5,14 @@ import {
   ContractPositionDefinition,
   PositionDefinition,
   TokenDefinition,
-} from '../../positions'
+} from '../../types/positions'
 import got from 'got'
 import BigNumber from 'bignumber.js'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
-import { DecimalNumber, toDecimalNumber } from '../../numbers'
+import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
 

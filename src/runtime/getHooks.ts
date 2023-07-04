@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import { PositionsHook } from './positions'
-import { ShortcutsHook } from './shortcuts'
+import { PositionsHook } from '../types/positions'
+import { ShortcutsHook } from '../types/shortcuts'
 
 type HookTypeName = 'positions' | 'shortcuts'
 
