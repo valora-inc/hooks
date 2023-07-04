@@ -9,7 +9,7 @@ import {
   http,
 } from 'viem'
 import { celo } from '@wagmi/chains'
-import { erc20Abi } from './abis/erc-20'
+import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
   AppInfo,
@@ -22,12 +22,12 @@ import {
   PositionDefinition,
   PricePerShareContext,
   Token,
-} from './positions'
+} from '../types/positions'
 import {
   DecimalNumber,
   toDecimalNumber,
   toSerializedDecimalNumber,
-} from './numbers'
+} from '../types/numbers'
 import { getHooks } from './getHooks'
 
 interface RawTokenInfo {

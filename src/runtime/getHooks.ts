@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
-import { PositionsHook } from './positions'
-import { ShortcutsHook } from './shortcuts'
+import { PositionsHook } from '../types/positions'
+import { ShortcutsHook } from '../types/shortcuts'
 
 type HookTypeName = 'positions' | 'shortcuts'
 
@@ -15,7 +15,7 @@ const APP_ID_PATTERN = /^[a-zA-Z0-9-]+$/
 
 async function getAllAppIds(): Promise<string[]> {
   // Read all folders from the "apps" folder
-  const files = await fs.readdir(path.join(__dirname, 'apps'), {
+  const files = await fs.readdir(path.join(__dirname, '../apps'), {
     withFileTypes: true,
   })
   const folders = files.filter((file) => file.isDirectory())
@@ -48,7 +48,7 @@ export async function getHooks<T extends HookTypeName>(
 
     let hook: any
     try {
-      hook = await import(`./apps/${appId}/${hookType}`)
+      hook = await import(`../apps/${appId}/${hookType}`)
     } catch (e) {
       if (appIds.includes(appId)) {
         if ((e as any).code === 'MODULE_NOT_FOUND') {

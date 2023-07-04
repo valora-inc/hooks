@@ -1,10 +1,10 @@
 import BigNumber from 'bignumber.js'
-import { DecimalNumber } from '../../numbers'
+import { DecimalNumber } from '../../types/numbers'
 import {
   PositionsHook,
   ContractPositionDefinition,
   TokenDefinition,
-} from '../../positions'
+} from '../../types/positions'
 import got from 'got'
 
 // User-Agent header is required by the HaloFi API

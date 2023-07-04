@@ -1,8 +1,11 @@
-import { PositionsHook, AppTokenPositionDefinition } from '../../positions'
+import {
+  PositionsHook,
+  AppTokenPositionDefinition,
+} from '../../types/positions'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
-import { DecimalNumber } from '../../numbers'
+import { DecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { DebtTokenDefinition, MOOLA_DEBT_TOKENS } from './debtTokens'
 

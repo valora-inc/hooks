@@ -25,7 +25,7 @@ From the information provided by the hook, Valora can show the user the value of
 
 Hooks are organized by application. For instance Ubeswap hooks are located in [`https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap`](https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap).
 
-Position pricing hooks must implement the [`PositionsHook`](https://github.com/valora-inc/hooks/blob/main/src/positions.ts) TypeScript interface.
+Position pricing hooks must implement the [`PositionsHook`](https://github.com/valora-inc/hooks/blob/main/src/types/positions.ts) TypeScript interface.
 
 ### Creating a Position Pricing Hook
 

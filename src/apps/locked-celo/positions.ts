@@ -1,4 +1,7 @@
-import { PositionsHook, ContractPositionDefinition } from '../../positions'
+import {
+  PositionsHook,
+  ContractPositionDefinition,
+} from '../../types/positions'
 import {
   Address,
   ContractFunctionExecutionError,
@@ -7,7 +10,7 @@ import {
 } from 'viem'
 import { celo } from 'viem/chains'
 import { LockedGoldAbi } from './abis/locked-gold'
-import { toDecimalNumber } from '../../numbers'
+import { toDecimalNumber } from '../../types/numbers'
 
 const CELO_ADDRESS = '0x471ece3750da237f93b8e339c536989b8978a438'
 const LOCKED_GOLD_ADDRESS = '0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e'

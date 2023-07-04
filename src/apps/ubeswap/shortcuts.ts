@@ -1,6 +1,6 @@
 import { Address, createPublicClient, http, encodeFunctionData } from 'viem'
 import { celo } from 'viem/chains'
-import { ShortcutsHook } from '../../shortcuts'
+import { ShortcutsHook } from '../../types/shortcuts'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 
 const client = createPublicClient({
