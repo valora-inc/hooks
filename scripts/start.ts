@@ -2,6 +2,7 @@
 import yargs from 'yargs'
 import qrcodeTerminal from 'qrcode-terminal'
 import internalIp from 'internal-ip'
+import chalk from 'chalk'
 import * as $ from 'shelljs'
 
 $.config.fatal = true
@@ -26,37 +27,6 @@ const argv = yargs(process.argv.slice(2))
   })
   .parseSync()
 
-const colors = {
-  bold: [1, 22],
-  italic: [3, 23],
-  underline: [4, 24],
-  inverse: [7, 27],
-  white: [37, 39],
-  grey: [90, 39],
-  black: [30, 39],
-  blue: [34, 39],
-  cyan: [36, 39],
-  green: [32, 39],
-  magenta: [35, 39],
-  red: [31, 39],
-  yellow: [33, 39],
-}
-
-/**
- * Add colors to the specified string, for colorized output in terminals
- */
-function stylize(str: string, color: keyof typeof colors) {
-  if (!str) {
-    return ''
-  }
-
-  const codes = colors[color]
-  if (codes) {
-    return '\x1B[' + codes[0] + 'm' + str + '\x1B[' + codes[1] + 'm'
-  }
-  return str
-}
-
 console.log('Starting hooks preview API server...')
 
 function printServerInfo() {
@@ -72,17 +42,14 @@ function printServerInfo() {
   )}`
   // This directly prints the QR code to the terminal
   qrcodeTerminal.generate(deeplink, { small: true })
-  console.log(stylize(deeplink, 'grey') + '\n')
+  console.log(chalk.gray(deeplink) + '\n')
 
-  console.log(`› Server URL: ${serverUrl}`)
+  console.log(`› Server URL: ${chalk.underline(serverUrl)}`)
   console.log(
     `› Scan the QR code above with Valora to enable live preview of hooks\n`,
   )
   console.log(
-    `Server logs will appear below. ${stylize(
-      'Press Ctrl+C to exit.',
-      'grey',
-    )}`,
+    `Server logs will appear below. ${chalk.gray('Press Ctrl+C to exit.')}`,
   )
 }
 
