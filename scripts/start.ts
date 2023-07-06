@@ -57,14 +57,14 @@ function startServer(command: string) {
   const child = $.exec(command, { async: true, silent: true })
   let serverReadyOnce = false
   // This string is printed by the functions-framework when the server is ready
+  // but we don't want print it since it says localhost
   const serverReadyString = `URL: http://localhost:${argv.port}/`
 
   // Wait for the server to be ready before printing the server info
   child.stdout!.on('data', function (data: Buffer) {
-    let readyIndex = -1
     const output = data.toString()
     // Remove serverReadyString from the output if it exists
-    readyIndex = output.indexOf(serverReadyString)
+    const readyIndex = output.indexOf(serverReadyString)
     if (readyIndex > -1) {
       data = Buffer.from(
         output.slice(0, readyIndex) +
