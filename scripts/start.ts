@@ -37,7 +37,7 @@ function printServerInfo() {
 
   const serverUrl = `http://${ipAddress}:${argv.port}`
 
-  const deeplink = `celo://wallet/enableHooksPreview?hooksApiUrl=${encodeURIComponent(
+  const deeplink = `celo://wallet/hooks/enablePreview?hooksApiUrl=${encodeURIComponent(
     serverUrl,
   )}`
   // This directly prints the QR code to the terminal
