@@ -4,9 +4,15 @@ import * as dotenv from 'dotenv'
 export function getConfig() {
   dotenv.config()
 
-  return z
-    .object({
-      GOOGLE_CLOUD_PROJECT: z.string().min(1),
-    })
-    .parse(process.env)
+  const productionSchema = z.object({
+    GOOGLE_CLOUD_PROJECT: z.string().min(1),
+  })
+
+  const developmentSchema = z.object({
+    GOOGLE_CLOUD_PROJECT: z.string().default('dev-project'),
+  })
+
+  return process.env.NODE_ENV === 'production'
+    ? productionSchema.parse(process.env)
+    : developmentSchema.parse(process.env)
 }
