@@ -15,6 +15,10 @@ describe('start', () => {
       })
     })
 
+    if (!child.pid) {
+      throw new Error('Child process has no PID')
+    }
+
     // Terminate the child process along with all its children
     await expect(terminate(child.pid)).resolves.toBeUndefined()
   })
