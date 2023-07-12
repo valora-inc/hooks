@@ -1,0 +1,2 @@
+# This is interestingly not set for us in the Cloud Function environment
+GOOGLE_CLOUD_PROJECT: celo-mobile-mainnet
