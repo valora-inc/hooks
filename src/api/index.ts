@@ -14,7 +14,7 @@ import { getShortcuts } from '../runtime/getShortcuts'
 
 // Elide Halofi because it's consistently 403ing and causing this endpoint to
 // return 500.
-const ENABLED_HOOK_APP_IDS = ['ubeswap', 'locked-celo', 'moola']
+const ENABLED_HOOK_APP_IDS = ['ubeswap', 'locked-celo', 'moola', 'gooddollar']
 
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
