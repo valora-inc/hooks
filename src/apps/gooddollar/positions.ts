@@ -82,7 +82,8 @@ const hook: PositionsHook = {
       type: 'contract-position-definition',
       network,
       address: UBI_ADDRESS,
-      tokens: [{ address: G$_ADDRESS, network }],
+      tokens: [{ address: G$_ADDRESS, network, category: 'claimable' }],
+      availableShortcutIds: ['claim-reward'],
       displayProps: {
         title: 'Daily UBI',
         description: !isWhitelisted
