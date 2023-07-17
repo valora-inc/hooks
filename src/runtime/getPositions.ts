@@ -313,7 +313,7 @@ export async function getPositions(
         (err) => {
           // In case of an error, log and return an empty array
           // so other positions can still be resolved
-          logger.warn(
+          logger.error(
             { err },
             `Failed to get position definitions for ${appId}`,
           )
