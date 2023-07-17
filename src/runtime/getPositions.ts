@@ -29,6 +29,7 @@ import {
   toSerializedDecimalNumber,
 } from '../types/numbers'
 import { getHooks } from './getHooks'
+import { logger } from '../log'
 
 interface RawTokenInfo {
   address: string
@@ -305,9 +306,20 @@ export async function getPositions(
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, plugin]) =>
-      plugin.getPositionDefinitions(network, address).then((definitions) => {
-        return definitions.map((definition) => addAppId(definition, appId))
-      }),
+      plugin.getPositionDefinitions(network, address).then(
+        (definitions) => {
+          return definitions.map((definition) => addAppId(definition, appId))
+        },
+        (err) => {
+          // In case of error, log and return empty array
+          // so other positions can still be resolved
+          logger.warn(
+            { err },
+            `Failed to get position definitions for ${appId}`,
+          )
+          return []
+        },
+      ),
     ),
   ).then((definitions) => definitions.flat())
   console.log('positions definitions', JSON.stringify(definitions, null, ' '))

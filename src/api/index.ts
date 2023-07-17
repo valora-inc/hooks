@@ -7,14 +7,10 @@ import {
 import express from 'express'
 import { z } from 'zod'
 import { getConfig } from './config'
-import { logger } from './log'
+import { logger } from '../log'
 import { parseRequest } from './parseRequest'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
-
-// Elide Halofi because it's consistently 403ing and causing this endpoint to
-// return 500.
-const ENABLED_HOOK_APP_IDS = ['ubeswap', 'locked-celo', 'moola']
 
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
@@ -46,11 +42,7 @@ function createApp() {
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, balancesRequestSchema)
       const { network, address } = parsedRequest.query
-      const positions = await getPositions(
-        network,
-        address,
-        ENABLED_HOOK_APP_IDS,
-      )
+      const positions = await getPositions(network, address)
       res.send({ message: 'OK', data: positions })
     }),
   )
