@@ -10,5 +10,5 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
-  setupFiles: ['<rootDir>/jest.e2e.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.e2e.setup.js'],
 }
