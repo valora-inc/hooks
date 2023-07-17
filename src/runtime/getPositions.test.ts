@@ -56,7 +56,7 @@ const failingTestHook: PositionsHook = {
   },
 }
 
-const loggerWarnSpy = jest.spyOn(logger, 'warn')
+const loggerErrorSpy = jest.spyOn(logger, 'error')
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -74,8 +74,8 @@ describe(getPositions, () => {
     )
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
-    expect(loggerWarnSpy).toHaveBeenCalledTimes(1)
-    expect(loggerWarnSpy).toHaveBeenCalledWith(
+    expect(loggerErrorSpy).toHaveBeenCalledTimes(1)
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
       { err: new Error('This hook fails') },
       'Failed to get position definitions for failing-hook',
     )
