@@ -1,4 +1,4 @@
-import { logger } from './log'
+import { logger } from '../log'
 import { AnyZodObject, ZodError, z } from 'zod'
 import { HttpError, Request } from '@valora/http-handler'
 
