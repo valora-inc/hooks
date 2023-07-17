@@ -311,7 +311,7 @@ export async function getPositions(
           return definitions.map((definition) => addAppId(definition, appId))
         },
         (err) => {
-          // In case of error, log and return empty array
+          // In case of an error, log and return an empty array
           // so other positions can still be resolved
           logger.warn(
             { err },
