@@ -44,7 +44,7 @@ const hook: PositionsHook = {
       abi: identityAbi,
     } as const
 
-    const [isWhitelisted, currentDay, periodStart, claimAmount] =
+    const [isVerified, currentDay, periodStart, claimAmount] =
       await client.multicall({
         contracts: [
           {
@@ -69,6 +69,10 @@ const hook: PositionsHook = {
         allowFailure: false,
       })
 
+    if (!isVerified) {
+      return []
+    }
+
     let startDate = new Date(
       Number(periodStart) * 1000 + Number(currentDay) * ONE_DAY_IN_MS,
     )
@@ -86,7 +90,7 @@ const hook: PositionsHook = {
       availableShortcutIds: ['claim-reward'],
       displayProps: {
         title: 'Daily UBI',
-        description: !isWhitelisted
+        description: !isVerified
           ? 'Verify on the dapp to claim'
           : claimAmount > 0n
           ? 'Claim now'
