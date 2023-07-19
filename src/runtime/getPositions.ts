@@ -172,7 +172,7 @@ async function resolveAppTokenPosition(
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
     const tokenInfo = tokensByAddress[token.address]!
-    priceUsd = priceUsd.plus(tokenInfo.priceUsd).times(pricePerShare[i])
+    priceUsd = priceUsd.plus(pricePerShare[i].times(tokenInfo.priceUsd))
   }
 
   const positionTokenInfo = tokensByAddress[positionDefinition.address]!
