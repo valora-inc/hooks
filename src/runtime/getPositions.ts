@@ -29,6 +29,7 @@ import {
   toSerializedDecimalNumber,
 } from '../types/numbers'
 import { getHooks } from './getHooks'
+import { logger } from '../log'
 
 interface RawTokenInfo {
   address: string
@@ -171,7 +172,7 @@ async function resolveAppTokenPosition(
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
     const tokenInfo = tokensByAddress[token.address]!
-    priceUsd = priceUsd.plus(tokenInfo.priceUsd).times(pricePerShare[i])
+    priceUsd = priceUsd.plus(pricePerShare[i].times(tokenInfo.priceUsd))
   }
 
   const positionTokenInfo = tokensByAddress[positionDefinition.address]!
@@ -305,9 +306,20 @@ export async function getPositions(
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, plugin]) =>
-      plugin.getPositionDefinitions(network, address).then((definitions) => {
-        return definitions.map((definition) => addAppId(definition, appId))
-      }),
+      plugin.getPositionDefinitions(network, address).then(
+        (definitions) => {
+          return definitions.map((definition) => addAppId(definition, appId))
+        },
+        (err) => {
+          // In case of an error, log and return an empty array
+          // so other positions can still be resolved
+          logger.error(
+            { err },
+            `Failed to get position definitions for ${appId}`,
+          )
+          return []
+        },
+      ),
     ),
   ).then((definitions) => definitions.flat())
   console.log('positions definitions', JSON.stringify(definitions, null, ' '))

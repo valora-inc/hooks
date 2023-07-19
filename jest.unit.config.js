@@ -13,5 +13,5 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
   },
-  setupFiles: ['<rootDir>/jest.unit.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.unit.setup.js'],
 }

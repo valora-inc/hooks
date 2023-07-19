@@ -1,159 +1,70 @@
-import BigNumber from 'bignumber.js'
-import { DecimalNumber } from '../../types/numbers'
 import {
-  PositionsHook,
   ContractPositionDefinition,
+  PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
-import got from 'got'
+import { Address, zeroAddress } from 'viem'
 
-// User-Agent header is required by the HaloFi API
-const USER_AGENT =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)'
-
-type PlayerGameResponse = {
-  playerId: string
-  gameId: string
-  mostRecentSegmentPaid: number
-  paidAmount: string
-  netPaidAmount: string
-  withdrawn: boolean
-  withdrawalSegment: number
-  canRejoin: boolean
-  isWinner: boolean
-  isWaiting: boolean
-  gameStartsAt: string
-  waitingRoundStartsAt: string
-  segmentLength: string
-  waitingRoundLength: string
-  totalSegmentCount: string
-  paymentCount: string
-  currentSegment: string
-  isGameCompleted: boolean
-  gameAPY: string
-  totalEarningsConverted: string
-  playerTotalEarningsConverted: string
-  rewards?: RewardBalance[]
-  interestAmount: string
-}
-
-type RewardBalance = {
-  tokenId: string
-  address: string
-  type: string
-  balance: string
-  convertedBalance: string
-}
-
-type GamesResponse = Record<
-  string,
-  {
-    strategyController: string
-    displayId: number
-    networkId: string
-    depositToken: string
-    liquidityToken: string
-    gameName: string
-    subgraphId: string
-    roundMeasure: string
-    contractVersion: string
-    isCapped: boolean
-    maxPlayers: string
-    strategyProvider: string
-    paymentAmount: string
-    isWhitelisted: boolean
-    isHidden: boolean
-    ggScore: number
-    gameNameShort: string
-    description: string
-    payments: string
-    riskProfile: string
-    proposer: string
-    calenderUrl: string
-    blogPostUri: string
-    id: string
-    gameStartsAt: string
-    segmentLength: string
-    paymentCount: string
-    totalSegmentCount: string
-    waitingRoundStartsAt: string
-    waitingRoundLength: string
-    earlyWithdrawalFee: string
-    performanceFee: string
-    maxDepositAmount: string
-    tags?: string[]
-    liquidityTokenAddress: string
-    depositTokenAddress: string
-    depositType: string
-    mechanismType: string
-    gameEndsAt: string
-    gameClosesAt: string
-    rewards?: Reward[]
-    currentSegment: string
-    isCompleted: boolean
-  }
->
-
-type Reward = {
-  tokenId: string
-  address: string
-  type: string
-}
+import { toDecimalNumber } from '../../types/numbers'
+import { getCompatibleGamesFromAPI } from './haloFiApi'
+import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
 
 const hook: PositionsHook = {
   getInfo() {
     return {
       id: 'halofi',
       name: 'HaloFi',
-      description: '',
+      description:
+        'Grow wealth with crypto, earn rewards, badges & more. We make personal finance fun.',
     }
   },
   async getPositionDefinitions(network, address) {
-    const [games, playerGames] = await Promise.all([
-      got
-        .get('https://goodghosting-api.com/v1/games', {
-          headers: { 'User-Agent': USER_AGENT },
-        })
-        .json<GamesResponse>(),
-      got
-        .get('https://goodghosting-api.com/v1/players/active-games', {
-          searchParams: {
-            networkId: 42220, // Celo mainnet
-            playerAddress: address,
-          },
-          headers: { 'User-Agent': USER_AGENT },
-        })
-        .json<PlayerGameResponse[]>(),
-    ])
+    const compatibleGames = await getCompatibleGamesFromAPI()
 
-    // console.log({ games, playerGames })
+    const contractAddressList = compatibleGames.map(
+      (game) => game.id as Address,
+    )
+    const haloFiGamesPlayerHasJoined = await getPlayerStructFromGames(
+      contractAddressList,
+      address as Address,
+    ).then((structs) =>
+      structs
+        .map((playerStruct, index) => ({
+          playerStruct,
+          game: compatibleGames[index],
+        }))
+        .filter(
+          ({ playerStruct }) =>
+            playerStruct[PlayerStructIndex.playerAddress] !== zeroAddress,
+        )
+        .filter(
+          ({ playerStruct }) =>
+            playerStruct[PlayerStructIndex.withdrawn] === false,
+        ),
+    )
 
-    return playerGames.map((playerGame) => {
-      const game = games[playerGame.gameId]
-      const rewards = playerGame.rewards ?? []
+    return haloFiGamesPlayerHasJoined.map(({ playerStruct, game }) => {
+      const depositTokenAddress = game.depositTokenAddress.toLowerCase()
+
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
         network,
         address: game.id.toLowerCase(),
-        tokens: [
-          { address: game.depositTokenAddress.toLowerCase(), network },
-          ...rewards.map((reward) => ({
-            address: reward.address.toLowerCase(),
-            network,
-          })),
-        ],
+        tokens: [{ address: depositTokenAddress, network }],
         displayProps: {
           title: game.gameNameShort,
           description: 'Challenge',
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/halofi.png',
         },
-        balances: async () => {
-          return [
-            playerGame.paidAmount,
-            // Some of these are claimable rewards
-            ...rewards.map((reward) => reward.balance),
-          ].map((value) => new BigNumber(value) as DecimalNumber)
+        balances: async ({ resolvedTokens }) => {
+          const depositToken = resolvedTokens[depositTokenAddress]
+
+          const playerAmountPaid = toDecimalNumber(
+            playerStruct[PlayerStructIndex.netAmountPaid],
+            depositToken.decimals,
+          )
+          return [playerAmountPaid]
         },
       }
       return position
