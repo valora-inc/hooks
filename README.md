@@ -1,5 +1,10 @@
 # Valora Hooks
 
+[![GitHub License](https://img.shields.io/github/license/valora-inc/hooks?color=blue)](https://github.com/valora-inc/hooks/blob/main/LICENSE)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/valora-inc/hooks/.github/workflows/workflow.yaml?branch=main)](https://github.com/valora-inc/hooks/actions/workflows/workflow.yaml?query=branch%3Amain)
+[![Codecov](https://img.shields.io/codecov/c/github/valora-inc/hooks)](https://codecov.io/gh/valora-inc/hooks)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/valora-inc/hooks#contributing)
+
 Valora Hooks allows developers to extend Valora's functionality by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide Valora with additional information and features.
 
 Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks/overview) for more information.
