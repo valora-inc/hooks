@@ -1424,10 +1424,10 @@
   dependencies:
     "@google-cloud/functions-framework" "^3.1.3"
 
-"@valora/logging@^1.3.1":
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.1.tgz#253c3c28256ff86a3ec35c3348e01169a70a0cc9"
-  integrity sha512-E5Ct6F/Yy73iABB9Yb0fopEFzoGG4HeY5q12oQQ2wJI6V2SPb9/l6Jx4RLh7kGGlfZVIWuDxJt3Cd0vrm66tTg==
+"@valora/logging@^1.3.2":
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.2.tgz#f37b182d56400cbbd6168f91777deed18cd009fe"
+  integrity sha512-DIZ+yGFYP8uIxJtjP6AE2SvN1f1MSfNfovT8W+rjliVGfIeaXJwiUNbxzehXOZHDTDsdQo577pDzeqhsjKaJZA==
   dependencies:
     "@google-cloud/logging" "^10.5.0"
     "@google-cloud/logging-bunyan" "^4.2.2"
