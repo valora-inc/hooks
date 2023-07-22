@@ -7,11 +7,7 @@ import { Address, zeroAddress } from 'viem'
 
 import { toDecimalNumber } from '../../types/numbers'
 import { getCompatibleGamesFromAPI } from './haloFiApi'
-import {
-  PlayerStructIndex,
-  getPlayerStructFromGames,
-  getTokensDecimals,
-} from './haloFiContract'
+import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -40,22 +36,15 @@ const hook: PositionsHook = {
         .filter(
           ({ playerStruct }) =>
             playerStruct[PlayerStructIndex.playerAddress] !== zeroAddress,
+        )
+        .filter(
+          ({ playerStruct }) =>
+            playerStruct[PlayerStructIndex.withdrawn] === false,
         ),
     )
 
-    const uniqueTokensFromJoinedGames = haloFiGamesPlayerHasJoined
-      .map(({ game }) => game.depositTokenAddress.toLowerCase() as Address)
-      .filter((address, index, self) => self.indexOf(address) === index)
-
-    const decimals = await getTokensDecimals(uniqueTokensFromJoinedGames)
-
     return haloFiGamesPlayerHasJoined.map(({ playerStruct, game }) => {
       const depositTokenAddress = game.depositTokenAddress.toLowerCase()
-
-      const tokenIndex = uniqueTokensFromJoinedGames.findIndex(
-        (value) => value === depositTokenAddress,
-      )
-      const depositTokenDecimals = decimals[tokenIndex]
 
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
@@ -68,10 +57,12 @@ const hook: PositionsHook = {
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/halofi.png',
         },
-        balances: async () => {
+        balances: async ({ resolvedTokens }) => {
+          const depositToken = resolvedTokens[depositTokenAddress]
+
           const playerAmountPaid = toDecimalNumber(
             playerStruct[PlayerStructIndex.netAmountPaid],
-            depositTokenDecimals,
+            depositToken.decimals,
           )
           return [playerAmountPaid]
         },

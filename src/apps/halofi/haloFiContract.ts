@@ -1,7 +1,6 @@
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { poolV205Abi } from './abis/pool-v205'
-import { erc20Abi } from '../../abis/erc-20'
 
 const client = createPublicClient({
   chain: celo,
@@ -30,20 +29,5 @@ export async function getPlayerStructFromGames(
 export const PlayerStructIndex = {
   netAmountPaid: 7,
   playerAddress: 3,
+  withdrawn: 0,
 } as const
-
-export async function getTokensDecimals(
-  tokenAddresses: Address[],
-): Promise<number[]> {
-  const decimals = await client.multicall({
-    contracts: tokenAddresses.map((address) => ({
-      abi: erc20Abi,
-      address,
-      functionName: 'decimals' as const,
-    })),
-
-    allowFailure: false,
-  })
-
-  return decimals
-}
