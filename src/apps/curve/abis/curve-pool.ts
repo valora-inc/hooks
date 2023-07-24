@@ -1,4 +1,4 @@
-export const curvePairAbi = [
+export const curvePoolAbi = [
   {
     name: 'Transfer',
     inputs: [

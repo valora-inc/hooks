@@ -1,12 +1,13 @@
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
+import got from 'got'
 import {
   AppTokenPositionDefinition,
   PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
 import { curveTripoolAbi } from './abis/curve-tripool'
-import { curvePairAbi } from './abis/curve-pair'
+import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 
 const client = createPublicClient({
@@ -14,20 +15,74 @@ const client = createPublicClient({
   transport: http(),
 })
 
-const CURVE_POOLS_WITH_SIZES: Record<Address, 2 | 3> = {
-  '0x9be5da31c7a42d7e045189ac1822d1fa5838e635': 2,
-  '0xf4cab10dc19695aace14b7a16d7705b600ad5f73': 2,
-  '0x32fd7e563c6521ab4d59ce3277bcfbe3317cfd63': 3,
+interface CurveApiResponse {
+  success: boolean
+  data: {
+    // this has more fields, but only including fields we use
+    poolData: {
+      address: Address
+      implementation: string
+    }[]
+  }
+}
+
+type PoolSize = 2 | 3
+
+const CURVE_POOL_URLS: Record<string, string> = {
+  celo: 'https://api.curve.fi/api/getFactoryV2Pools-celo',
+}
+
+async function getAllCurvePools(network: string) {
+  const { data } = await got
+    .get(CURVE_POOL_URLS[network])
+    .json<CurveApiResponse>()
+
+  const pools: { address: Address; size: PoolSize }[] = data.poolData.map(
+    (poolInfo) => ({
+      address: poolInfo.address,
+      size: poolInfo.implementation === 'plain3basic' ? 3 : 2,
+    }),
+  )
+
+  return pools
+}
+
+export async function getPoolPositionDefinitions(
+  network: string,
+  address: Address,
+) {
+  const pools = await getAllCurvePools(network)
+
+  // call balanceOf to check if user has balance on a pool
+  const result = await client.multicall({
+    contracts: pools.map((pool) => ({
+      address: pool.address,
+      abi: pool.size === 3 ? curveTripoolAbi : curvePoolAbi,
+      functionName: 'balanceOf',
+      args: [address],
+    })),
+    allowFailure: false,
+  })
+
+  const userPools = pools
+    .map((pool, i) => ({ ...pool, balance: result[i] }))
+    .filter((pool) => pool.balance > 0)
+
+  return await Promise.all(
+    userPools.map((pool) =>
+      getPoolPositionDefinition(network, pool.address, pool.size),
+    ),
+  )
 }
 
 async function getPoolPositionDefinition(
   network: string,
   poolAddress: Address,
+  poolSize: PoolSize,
 ) {
-  const poolSize = CURVE_POOLS_WITH_SIZES[poolAddress.toLowerCase() as Address]
   const poolTokenContract = {
     address: poolAddress,
-    abi: poolSize === 3 ? curveTripoolAbi : curvePairAbi,
+    abi: poolSize === 3 ? curveTripoolAbi : curvePoolAbi,
   }
 
   const tokenAddresses = (await client.multicall({
@@ -92,16 +147,18 @@ const hook: PositionsHook = {
       description: 'Curve pools',
     }
   },
-  getPositionDefinitions(network, _address) {
-    return Promise.all(
-      Object.keys(CURVE_POOLS_WITH_SIZES).map((poolAddress) =>
-        getPoolPositionDefinition(network, poolAddress as Address),
-      ),
-    )
+  getPositionDefinitions(network, address) {
+    return getPoolPositionDefinitions(network, address as Address)
   },
-  getAppTokenDefinition({ network, address }: TokenDefinition) {
+  async getAppTokenDefinition({ network, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    return getPoolPositionDefinition(network, address as Address)
+    const pools = await getAllCurvePools(network)
+    const poolSize = pools.find((pool) => pool.address === address)?.size
+    return await getPoolPositionDefinition(
+      network,
+      address as Address,
+      poolSize!,
+    )
   },
 }
 
