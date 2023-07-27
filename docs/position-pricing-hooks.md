@@ -126,3 +126,9 @@ Example for locked-celo:
 ```sh
 yarn getPositions --network celo --address 0x2b8441ef13333ffa955c9ea5ab5b3692da95260d --apps locked-celo
 ```
+
+You can get additional logs about how positions are resolved by the runtime by setting the `LOG_LEVEL` environment variable to `debug`.
+
+```sh
+LOG_LEVEL=debug yarn getPositions --network celo --address 0x2b8441ef13333ffa955c9ea5ab5b3692da95260d --apps locked-celo
+```

@@ -123,8 +123,6 @@ async function getPoolPositionDefinitions(
     .filter((position: any) => Number(position.liquidityTokenBalance) > 0)
     .map((position: any) => position.pair.id)
 
-  // console.log({ pairs })
-
   // Get all positions
   const positions = await Promise.all(
     pairs.map(async (pair) => {
@@ -182,8 +180,6 @@ async function getFarmPositionDefinitions(
       rewardsEarned: data[4 * i + 3] as bigint,
     }))
     .filter((farm) => farm.balance > 0)
-
-  // console.log({ userFarms })
 
   const positions = await Promise.all(
     userFarms.map(async (farm) => {

@@ -1,5 +1,3 @@
-// Allow console logs for now, since we're early in development
-/* eslint-disable no-console */
 import got from 'got'
 import BigNumber from 'bignumber.js'
 import {
@@ -322,7 +320,7 @@ export async function getPositions(
       ),
     ),
   ).then((definitions) => definitions.flat())
-  console.log('positions definitions', JSON.stringify(definitions, null, ' '))
+  logger.debug({ definitions }, 'positions definitions')
 
   // Get the base tokens info
   const baseTokensInfo = await getBaseTokensInfo()
@@ -341,7 +339,7 @@ export async function getPositions(
     })
 
     if (definitionsToResolve.length === 0) {
-      console.log('No more positions to resolve')
+      logger.debug('No more positions to resolve')
       break
     }
 
@@ -350,10 +348,7 @@ export async function getPositions(
       position.tokens.map((token) => addSourceAppId(token, position.appId)),
     )
 
-    console.log(
-      'allTokenDefinitions',
-      JSON.stringify(allTokenDefinitions, null, ' '),
-    )
+    logger.debug({ allTokenDefinitions }, 'allTokenDefinitions')
 
     // Get the tokens definitions for which we don't have the base token info or position definition
     const unresolvedTokenDefinitions = allTokenDefinitions.filter(
@@ -363,10 +358,7 @@ export async function getPositions(
         ] && !visitedDefinitions[tokenDefinition.address],
     )
 
-    console.log(
-      'unresolvedTokenDefinitions',
-      JSON.stringify(unresolvedTokenDefinitions, null, ' '),
-    )
+    logger.debug({ unresolvedTokenDefinitions }, 'unresolvedTokenDefinitions')
 
     // Get the token info for the unresolved token definitions
     const newUnlistedBaseTokensInfo: TokensInfo = {}
@@ -398,14 +390,8 @@ export async function getPositions(
       )
     ).filter((p): p is Exclude<typeof p, null | undefined> => p != null)
 
-    console.log(
-      'appTokenDefinitions',
-      JSON.stringify(appTokenDefinitions, null, ' '),
-    )
-    console.log(
-      'newUnlistedBaseTokensInfo',
-      JSON.stringify(newUnlistedBaseTokensInfo, null, ' '),
-    )
+    logger.debug({ appTokenDefinitions }, 'appTokenDefinitions')
+    logger.debug({ newUnlistedBaseTokensInfo }, 'newUnlistedBaseTokensInfo')
 
     unlistedBaseTokensInfo = {
       ...unlistedBaseTokensInfo,
@@ -416,7 +402,7 @@ export async function getPositions(
     definitionsToResolve = appTokenDefinitions
   }
 
-  console.log({
+  logger.debug({
     unlistedBaseTokensInfo,
     visitedPositions: visitedDefinitions,
   })
@@ -479,7 +465,7 @@ export async function getPositions(
 
     const type = positionDefinition.type
 
-    console.log('Resolving definition', type, positionDefinition.address)
+    logger.debug('Resolving definition', type, positionDefinition.address)
 
     const appInfo = hooksByAppId[positionDefinition.appId].getInfo()
 
