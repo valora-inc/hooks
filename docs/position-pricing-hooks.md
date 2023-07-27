@@ -29,12 +29,12 @@ Position pricing hooks must implement the [`PositionsHook`](https://github.com/v
 
 ### Creating a Position Pricing Hook
 
-To create a position pricing hook for your application named `MyApp`, you will need to create a new folder with the name `my-app` in `src/apps` and add a `plugin.ts` file. The file should export an object with the following properties:
+To create a position pricing hook for your application named `MyApp`, you will need to create a new folder with the name `my-app` in `src/apps` and add a `positions.ts` file. The file should export an object with the following properties:
 
 ```ts
-import { AppPlugin } from '../../plugin'
+import { PositionsHook } from '../../types/positions'
 
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return { name: 'MyDapp' }
   },
@@ -43,7 +43,7 @@ const plugin: AppPlugin = {
   },
 }
 
-export default plugin
+export default hook
 ```
 
 ### Implementing `getPositionDefinitions`
@@ -55,7 +55,7 @@ It receives the following arguments:
 - `network`: the network for which the positions should be returned.
 - `address`: the address of the user for which the positions should be returned.
 
-It should return an array of [`PositionDefinition`](https://github.com/valora-inc/hooks/blob/main/src/plugin.ts) objects.
+It should return an array of [`PositionDefinition`](https://github.com/valora-inc/hooks/blob/main/src/types/positions.ts) objects.
 
 The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
@@ -69,10 +69,10 @@ TODO
 
 Here's a simplified example of a `getPositionDefinitions` implementation for representing locked CELO owned by a user.
 
-Please take a look at the [full implementation](https://github.com/valora-inc/hooks/blob/main/src/apps/locked-celo/plugin.ts) for more details.
+Please take a look at the [full implementation](https://github.com/valora-inc/hooks/blob/main/src/apps/locked-celo/positions.ts) for more details.
 
 ```ts
-const plugin: AppPlugin = {
+const hook: PositionsHook = {
   getInfo() {
     return { name: 'MyDapp' }
   },

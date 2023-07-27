@@ -305,8 +305,8 @@ export async function getPositions(
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
-    Object.entries(hooksByAppId).map(([appId, plugin]) =>
-      plugin.getPositionDefinitions(network, address).then(
+    Object.entries(hooksByAppId).map(([appId, hook]) =>
+      hook.getPositionDefinitions(network, address).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },
@@ -374,11 +374,11 @@ export async function getPositions(
       await Promise.all(
         unresolvedTokenDefinitions.map(async (tokenDefinition) => {
           try {
-            // Assume the token is an app token from the plugin
-            // TODO: We'll probably need to allow plugins to specify the app id themselves
+            // Assume the token is an app token from the hook
+            // TODO: We'll probably need to allow hooks to specify the app id themselves
             const { sourceAppId } = tokenDefinition
-            const plugin = hooksByAppId[sourceAppId]
-            const appTokenDefinition = await plugin
+            const hook = hooksByAppId[sourceAppId]
+            const appTokenDefinition = await hook
               .getAppTokenDefinition(tokenDefinition)
               .then((definition) => addAppId(definition, sourceAppId))
             return appTokenDefinition
