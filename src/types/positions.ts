@@ -1,6 +1,6 @@
 import { DecimalNumber, SerializedDecimalNumber } from './numbers'
 
-// Plugin interface that authors will implement
+// Interface that authors will implement
 export interface PositionsHook {
   getInfo(): AppInfo
   // Get position definitions for a given address

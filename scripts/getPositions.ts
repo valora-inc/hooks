@@ -1,4 +1,4 @@
-// Helper script to call the plugins and get the positions
+// Helper script to call the hooks and get the positions
 /* eslint-disable no-console */
 import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
