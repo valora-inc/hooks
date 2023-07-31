@@ -11,7 +11,7 @@ Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks
 
 Currently, this repository contains position pricing and shortcut hooks.
 
-> **Warning**
+> [!WARNING]
 > It is an experimental feature and is not fully supported yet.
 
 ## Developing Hooks
