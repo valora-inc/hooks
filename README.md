@@ -9,9 +9,10 @@ Valora Hooks allows developers to extend Valora's functionality by writing short
 
 Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks/overview) for more information.
 
-Currently, this repository contains position pricing hooks.
+Currently, this repository contains position pricing and shortcut hooks.
 
-> :warning: It is an experimental feature and is not fully supported yet.
+> **Warning**
+> It is an experimental feature and is not fully supported yet.
 
 ## Developing Hooks
 
@@ -25,6 +26,10 @@ To develop hooks, you will need to have Node.js installed on your computer.
 ### Position Pricing
 
 See the [documentation](docs/position-pricing-hooks.md) for developing position pricing hooks.
+
+### Shortcuts
+
+See the [documentation](docs/shortcut-hooks.md) for developing shortcut hooks.
 
 ## Contributing
 
