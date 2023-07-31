@@ -111,7 +111,7 @@ Once this all done, Valora will show the GoodDollar shortcut in the rewards scre
 
 ### Testing a Shortcut Hook
 
-The [hooks live preview](live-preview.md) mode in Valora, is the easiest way to test your shortcut hook while developing it.
+The [hooks live preview](live-preview.md) mode in Valora is the easiest way to test your shortcut hook while developing it.
 
 Alternatively, you can use the following scripts via the command line.
 

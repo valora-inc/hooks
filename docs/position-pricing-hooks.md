@@ -115,7 +115,7 @@ This is all that is needed for Valora to show the user the value of their locked
 
 ### Testing a Position Pricing Hook
 
-The [hooks live preview](live-preview.md) mode in Valora, is the easiest way to test your position hook while developing it.
+The [hooks live preview](live-preview.md) mode in Valora is the easiest way to test your position hook while developing it.
 
 Alternatively, you can use the `getPositions` script via the command line.
 
