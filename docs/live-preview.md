@@ -3,7 +3,7 @@
 Hooks in development can be easily tested in Valora using the live preview feature.
 
 <video controls muted playsInline width="100%">
-  <source src="https://raw.githubusercontent.com/valora-inc/hooks/main/docs/assets/hook-preview-mode.mp4"/>
+  <source src="https://raw.githubusercontent.com/valora-inc/hooks/main/docs/assets/live-preview.mp4"/>
 </video>
 
 ## Steps
