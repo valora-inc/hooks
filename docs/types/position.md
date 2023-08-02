@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+---
+
 # Position Pricing Hooks
 
 A user's Valora wallet invokes position hooks when determining the types, quantity, and value of assets a user owns. If a position hook detects a user owns one or more positions, it provides information about the positions for Valora to show to the user.
@@ -115,7 +119,7 @@ This is all that is needed for Valora to show the user the value of their locked
 
 ### Testing a Position Pricing Hook
 
-The [hooks live preview](live-preview.md) mode in Valora is the easiest way to test your position hook while developing it.
+The [hooks live preview](../live-preview.md) mode in Valora is the easiest way to test your position hook while developing it.
 
 Alternatively, you can use the `getPositions` script via the command line.
 

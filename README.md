@@ -25,11 +25,11 @@ To develop hooks, you will need to have Node.js installed on your computer.
 
 ### Position Pricing
 
-See the [documentation](docs/position-pricing-hooks.md) for developing position pricing hooks.
+See the [documentation](docs/types/position.md) for developing position pricing hooks.
 
 ### Shortcuts
 
-See the [documentation](docs/shortcut-hooks.md) for developing shortcut hooks.
+See the [documentation](docs/types/shortcut.md) for developing shortcut hooks.
 
 ## Contributing
 
