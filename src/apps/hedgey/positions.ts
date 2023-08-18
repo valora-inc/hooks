@@ -21,13 +21,20 @@ const hedgeyContractNames: Record<string, string> = {
   '0xd240f76c57fb18196a864b8b06e9b168c98c4524': 'Vesting Plan',
 }
 
-// TODO(sbw): placeholder icon
-const IMAGE_URL =
+// TODO(sbw): not sure what the right default image URL should be
+const DEFAULT_IMAGE_URL =
   'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png'
 
 interface Nft {
   contractAddress: string
   tokenId: string
+  metadata?: {
+    image: string
+  }
+  media: {
+    raw: string
+    gateway: string
+  }[]
 }
 
 async function getNfts(address: string) {
@@ -119,6 +126,10 @@ const hook: PositionsHook = {
         const remainder = toDecimalNumber(planBalanceOfResult[1], tokenDecimals)
         const contractName = hedgeyContractNames[planNft.contractAddress]
 
+        const imageUrl =
+          planNft.media.find((media) => media.raw === planNft.metadata?.image)
+            ?.gateway ?? DEFAULT_IMAGE_URL
+
         return {
           type: 'contract-position-definition',
           network,
@@ -130,7 +141,7 @@ const hook: PositionsHook = {
             description: `Claim ${balance.dp(2)} ${tokenSymbol} (${remainder.dp(
               2,
             )} unvested)`,
-            imageUrl: IMAGE_URL,
+            imageUrl,
           },
         }
       }),
