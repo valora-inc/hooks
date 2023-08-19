@@ -1,73 +1,19 @@
-import got from 'got'
+import { celo } from 'viem/chains'
+import { createPublicClient, http, Address } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import {
   ContractPositionDefinition,
   PositionsHook,
 } from '../../types/positions'
-import { celo } from 'viem/chains'
-import { createPublicClient, http, Address } from 'viem'
+import { hedgeyContractNames, hedgeyDefaultImageUrl } from './config'
 import { erc20Abi } from '../../abis/erc-20'
-
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
+import { getHedgeyPlanNfts } from './nfts'
 
 const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
-
-// TODO(sbw): there's others we need to add
-// https://github.com/hedgey-finance/Locked_VestingTokenPlans#mainnet-deployments
-const hedgeyContractNames: Record<string, string> = {
-  '0xd240f76c57fb18196a864b8b06e9b168c98c4524': 'Vesting Plan',
-}
-
-// TODO(sbw): not sure what the right default image URL should be
-const DEFAULT_IMAGE_URL =
-  'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png'
-
-interface Nft {
-  contractAddress: string
-  tokenId: string
-  metadata?: {
-    image: string
-  }
-  media: {
-    raw: string
-    gateway: string
-  }[]
-}
-
-async function getNfts(address: string) {
-  const pagination = got.paginate<Nft>(
-    'https://api.mainnet.valora.xyz/getNfts',
-    {
-      searchParams: { address },
-      pagination: {
-        transform: (response) => {
-          return JSON.parse(response.body as string).result
-        },
-        paginate: (response) => {
-          const pageKey = JSON.parse(response.body as string).pageKey
-          if (pageKey) {
-            return {
-              searchParams: { address, pageKey },
-            }
-          }
-          return false
-        },
-      },
-    },
-  )
-
-  const result: Nft[] = []
-  for await (const nft of pagination) {
-    if (nft.contractAddress in hedgeyContractNames) {
-      result.push(nft)
-    }
-  }
-
-  return result
-}
 
 const hook: PositionsHook = {
   getInfo() {
@@ -79,7 +25,7 @@ const hook: PositionsHook = {
   },
 
   async getPositionDefinitions(network: string, address: string) {
-    const planNfts = await getNfts(address)
+    const planNfts = await getHedgeyPlanNfts({ address })
     const now = BigInt(Math.floor(new Date().getTime() / 1000))
 
     const positions: ContractPositionDefinition[] = await Promise.all(
@@ -128,7 +74,7 @@ const hook: PositionsHook = {
 
         const imageUrl =
           planNft.media.find((media) => media.raw === planNft.metadata?.image)
-            ?.gateway ?? DEFAULT_IMAGE_URL
+            ?.gateway ?? hedgeyDefaultImageUrl
 
         return {
           type: 'contract-position-definition',
