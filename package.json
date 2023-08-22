@@ -45,7 +45,7 @@
     "express": "^4.18.2",
     "got": "^11.8.6",
     "viem": "^1.6.0",
-    "zod": "^3.22.1"
+    "zod": "^3.22.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",
