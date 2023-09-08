@@ -70,7 +70,7 @@ async function getPoolPositionDefinition(
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
         imageUrl:
-          'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/ubeswap.png',
+          'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/ubeswap.png',
       }
     },
     pricePerShare: async ({ tokensByAddress }) => {
