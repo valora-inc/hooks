@@ -1,8 +1,21 @@
 import { getPositions } from './getPositions'
 import * as hooks from './getHooks'
-import { ContractPositionDefinition, PositionsHook } from '../types/positions'
+import {
+  AppTokenPositionDefinition,
+  ContractPositionDefinition,
+  PositionsHook,
+} from '../types/positions'
 import { toDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
+
+jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
+  createPublicClient: () => ({
+    multicall: (...args: any) => mockMulticall(...args),
+  }),
+}))
+
+const mockMulticall = jest.fn()
 
 const getHooksSpy = jest.spyOn(hooks, 'getHooks')
 
@@ -35,9 +48,6 @@ const lockedCeloTestHook: PositionsHook = {
 
     return [position]
   },
-  getAppTokenDefinition() {
-    throw new Error('Not implemented')
-  },
 }
 
 const failingTestHook: PositionsHook = {
@@ -50,9 +60,6 @@ const failingTestHook: PositionsHook = {
   },
   async getPositionDefinitions(_network, _address) {
     throw new Error('This hook fails')
-  },
-  getAppTokenDefinition() {
-    throw new Error('Not implemented')
   },
 }
 
@@ -78,6 +85,53 @@ describe(getPositions, () => {
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       { err: new Error('This hook fails') },
       'Failed to get position definitions for failing-hook',
+    )
+  })
+
+  it('should throw an error when getAppTokenDefinition is needed but not implemented', async () => {
+    const testHook: PositionsHook = {
+      getInfo() {
+        return {
+          id: 'test-hook',
+          name: 'Test Hook',
+          description: '',
+        }
+      },
+      async getPositionDefinitions(network, _address) {
+        const position: AppTokenPositionDefinition = {
+          type: 'app-token-definition',
+          network,
+          address: '0xda7f463c27ec862cfbf2369f3f74c364d050d93f',
+          tokens: [
+            // Intermediary token that would need to be resolved
+            { address: '0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e', network },
+          ],
+          displayProps: {
+            title: 'Test Hook',
+            description: '',
+            imageUrl:
+              'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+          },
+          pricePerShare: async () => {
+            return [toDecimalNumber(5n, 1)]
+          },
+        }
+
+        return [position]
+      },
+    }
+
+    mockMulticall.mockResolvedValue([
+      'ULP', // Symbol for 0xda7f463c27ec862cfbf2369f3f74c364d050d93f
+      18n, // Decimals
+    ])
+    getHooksSpy.mockResolvedValue({
+      'test-hook': testHook,
+    })
+    await expect(
+      getPositions('celo', '0x0000000000000000000000000000000000007e57'),
+    ).rejects.toThrowError(
+      "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo)",
     )
   })
 })

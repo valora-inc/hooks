@@ -370,6 +370,11 @@ export async function getPositions(
             // TODO: We'll probably need to allow hooks to specify the app id themselves
             const { sourceAppId } = tokenDefinition
             const hook = hooksByAppId[sourceAppId]
+            if (!hook.getAppTokenDefinition) {
+              throw new Error(
+                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.network}).`,
+              )
+            }
             const appTokenDefinition = await hook
               .getAppTokenDefinition(tokenDefinition)
               .then((definition) => addAppId(definition, sourceAppId))
