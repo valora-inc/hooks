@@ -1,7 +1,6 @@
 import {
   ContractPositionDefinition,
   PositionsHook,
-  TokenDefinition,
 } from '../../types/positions'
 import { Address, zeroAddress } from 'viem'
 
