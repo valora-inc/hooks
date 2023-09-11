@@ -130,7 +130,7 @@ describe(getPositions, () => {
     })
     await expect(
       getPositions('celo', '0x0000000000000000000000000000000000007e57'),
-    ).rejects.toThrowError(
+    ).rejects.toThrow(
       "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo)",
     )
   })
