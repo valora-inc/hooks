@@ -118,10 +118,6 @@ const hook: PositionsHook = {
 
     return [position]
   },
-  getAppTokenDefinition() {
-    // We don't need this for now, since there are no intermediary tokens
-    throw new Error('Not implemented')
-  },
 }
 
 export default hook

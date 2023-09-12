@@ -56,10 +56,6 @@ const hook: PositionsHook = {
         getAppTokenPositionDefinition(debtTokenDefinition, network),
     )
   },
-  getAppTokenDefinition(_) {
-    // We don't need this for now, since there are no intermediary tokens
-    throw new Error('Not implemented')
-  },
 }
 
 export default hook

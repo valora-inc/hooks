@@ -1,7 +1,6 @@
 import {
   ContractPositionDefinition,
   PositionsHook,
-  TokenDefinition,
 } from '../../types/positions'
 import { Address, zeroAddress } from 'viem'
 
@@ -69,10 +68,6 @@ const hook: PositionsHook = {
       }
       return position
     })
-  },
-  getAppTokenDefinition(_context: TokenDefinition) {
-    // We don't need this for now, since there are no intermediary tokens
-    throw new Error('Not implemented')
   },
 }
 
