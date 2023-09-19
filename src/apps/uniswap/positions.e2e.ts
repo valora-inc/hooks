@@ -1,14 +1,14 @@
 import hook from './positions'
 
 describe('getPositionDefinitions', () => {
-  // The test address doesn't have any positions, so skipping for now.
-  it.skip('should get the address definitions successfully', async () => {
+  it('should get the address definitions successfully', async () => {
     const positions = await hook.getPositionDefinitions(
       'celo',
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
 
-    expect(positions.length).toBeGreaterThan(0)
+    // The test address doesn't have any positions.
+    expect(positions.length).toBe(0)
   })
 
   it('should get no definitions for an address with no blockchain interaction', async () => {
