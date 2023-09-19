@@ -7,7 +7,7 @@ describe('getPositionDefinitions', () => {
       'celo',
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
-    
+
     expect(positions.length).toBeGreaterThan(0)
   })
 
