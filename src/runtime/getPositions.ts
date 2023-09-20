@@ -59,7 +59,7 @@ async function getBaseTokensInfo(): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
     .get(
-      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getTokensInfo',
+      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getRtdbTokensInfo',
     )
     .json<{ tokens: Record<string, RawTokenInfo> }>()
 
