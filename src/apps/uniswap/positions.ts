@@ -10,11 +10,13 @@ const client = createPublicClient({
 })
 
 // Standard Uniswap v3 addresses on CELO
-const factory = '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc'
-const nftPositions = '0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A'
+const UNISWAP_V3_FACTORY_ADDRESS = '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc'
+const UNISWAP_V3_NFT_POSITIONS_MANAGER_ADDRESS =
+  '0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A'
 // Custom read-only contract. Code:
 // https://github.com/celo-tracker/celo-tracker-contracts/blob/main/contracts/multicall/UniV3UserPositionsMulticall.sol
-const userPositionsMulticall = '0x0588Cc1eD79e3c754F4180E78554691E82c2dEdB'
+const USER_POSITIONS_MULTICALL_ADDRESS =
+  '0x0588Cc1eD79e3c754F4180E78554691E82c2dEdB'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -27,9 +29,13 @@ const hook: PositionsHook = {
   async getPositionDefinitions(network, address) {
     const userPools = await client.readContract({
       abi: userPositionsAbi,
-      address: userPositionsMulticall,
+      address: USER_POSITIONS_MULTICALL_ADDRESS,
       functionName: 'getPositions',
-      args: [nftPositions, factory, address as Address],
+      args: [
+        UNISWAP_V3_NFT_POSITIONS_MANAGER_ADDRESS,
+        UNISWAP_V3_FACTORY_ADDRESS,
+        address as Address,
+      ],
     })
     return userPools
       .map((pool) => ({
