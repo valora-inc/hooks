@@ -7,8 +7,7 @@ describe('getPositionDefinitions', () => {
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
 
-    // The test address doesn't have any positions.
-    expect(positions.length).toBe(0)
+    expect(positions.length).toBeGreaterThan(0)
   })
 
   it('should get no definitions for an address with no blockchain interaction', async () => {
