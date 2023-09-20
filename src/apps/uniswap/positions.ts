@@ -1,4 +1,4 @@
-import { createPublicClient, http } from 'viem'
+import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
@@ -16,24 +16,6 @@ const nftPositions = '0x3d79EdAaBC0EaB6F08ED885C05Fc0B014290D95A'
 // https://github.com/celo-tracker/celo-tracker-contracts/blob/main/contracts/multicall/UniV3UserPositionsMulticall.sol
 const userPositionsMulticall = '0x0588Cc1eD79e3c754F4180E78554691E82c2dEdB'
 
-export interface UniV3Position {
-  poolAddress: string
-  nonce: bigint
-  operator: string
-  token0: string
-  token1: string
-  fee: number
-  tickLower: number
-  tickUpper: number
-  liquidity: bigint
-  amount0: bigint
-  amount1: bigint
-  feeGrowthInside0LastX128: bigint
-  feeGrowthInside1LastX128: bigint
-  tokensOwed0: bigint
-  tokensOwed1: bigint
-}
-
 const hook: PositionsHook = {
   getInfo() {
     return {
@@ -43,12 +25,12 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(network, address) {
-    const userPools = (await client.readContract({
+    const userPools = await client.readContract({
       abi: userPositionsAbi,
       address: userPositionsMulticall,
       functionName: 'getPositions',
-      args: [nftPositions, factory, address],
-    })) as UniV3Position[]
+      args: [nftPositions, factory, address as Address],
+    })
     return userPools
       .map((pool) => ({
         ...pool,

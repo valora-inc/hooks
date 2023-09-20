@@ -110,4 +110,4 @@ export const userPositionsAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-]
+] as const
