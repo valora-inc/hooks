@@ -6,7 +6,7 @@ import {
   createPublicClient,
   http,
 } from 'viem'
-import { celo } from '@wagmi/chains'
+import { celo } from 'viem/chains'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
