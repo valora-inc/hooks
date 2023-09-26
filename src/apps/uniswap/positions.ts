@@ -43,6 +43,7 @@ const hook: PositionsHook = {
         token0: pool.token0.toLowerCase(),
         token1: pool.token1.toLowerCase(),
       }))
+      .filter((pool) => pool.liquidity > 0)
       .map((pool) => {
         return {
           type: 'contract-position-definition',
