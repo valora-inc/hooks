@@ -7,7 +7,7 @@
 
 Valora Hooks allows developers to extend Valora's functionality by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide Valora with additional information and features.
 
-Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks/overview) for more information.
+Check out the [Valora Hooks documentation](https://docs.valora.xyz/hooks/) for more information.
 
 Currently, this repository contains position pricing and shortcut hooks.
 
