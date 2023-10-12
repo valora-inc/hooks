@@ -49,8 +49,11 @@ function createApp() {
 
   app.get(
     '/getShortcuts',
-    asyncHandler(async (_req, res) => {
-      const shortcuts = await getShortcuts()
+    asyncHandler(async (req, res) => {
+      // TODO(sbw): rename schema
+      const parsedRequest = await parseRequest(req, balancesRequestSchema)
+      const { network, address } = parsedRequest.query
+      const shortcuts = await getShortcuts(network, address)
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
@@ -82,7 +85,7 @@ function createApp() {
       const { network, address, appId, shortcutId, positionAddress } =
         parsedRequest.body
 
-      const shortcuts = await getShortcuts([appId])
+      const shortcuts = await getShortcuts(network, address, [appId])
 
       const shortcut = shortcuts.find((s) => s.id === shortcutId)
       if (!shortcut) {

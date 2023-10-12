@@ -1,5 +1,5 @@
 export interface ShortcutsHook {
-  getShortcutDefinitions(): ShortcutDefinition[]
+  getShortcutDefinitions(network: string, address: string): ShortcutDefinition[]
 }
 
 export interface ShortcutDefinition {
