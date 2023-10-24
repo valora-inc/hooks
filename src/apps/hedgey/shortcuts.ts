@@ -27,7 +27,7 @@ const hook: ShortcutsHook = {
           address: positionAddress as Address,
           abi: tokenVestingPlansAbi,
           functionName: 'redeemPlans',
-          args: [planNft.tokenId],
+          args: [[BigInt(planNft.tokenId)]],
           account: address as Address,
         })
         
