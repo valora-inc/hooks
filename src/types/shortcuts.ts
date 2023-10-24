@@ -1,5 +1,5 @@
 export interface ShortcutsHook {
-  getShortcutDefinitions(network: string, address: string): ShortcutDefinition[]
+  getShortcutDefinitions(network: string, address: string): Promise<ShortcutDefinition[]>
 }
 
 export interface ShortcutDefinition {
