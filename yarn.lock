@@ -942,10 +942,10 @@
     "@types/connect" "*"
     "@types/node" "*"
 
-"@types/bunyan@^1.8.10":
-  version "1.8.10"
-  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.10.tgz#60f2d297c3d29fd3b85c54f28a48b99d61686fe0"
-  integrity sha512-A82U/3EAdWX89f+dfysGiRvbeoLuRLV3i6SLg3HuNK4Yf+dHOqdbxT70vQUwvD3DOr2Dvpcv9dRX4ipTf0LpEg==
+"@types/bunyan@^1.8.11":
+  version "1.8.11"
+  resolved "https://registry.yarnpkg.com/@types/bunyan/-/bunyan-1.8.11.tgz#0b9e7578a5aa2390faf12a460827154902299638"
+  integrity sha512-758fRH7umIMk5qt5ELmRMff4mLDlN+xyYzC+dkPTdKwbSkJFvz6xwyScrytPU0QIBbRRwbiE8/BIg8bpajerNQ==
   dependencies:
     "@types/node" "*"
 
@@ -1003,10 +1003,10 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/fast-redact@^3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@types/fast-redact/-/fast-redact-3.0.3.tgz#7a1daa13a96bb523441938d9c30bb5d7ae39ec4f"
-  integrity sha512-NsxshmEC4C98Wdq0sdywEKtjNirvYKOB0ELQWN647cNRET4Hvk7pTLFyb2opbHK4pg1X8BjgwKF39xEqE9hRXQ==
+"@types/fast-redact@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@types/fast-redact/-/fast-redact-3.0.4.tgz#7f7cdf30efd02ae6f9360f3361ee9a7a8b9a748d"
+  integrity sha512-tgGJaXucrCH4Yx2l/AI6e/JQksZhKGIQsVwBMTh+nxUhQDv5tXScTs5DHTw+qSKDXnHL2dTAh1e2rd5pcFQyNQ==
 
 "@types/glob@~7.2.0":
   version "7.2.0"
@@ -1354,15 +1354,15 @@
   dependencies:
     "@google-cloud/functions-framework" "^3.1.3"
 
-"@valora/logging@^1.3.9":
-  version "1.3.9"
-  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.9.tgz#fa22d8979a20855aea0bac30d0d4ec920289b80d"
-  integrity sha512-3a9uoad2k/khh4dR/1ZJ7RExOglUN7sGy3huE9BTbm8ltb96qxLPQDR2wI7sox0GzSsRwi4HHdoOJ/WDX2Nwbg==
+"@valora/logging@^1.3.11":
+  version "1.3.11"
+  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.11.tgz#ba2a9ee9936642a0ea89d34dec2478f0e16ae603"
+  integrity sha512-hVgoJVYeuU0OIvmjGbZmuFnd8A8CiQwcqBhn8MWBzuaX9x5z83hiGTXjE+v/bvC7ddMpp0qHaTdAYjKuUcML+Q==
   dependencies:
     "@google-cloud/logging" "^11.0.0"
     "@google-cloud/logging-bunyan" "^5.0.1"
-    "@types/bunyan" "^1.8.10"
-    "@types/fast-redact" "^3.0.3"
+    "@types/bunyan" "^1.8.11"
+    "@types/fast-redact" "^3.0.4"
     bunyan "^1.8.15"
     bunyan-prettystream "^0.1.3"
     fast-redact "^3.3.0"
