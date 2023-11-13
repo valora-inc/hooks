@@ -49,8 +49,8 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.7",
-    "@types/qrcode-terminal": "^0.12.1",
-    "@types/shelljs": "^0.8.14",
+    "@types/qrcode-terminal": "^0.12.2",
+    "@types/shelljs": "^0.8.15",
     "@types/supertest": "^2.0.15",
     "@typescript-eslint/eslint-plugin": "^6.9.1",
     "@valora/eslint-config-typescript": "^1.0.2",
