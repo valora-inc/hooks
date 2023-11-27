@@ -9,7 +9,7 @@ const client = createPublicClient({
 })
 
 const hook: ShortcutsHook = {
-  getShortcutDefinitions() {
+  getShortcutDefinitions(_network?: string, _address?: string) {
     return [
       {
         id: 'claim-reward',

@@ -56,7 +56,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 void (async () => {
-  const shortcuts = await getShortcuts([argv.app])
+  const shortcuts = await getShortcuts(argv.network, argv.address, [argv.app])
 
   const shortcut = shortcuts.find((s) => s.id === argv.shortcut)
   if (!shortcut) {
