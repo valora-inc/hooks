@@ -16,7 +16,6 @@ const argv = yargs(process.argv.slice(2))
       alias: 'a',
       describe: 'Address to get positions for',
       type: 'string',
-      demandOption: true,
     },
     apps: {
       alias: 'p',
