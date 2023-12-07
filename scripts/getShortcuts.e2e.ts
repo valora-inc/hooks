@@ -9,9 +9,7 @@ describe('getShortcuts', () => {
   })
 
   it('should get shortcuts successfully without --address', () => {
-    const result = $.exec(
-      'yarn getShortcuts',
-    )
+    const result = $.exec('yarn getShortcuts')
     expect(result.code).toBe(0)
   })
 })
