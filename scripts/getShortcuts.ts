@@ -6,6 +6,17 @@ import { getShortcuts } from '../src/runtime/getShortcuts'
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --apps app1[,app2]')
   .options({
+    network: {
+      alias: 'n',
+      describe: 'Network to get positions for',
+      choices: ['celo', 'celoAlfajores'],
+      default: 'celo',
+    },
+    address: {
+      alias: 'a',
+      describe: 'Address to get positions for',
+      type: 'string',
+    },
     apps: {
       alias: 'p',
       describe: 'App IDs to get shortcuts for, defaults to all',
@@ -20,7 +31,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 void (async () => {
-  const shortcuts = await getShortcuts(argv.apps)
+  const shortcuts = await getShortcuts(argv.network, argv.address, argv.apps)
   console.log('shortcuts', JSON.stringify(shortcuts, null, ' '))
 
   console.table(shortcuts)

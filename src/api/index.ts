@@ -27,7 +27,7 @@ function createApp() {
     }),
   )
 
-  const balancesRequestSchema = z.object({
+  const getHooksRequestSchema = z.object({
     query: z.object({
       network: z.string({ required_error: 'network is required' }),
       address: z
@@ -40,7 +40,7 @@ function createApp() {
   app.get(
     '/getPositions',
     asyncHandler(async (req, res) => {
-      const parsedRequest = await parseRequest(req, balancesRequestSchema)
+      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { network, address } = parsedRequest.query
       const positions = await getPositions(network, address)
       res.send({ message: 'OK', data: positions })
@@ -51,6 +51,16 @@ function createApp() {
     '/getShortcuts',
     asyncHandler(async (_req, res) => {
       const shortcuts = await getShortcuts()
+      res.send({ message: 'OK', data: shortcuts })
+    }),
+  )
+
+  app.get(
+    '/v2/getShortcuts',
+    asyncHandler(async (req, res) => {
+      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
+      const { network, address } = parsedRequest.query
+      const shortcuts = await getShortcuts(network, address)
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
@@ -82,7 +92,7 @@ function createApp() {
       const { network, address, appId, shortcutId, positionAddress } =
         parsedRequest.body
 
-      const shortcuts = await getShortcuts([appId])
+      const shortcuts = await getShortcuts(network, address, [appId])
 
       const shortcut = shortcuts.find((s) => s.id === shortcutId)
       if (!shortcut) {
