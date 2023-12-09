@@ -2,7 +2,7 @@ export interface ShortcutsHook {
   getShortcutDefinitions(
     network?: string,
     address?: string,
-  ): ShortcutDefinition[]
+  ): Promise<ShortcutDefinition[]>
 }
 
 export interface ShortcutDefinition {

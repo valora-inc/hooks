@@ -10,7 +10,7 @@ const client = createPublicClient({
 
 const hook: ShortcutsHook = {
   getShortcutDefinitions(_network?: string, _address?: string) {
-    return [
+    return Promise.resolve([
       {
         id: 'claim-reward',
         name: 'Claim',
@@ -42,7 +42,7 @@ const hook: ShortcutsHook = {
           ]
         },
       },
-    ]
+    ])
   },
 }
 
