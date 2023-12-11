@@ -64,7 +64,7 @@ jobs:
         with:
           project_id: celo-mobile-alfajores
           credentials_json: ${{ secrets.ALFAJORES_SERVICE_ACCOUNT_KEY }}
-      - uses: google-github-actions/setup-gcloud@v1
+      - uses: google-github-actions/setup-gcloud@v2
         with:
           install_components: 'beta'
       - uses: actions/setup-node@v4
@@ -87,7 +87,7 @@ jobs:
         with:
           project_id: celo-mobile-mainnet
           credentials_json: ${{ secrets.MAINNET_SERVICE_ACCOUNT_KEY }}
-      - uses: google-github-actions/setup-gcloud@v1
+      - uses: google-github-actions/setup-gcloud@v2
         with:
           install_components: 'beta'
       - uses: actions/setup-node@v4
