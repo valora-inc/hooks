@@ -48,7 +48,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.10",
+    "@types/jest": "^29.5.11",
     "@types/qrcode-terminal": "^0.12.2",
     "@types/shelljs": "^0.8.15",
     "@types/supertest": "^2.0.16",
