@@ -18,7 +18,7 @@ const hook: ShortcutsHook = {
     const planNfts = await getHedgeyPlanNfts({ address })
 
     return planNfts.map((planNft) => ({
-      id: `${planNft.contractAddress},${planNft.tokenId}`,
+      id: `${planNft.contractAddress}:${planNft.tokenId}`,
       name: 'Claim',
       description: 'Claim vested rewards',
       networks: ['celo'],

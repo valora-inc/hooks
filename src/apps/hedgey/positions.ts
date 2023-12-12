@@ -82,7 +82,7 @@ const hook: PositionsHook = {
           address: planNft.contractAddress,
           tokens: [{ address: tokenAddress, network, category: 'claimable' }],
           availableShortcutIds: [
-            `${planNft.contractAddress},${planNft.tokenId}`,
+            `${planNft.contractAddress}:${planNft.tokenId}`,
           ],
           balances: [balance],
           displayProps: {
