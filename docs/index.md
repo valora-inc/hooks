@@ -4,7 +4,9 @@ sidebar_position: 1
 
 # Extend Valora using Hooks
 
-> Valora Hooks are in-development and not fully supported yet!
+> If you're want to start coding, see check out the [Live
+> Preview](live-preview) and the [example application](https://github.com/valora-inc/hooks/blob/master/src/apps/example)
+> with hook implementations.
 
 Valora Hooks is a system that allows developers to extend Valora by
 writing short programs called "hooks". Valora will call hooks in
