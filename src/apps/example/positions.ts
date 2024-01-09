@@ -64,7 +64,9 @@ const hook: PositionsHook = {
         // Position Hooks type, see https://docs.valora.xyz/hooks/
         type: 'contract-position-definition',
         network,
-        // TODO: What's the meaning of this property?
+        // This serves an ID and by convention it should be the contract holding
+        // the underlying position. The runtime passed this addresses to any
+        // shortcut definitions that might execute on this position.
         address: `0x${'1'.repeat(40)}`,
         tokens,
         balances,
