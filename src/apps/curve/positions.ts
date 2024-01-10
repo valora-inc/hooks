@@ -60,7 +60,7 @@ export async function getPoolPositionDefinitions(
       abi: pool.size === 3 ? curveTripoolAbi : curvePoolAbi,
       functionName: 'balanceOf',
       args: [address],
-    })),
+    }) as const),
     allowFailure: false,
   })
 
