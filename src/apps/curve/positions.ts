@@ -55,12 +55,15 @@ export async function getPoolPositionDefinitions(
 
   // call balanceOf to check if user has balance on a pool
   const result = await client.multicall({
-    contracts: pools.map((pool) => ({
-      address: pool.address,
-      abi: pool.size === 3 ? curveTripoolAbi : curvePoolAbi,
-      functionName: 'balanceOf',
-      args: [address],
-    })),
+    contracts: pools.map(
+      (pool) =>
+        ({
+          address: pool.address,
+          abi: pool.size === 3 ? curveTripoolAbi : curvePoolAbi,
+          functionName: 'balanceOf',
+          args: [address],
+        }) as const,
+    ),
     allowFailure: false,
   })
 
