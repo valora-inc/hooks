@@ -78,10 +78,6 @@ const hook: PositionsHook = {
       },
     ]
   },
-
-  async getAppTokenDefinition(_) {
-    throw new Error('Not implemented')
-  },
 }
 
 export default hook
