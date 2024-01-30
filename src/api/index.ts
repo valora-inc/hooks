@@ -42,7 +42,7 @@ function createApp() {
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { network, address } = parsedRequest.query
-      const positions = await getPositions(network, address)
+      const positions = await getPositions(network, address, config.APP_IDS)
       res.send({ message: 'OK', data: positions })
     }),
   )
@@ -50,7 +50,7 @@ function createApp() {
   app.get(
     '/getShortcuts',
     asyncHandler(async (_req, res) => {
-      const shortcuts = await getShortcuts()
+      const shortcuts = await getShortcuts(undefined, undefined, config.APP_IDS)
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
@@ -60,7 +60,7 @@ function createApp() {
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { network, address } = parsedRequest.query
-      const shortcuts = await getShortcuts(network, address)
+      const shortcuts = await getShortcuts(network, address, config.APP_IDS)
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
