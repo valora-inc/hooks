@@ -4,6 +4,8 @@ sidebar_position: 1
 
 # Position Pricing Hooks
 
+> The [example position hook](https://github.com/valora-inc/hooks/blob/master/src/apps/example/positions.ts) is an easy way to get started.
+
 A user's Valora wallet invokes position hooks when determining the types, quantity, and value of assets a user owns. If a position hook detects a user owns one or more positions, it provides information about the positions for Valora to show to the user.
 
 ## Principle
