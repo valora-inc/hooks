@@ -1,2 +1,3 @@
 # This is interestingly not set for us in the Cloud Function environment
 GOOGLE_CLOUD_PROJECT: celo-mobile-mainnet
+APP_IDS: 'curve,gooddollar,halofi,hedgey,locked-celo,moola,ubeswap,uniswap'
