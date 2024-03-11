@@ -1,13 +1,16 @@
 import { DecimalNumber, SerializedDecimalNumber } from './numbers'
+import { NetworkId } from '../api/networkId'
 
 // Interface that authors will implement
 export interface PositionsHook {
   getInfo(): AppInfo
+
   // Get position definitions for a given address
   getPositionDefinitions(
-    network: string,
+    networkId: NetworkId,
     address: string,
   ): Promise<PositionDefinition[]>
+
   // Get an app token definition from a token definition
   getAppTokenDefinition(
     tokenDefinition: TokenDefinition,
@@ -16,7 +19,7 @@ export interface PositionsHook {
 
 export interface TokenDefinition {
   address: string
-  network: string
+  networkId: NetworkId
 }
 
 export type TokenCategory = 'claimable' // We could add more categories later
@@ -32,7 +35,7 @@ export interface DisplayProps {
 }
 
 export interface AbstractPositionDefinition {
-  network: string
+  networkId: NetworkId
   address: string
   displayProps: ((context: DisplayPropsContext) => DisplayProps) | DisplayProps
   tokens: (TokenDefinition & {
@@ -78,7 +81,7 @@ export interface AppInfo {
 
 export interface AbstractPosition {
   address: string // Example: 0x...
-  network: string // Example: celo
+  networkId: NetworkId // Example: celo-mainnet
   appId: string // Example: ubeswap
   appName: string // Example: Ubeswap
   /**
@@ -92,7 +95,7 @@ export interface AbstractPosition {
 
 export interface AbstractToken {
   address: string // Example: 0x...
-  network: string // Example: celo
+  networkId: NetworkId // Example: celo-mainnet
 
   // These would be resolved dynamically
   symbol: string // Example: cUSD

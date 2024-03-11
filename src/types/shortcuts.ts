@@ -1,3 +1,5 @@
+import {NetworkId} from "../api/networkId";
+
 export interface ShortcutsHook {
   getShortcutDefinitions(): ShortcutDefinition[]
 }
@@ -9,14 +11,14 @@ export interface ShortcutDefinition {
   networks: string[] // Example: ['celo']
   category?: 'claim' // We'll add more categories later
   onTrigger: (
-    network: string,
+    networkId: NetworkId,
     address: string,
     positionAddress: string,
   ) => Promise<Transaction[]> // 0, 1 or more transactions to sign by the user
 }
 
 export type Transaction = {
-  network: string
+  networkId: NetworkId
   from: string
   to: string
   data: string

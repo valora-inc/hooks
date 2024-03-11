@@ -16,7 +16,7 @@ const client = createPublicClient({
 
 function getAppTokenPositionDefinition(
   debtTokenDefinition: DebtTokenDefinition,
-  network: string,
+  networkId: NetworkId,
 ): AppTokenPositionDefinition {
   return {
     type: 'app-token-definition',

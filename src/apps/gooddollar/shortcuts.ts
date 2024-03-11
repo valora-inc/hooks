@@ -2,6 +2,7 @@ import { Address, createPublicClient, http, encodeFunctionData } from 'viem'
 import { celo } from 'viem/chains'
 import { ShortcutsHook } from '../../types/shortcuts'
 import { ubiSchemeAbi } from './abis/ubi-scheme'
+import {NetworkId} from "../../api/networkId";
 
 const client = createPublicClient({
   chain: celo,
@@ -15,7 +16,7 @@ const hook: ShortcutsHook = {
         id: 'claim-reward',
         name: 'Claim',
         description: 'Claim daily UBI rewards',
-        networks: ['celo'],
+        networks: [NetworkId["celo-mainnet"]],
         category: 'claim',
         async onTrigger(network, address, positionAddress) {
           // This isn't strictly needed, but will help while we're developing shortcuts

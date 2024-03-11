@@ -28,6 +28,7 @@ import {
 } from '../types/numbers'
 import { getHooks } from './getHooks'
 import { logger } from '../log'
+import {NetworkId} from "../api/networkId";
 
 interface RawTokenInfo {
   address: string
@@ -295,7 +296,7 @@ function addSourceAppId<T>(definition: T, sourceAppId: string) {
 
 // This is the main logic to get positions
 export async function getPositions(
-  network: string,
+  networkId: NetworkId,
   address: string,
   appIds: string[] = [],
 ) {
@@ -304,7 +305,7 @@ export async function getPositions(
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, hook]) =>
-      hook.getPositionDefinitions(network, address).then(
+      hook.getPositionDefinitions(networkId, address).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },

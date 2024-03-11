@@ -15,6 +15,7 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
+import {NetworkId} from "../../api/networkId";
 
 const client = createPublicClient({
   chain: celo,
@@ -35,7 +36,7 @@ const PAIRS_QUERY = `
 `
 
 async function getPoolPositionDefinition(
-  network: string,
+  networkId: NetworkId,
   poolAddress: Address,
 ): Promise<AppTokenPositionDefinition> {
   const poolTokenContract = {
@@ -57,11 +58,11 @@ async function getPoolPositionDefinition(
   })
   const position: AppTokenPositionDefinition = {
     type: 'app-token-definition',
-    network,
+    networkId,
     address: poolAddress.toLowerCase(),
     tokens: [token0Address, token1Address].map((token) => ({
       address: token.toLowerCase(),
-      network,
+      networkId,
     })),
     displayProps: ({ resolvedTokens }) => {
       const token0 = resolvedTokens[token0Address.toLowerCase()]
@@ -104,7 +105,7 @@ async function getPoolPositionDefinition(
 }
 
 async function getPoolPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
@@ -126,7 +127,7 @@ async function getPoolPositionDefinitions(
   // Get all positions
   const positions = await Promise.all(
     pairs.map(async (pair) => {
-      return getPoolPositionDefinition(network, pair)
+      return getPoolPositionDefinition(networkId, pair)
     }),
   )
 
@@ -134,7 +135,7 @@ async function getPoolPositionDefinitions(
 }
 
 async function getFarmPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
   // Call balanceOf and totalSupply for each farm stakingAddress
@@ -185,13 +186,13 @@ async function getFarmPositionDefinitions(
     userFarms.map(async (farm) => {
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
-        network,
+        networkId,
         address: farm.stakingAddress.toLowerCase(),
         tokens: [
-          { address: farm.lpAddress.toLowerCase(), network },
+          { address: farm.lpAddress.toLowerCase(), networkId },
           {
             address: farm.rewardsTokenAddress.toLowerCase(),
-            network,
+            networkId,
             category: 'claimable',
           },
         ],
@@ -265,9 +266,9 @@ const hook: PositionsHook = {
 
     return [...poolDefinitions, ...farmDefinitions]
   },
-  getAppTokenDefinition({ network, address }: TokenDefinition) {
+  getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    return getPoolPositionDefinition(network, address as Address)
+    return getPoolPositionDefinition(networkId, address as Address)
   },
 }
 

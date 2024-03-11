@@ -9,6 +9,7 @@ import {
 import { curveTripoolAbi } from './abis/curve-tripool'
 import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import { NetworkId } from '../../api/networkId'
 
 const client = createPublicClient({
   chain: celo,
@@ -28,13 +29,24 @@ interface CurveApiResponse {
 
 type PoolSize = 2 | 3
 
-const CURVE_POOL_URLS: Record<string, string> = {
-  celo: 'https://api.curve.fi/api/getFactoryV2Pools-celo',
+const NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID: Record<NetworkId, string | null> = {
+  [NetworkId['celo-mainnet']]: 'celo',
+  [NetworkId['ethereum-mainnet']]: 'ethereum',
+  [NetworkId['arbitrum-one']]: 'arbitrum',
+  [NetworkId['op-mainnet']]: 'optimism',
+  [NetworkId['ethereum-sepolia']]: null,
+  [NetworkId['arbitrum-sepolia']]: null,
+  [NetworkId['op-sepolia']]: null,
+  [NetworkId['celo-alfajores']]: null,
 }
 
-async function getAllCurvePools(network: string) {
+async function getAllCurvePools(networkId: NetworkId) {
+  const blockchainId = NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID[networkId]
+  if (blockchainId === null) {
+    return []
+  }
   const { data } = await got
-    .get(CURVE_POOL_URLS[network])
+    .get(`https://api.curve.fi/api/getPools/${blockchainId}/factory`)
     .json<CurveApiResponse>()
 
   const pools: { address: Address; size: PoolSize }[] = data.poolData.map(
@@ -48,10 +60,10 @@ async function getAllCurvePools(network: string) {
 }
 
 export async function getPoolPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: Address,
 ) {
-  const pools = await getAllCurvePools(network)
+  const pools = await getAllCurvePools(networkId)
 
   // call balanceOf to check if user has balance on a pool
   const result = await client.multicall({
@@ -70,13 +82,13 @@ export async function getPoolPositionDefinitions(
 
   return await Promise.all(
     userPools.map((pool) =>
-      getPoolPositionDefinition(network, pool.address, pool.size),
+      getPoolPositionDefinition(networkId, pool.address, pool.size),
     ),
   )
 }
 
 async function getPoolPositionDefinition(
-  network: string,
+  networkId: NetworkId,
   poolAddress: Address,
   poolSize: PoolSize,
 ) {
@@ -98,11 +110,11 @@ async function getPoolPositionDefinition(
 
   const position: AppTokenPositionDefinition = {
     type: 'app-token-definition',
-    network,
+    networkId,
     address: poolAddress.toLowerCase(),
     tokens: tokenAddresses.map((token) => ({
       address: token.toLowerCase(),
-      network,
+      networkId,
     })),
     displayProps: ({ resolvedTokens }) => {
       const tokenSymbols = tokenAddresses.map(
@@ -147,15 +159,15 @@ const hook: PositionsHook = {
       description: 'Curve pools',
     }
   },
-  getPositionDefinitions(network, address) {
-    return getPoolPositionDefinitions(network, address as Address)
+  getPositionDefinitions(networkId, address) {
+    return getPoolPositionDefinitions(networkId, address as Address)
   },
-  async getAppTokenDefinition({ network, address }: TokenDefinition) {
+  async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    const pools = await getAllCurvePools(network)
+    const pools = await getAllCurvePools(networkId)
     const poolSize = pools.find((pool) => pool.address === address)?.size
     return await getPoolPositionDefinition(
-      network,
+      networkId,
       address as Address,
       poolSize!,
     )
