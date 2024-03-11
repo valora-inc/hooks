@@ -1,7 +1,10 @@
 import {NetworkId} from "../api/networkId";
 
 export interface ShortcutsHook {
-  getShortcutDefinitions(): ShortcutDefinition[]
+  getShortcutDefinitions(
+    network?: string,
+    address?: string,
+  ): Promise<ShortcutDefinition[]>
 }
 
 export interface ShortcutDefinition {

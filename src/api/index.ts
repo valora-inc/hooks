@@ -33,7 +33,7 @@ function createApp() {
     }),
   )
 
-  const balancesRequestSchema = z.object({
+  const getHooksRequestSchema = z.object({
     query: z.intersection(
       z.object({
         address: z
@@ -48,13 +48,17 @@ function createApp() {
   app.get(
     '/getPositions',
     asyncHandler(async (req, res) => {
-      const parsedRequest = await parseRequest(req, balancesRequestSchema)
+      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { address } = parsedRequest.query
       const networkId =
         'network' in parsedRequest.query
           ? legacyNetworkToNetworkId[parsedRequest.query.network]
           : parsedRequest.query.networkId
-      const positions = await getPositions(networkId, address)
+      const positions = await getPositions(
+        networkId,
+        address,
+        config.POSITION_IDS,
+      )
       res.send({ message: 'OK', data: positions })
     }),
   )
@@ -62,7 +66,29 @@ function createApp() {
   app.get(
     '/getShortcuts',
     asyncHandler(async (_req, res) => {
-      const shortcuts = await getShortcuts()
+      const shortcuts = await getShortcuts(
+        undefined,
+        undefined,
+        config.SHORTCUT_IDS,
+      )
+      res.send({ message: 'OK', data: shortcuts })
+    }),
+  )
+
+  app.get(
+    '/v2/getShortcuts',
+    asyncHandler(async (req, res) => {
+      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
+      const { address } = parsedRequest.query
+      const networkId =
+        'network' in parsedRequest.query
+          ? legacyNetworkToNetworkId[parsedRequest.query.network]
+          : parsedRequest.query.networkId
+      const shortcuts = await getShortcuts(
+        networkId,
+        address,
+        config.SHORTCUT_IDS,
+      )
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
@@ -94,12 +120,13 @@ function createApp() {
       )
 
       const { address, appId, shortcutId, positionAddress } = parsedRequest.body
+
       const networkId =
         'network' in parsedRequest.body
           ? legacyNetworkToNetworkId[parsedRequest.body.network]
           : parsedRequest.body.networkId
 
-      const shortcuts = await getShortcuts([appId])
+      const shortcuts = await getShortcuts(networkId, address, [appId])
 
       const shortcut = shortcuts.find((s) => s.id === shortcutId)
       if (!shortcut) {

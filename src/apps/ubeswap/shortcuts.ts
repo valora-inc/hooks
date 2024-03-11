@@ -10,7 +10,7 @@ const client = createPublicClient({
 })
 
 const hook: ShortcutsHook = {
-  getShortcutDefinitions() {
+  async getShortcutDefinitions(_network?: string, _address?: string) {
     return [
       {
         id: 'claim-reward',

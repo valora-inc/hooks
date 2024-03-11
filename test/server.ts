@@ -3,7 +3,7 @@ import { rest } from 'msw'
 
 const handlers = [
   rest.get(
-    'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getTokensInfo',
+    'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getRtdbTokensInfo',
     async (_req, res, ctx) => {
       return res(
         ctx.json({

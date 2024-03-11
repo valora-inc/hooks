@@ -6,7 +6,7 @@ import {
   createPublicClient,
   http,
 } from 'viem'
-import { celo } from '@wagmi/chains'
+import { celo } from 'viem/chains'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -60,7 +60,7 @@ async function getBaseTokensInfo(): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
     .get(
-      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getTokensInfo',
+      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getRtdbTokensInfo',
     )
     .json<{ tokens: Record<string, RawTokenInfo> }>()
 
@@ -371,6 +371,11 @@ export async function getPositions(
             // TODO: We'll probably need to allow hooks to specify the app id themselves
             const { sourceAppId } = tokenDefinition
             const hook = hooksByAppId[sourceAppId]
+            if (!hook.getAppTokenDefinition) {
+              throw new Error(
+                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.network}).`,
+              )
+            }
             const appTokenDefinition = await hook
               .getAppTokenDefinition(tokenDefinition)
               .then((definition) => addAppId(definition, sourceAppId))

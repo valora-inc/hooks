@@ -12,7 +12,10 @@ export interface PositionsHook {
   ): Promise<PositionDefinition[]>
 
   // Get an app token definition from a token definition
-  getAppTokenDefinition(
+  // This is needed when a position definition has one ore more intermediary app tokens, which are not base tokens.
+  // For instance a farm position composed of a LP token.
+  // The runtime needs to call this function to resolve such intermediary tokens.
+  getAppTokenDefinition?(
     tokenDefinition: TokenDefinition,
   ): Promise<AppTokenPositionDefinition>
 }

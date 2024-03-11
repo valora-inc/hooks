@@ -1,9 +1,13 @@
+---
+sidebar_position: 2
+---
+
 # Shortcut Hooks
 
 A user's Valora wallet invokes shortcut hooks when determining asset or dapp related calls-to-action for the user. For example, when a user opens Valora's homescreen. A shortcut hook returns a human readable summary of available actions (_e.g._, "Claim your 1 cUSD earnings") and if the user chooses to act on them, a set of blockchain or in-app transactions will be executed by Valora with the user's consent.
 
 > **Note**
-> The UI/UX for shortcut hooks in Valora is currently focused on the "claim rewards" use case and requires a [position pricing hook](position-pricing-hooks.md) to be implemented as well. We plan to expand them to other use cases in the future (shortcuts with custom inputs, not linked to positions, or across dapps).
+> The UI/UX for shortcut hooks in Valora is currently focused on the "claim rewards" use case and requires a [position pricing hook](position.md) to be implemented as well. We plan to expand them to other use cases in the future (shortcuts with custom inputs, not linked to positions, or across dapps).
 
 ## Developing a Shortcut Hook
 
@@ -90,7 +94,7 @@ Here you can see that it contains the following properties:
 - `category`: the category of the shortcut
 - `onTrigger`: the function that is called when the shortcut is triggered
 
-Once the shortcut is defined, Valora needs to know when to show it to the user, by linking it to an existing [position](position-pricing-hooks.md).
+Once the shortcut is defined, Valora needs to know when to show it to the user, by linking it to an existing [position](position.md).
 
 This is done by adding the `availableShortcutIds` property to the position definition and setting the `category` to `claimable` for the appropriate token(s).
 
@@ -111,7 +115,7 @@ Once this all done, Valora will show the GoodDollar shortcut in the rewards scre
 
 ### Testing a Shortcut Hook
 
-The [hooks live preview](live-preview.md) mode in Valora is the easiest way to test your shortcut hook while developing it.
+The [hooks live preview](../live-preview.md) mode in Valora is the easiest way to test your shortcut hook while developing it.
 
 Alternatively, you can use the following scripts via the command line.
 

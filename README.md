@@ -7,7 +7,7 @@
 
 Valora Hooks allows developers to extend Valora's functionality by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide Valora with additional information and features.
 
-Check out the [Valora Hooks documentation](https://docs.staging.valora.xyz/hooks/overview) for more information.
+Check out the [Valora Hooks documentation](https://docs.valora.xyz/hooks/) for more information.
 
 Currently, this repository contains position pricing and shortcut hooks.
 
@@ -25,11 +25,11 @@ To develop hooks, you will need to have Node.js installed on your computer.
 
 ### Position Pricing
 
-See the [documentation](docs/position-pricing-hooks.md) for developing position pricing hooks.
+See the [documentation](docs/types/position.md) for developing position pricing hooks.
 
 ### Shortcuts
 
-See the [documentation](docs/shortcut-hooks.md) for developing shortcut hooks.
+See the [documentation](docs/types/shortcut.md) for developing shortcut hooks.
 
 ## Contributing
 
