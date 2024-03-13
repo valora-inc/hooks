@@ -1,4 +1,4 @@
-import {NetworkId} from "../api/networkId";
+import { NetworkId } from '../api/networkId'
 
 export interface ShortcutsHook {
   getShortcutDefinitions(

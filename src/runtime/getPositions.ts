@@ -28,7 +28,7 @@ import {
 } from '../types/numbers'
 import { getHooks } from './getHooks'
 import { logger } from '../log'
-import {NetworkId} from "../api/networkId";
+import { NetworkId } from '../api/networkId'
 
 interface RawTokenInfo {
   address: string
