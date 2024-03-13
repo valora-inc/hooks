@@ -69,7 +69,7 @@ async function getBaseTokensInfo(): Promise<TokensInfo> {
   for (const [address, tokenInfo] of Object.entries(data.tokens)) {
     const addressLowerCase = address.toLowerCase()
     tokensInfo[addressLowerCase] = {
-      network: 'celo', // TODO: adjust for other networks
+      networkId: NetworkId['celo-mainnet'], // TODO: adjust for other networks
       address: addressLowerCase,
       symbol: tokenInfo.symbol,
       decimals: tokenInfo.decimals,
@@ -100,7 +100,7 @@ async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
   })
 
   return {
-    network: 'celo',
+    networkId: NetworkId['celo-mainnet'], //fixme
     address: address,
     symbol: symbol,
     decimals: decimals,
@@ -199,7 +199,7 @@ async function resolveAppTokenPosition(
 
   const position: AppTokenPosition = {
     type: 'app-token',
-    network: positionDefinition.network,
+    networkId: positionDefinition.networkId,
     address: positionDefinition.address,
     appId: positionDefinition.appId,
     appName: appInfo.name,
@@ -267,7 +267,7 @@ async function resolveContractPosition(
   const position: ContractPosition = {
     type: 'contract-position',
     address: positionDefinition.address,
-    network: positionDefinition.network,
+    networkId: positionDefinition.networkId,
     appId: positionDefinition.appId,
     appName: appInfo.name,
     label: displayProps.title,
@@ -373,7 +373,7 @@ export async function getPositions(
             const hook = hooksByAppId[sourceAppId]
             if (!hook.getAppTokenDefinition) {
               throw new Error(
-                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.network}).`,
+                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.networkId}).`,
               )
             }
             const appTokenDefinition = await hook

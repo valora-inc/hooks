@@ -8,6 +8,7 @@ import { getShortcuts } from '../runtime/getShortcuts'
 import { Position } from '../types/positions'
 import './index'
 import { SerializedDecimalNumber } from '../types/numbers'
+import { NetworkId } from './networkId'
 
 jest.mock('../runtime/getPositions')
 jest.mock('../runtime/getShortcuts')
@@ -17,7 +18,7 @@ const TEST_POSITIONS: Position[] = [
     type: 'app-token',
     appId: 'ubeswap',
     appName: 'Ubeswap',
-    network: 'celo',
+    networkId: NetworkId['celo-mainnet'],
     address: '0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     symbol: 'ULP',
     decimals: 18,
@@ -30,7 +31,7 @@ const TEST_POSITIONS: Position[] = [
     tokens: [
       {
         type: 'base-token',
-        network: 'celo',
+        networkId: NetworkId['celo-mainnet'],
         address: '0x62b8b11039fcfe5ab0c56e502b1c372a3d2a9c7a',
         symbol: 'G$',
         decimals: 18,
@@ -39,7 +40,7 @@ const TEST_POSITIONS: Position[] = [
       },
       {
         type: 'base-token',
-        network: 'celo',
+        networkId: NetworkId['celo-mainnet'],
         address: '0x765de816845861e75a25fca122bb6898b8b1282a',
         symbol: 'cUSD',
         decimals: 18,
@@ -68,11 +69,11 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
     description: 'Claim rewards for staked liquidity',
     networks: ['celo'],
     category: 'claim',
-    async onTrigger(network, address, positionAddress) {
+    async onTrigger(networkId, address, positionAddress) {
       // Bogus implementation for testing
       return [
         {
-          network,
+          networkId,
           from: address,
           to: positionAddress,
           data: '0xTEST',
