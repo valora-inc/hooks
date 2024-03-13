@@ -4,6 +4,7 @@ import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/types/positions'
 import { getPositions } from '../src/runtime/getPositions'
+import {NetworkId} from "../src/api/networkId";
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -11,8 +12,8 @@ const argv = yargs(process.argv.slice(2))
     network: {
       alias: 'n',
       describe: 'Network to get positions for',
-      choices: ['celo', 'celoAlfajores'],
-      default: 'celo',
+      choices: Object.values(NetworkId),
+      default: NetworkId['celo-mainnet'],
     },
     address: {
       alias: 'a',
@@ -59,7 +60,7 @@ void (async () => {
           appId: position.appId,
           type: position.type,
           address: position.address,
-          network: position.network,
+          network: position.networkId,
           title: `${position.displayProps.title} (${position.displayProps.description})`,
           priceUsd: new BigNumber(position.priceUsd).toFixed(2),
           balance: balance.toFixed(2),
@@ -72,7 +73,7 @@ void (async () => {
           appId: position.appId,
           type: position.type,
           address: position.address,
-          network: position.network,
+          network: position.networkId,
           title: `${position.displayProps.title} (${position.displayProps.description})`,
           balanceUsd: new BigNumber(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),
