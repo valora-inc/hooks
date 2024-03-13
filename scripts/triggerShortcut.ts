@@ -5,6 +5,7 @@ import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 import { celo } from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
+import { NetworkId } from '../src/api/networkId'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 
@@ -14,11 +15,11 @@ const argv = yargs(process.argv.slice(2))
   )
   .env('')
   .options({
-    network: {
+    networkId: {
       alias: 'n',
-      describe: 'Network to get positions for',
-      choices: ['celo', 'celoAlfajores'],
-      default: 'celo',
+      describe: 'Network ID to get positions for',
+      choices: Object.values(NetworkId),
+      default: NetworkId['celo-mainnet'],
     },
     address: {
       alias: 'a',
@@ -56,7 +57,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 void (async () => {
-  const shortcuts = await getShortcuts(argv.network, argv.address, [argv.app])
+  const shortcuts = await getShortcuts(argv.networkId, argv.address, [argv.app])
 
   const shortcut = shortcuts.find((s) => s.id === argv.shortcut)
   if (!shortcut) {
@@ -76,7 +77,7 @@ void (async () => {
     },
   )
   const result = await shortcut.onTrigger(
-    argv.network,
+    argv.networkId,
     argv.address,
     argv.positionAddress,
   )

@@ -9,9 +9,9 @@ import {NetworkId} from "../src/api/networkId";
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
   .options({
-    network: {
+    networkId: {
       alias: 'n',
-      describe: 'Network to get positions for',
+      describe: 'Network ID to get positions for',
       choices: Object.values(NetworkId),
       default: NetworkId['celo-mainnet'],
     },
@@ -49,7 +49,7 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await getPositions(argv.network, argv.address, argv.apps)
+  const positions = await getPositions(argv.networkId, argv.address, argv.apps)
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(
