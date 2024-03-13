@@ -40,23 +40,19 @@ const NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID: Record<NetworkId, string | null> = {
   [NetworkId['celo-alfajores']]: null,
 }
 
-async function getAllCurvePools(networkId: NetworkId) {
+async function getAllCurvePools(networkId: NetworkId): Promise<{ address: Address; size: PoolSize }[]> {
   const blockchainId = NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID[networkId]
   if (blockchainId === null) {
     return []
   }
   const { data } = await got
-    .get(`https://api.curve.fi/api/getPools/${blockchainId}/factory`)
+    .get(`https://api.curve.fi/v1/getPools/${blockchainId}/factory`)
     .json<CurveApiResponse>()
 
-  const pools: { address: Address; size: PoolSize }[] = data.poolData.map(
-    (poolInfo) => ({
-      address: poolInfo.address,
-      size: poolInfo.implementation === 'plain3basic' ? 3 : 2,
-    }),
-  )
-
-  return pools
+  return data.poolData.map((poolInfo) => ({
+    address: poolInfo.address,
+    size: poolInfo.implementation === 'plain3basic' ? 3 : 2,
+  }))
 }
 
 export async function getPoolPositionDefinitions(
