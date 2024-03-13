@@ -26,7 +26,7 @@ const hook: PositionsHook = {
       description: 'Uniswap pools',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
     const userPools = await client.readContract({
       abi: userPositionsAbi,
       address: USER_POSITIONS_MULTICALL_ADDRESS,
@@ -47,11 +47,11 @@ const hook: PositionsHook = {
       .map((pool) => {
         return {
           type: 'contract-position-definition',
-          network,
+          networkId,
           address: pool.poolAddress,
           tokens: [
-            { address: pool.token0, network },
-            { address: pool.token1, network },
+            { address: pool.token0, networkId },
+            { address: pool.token1, networkId },
           ],
           displayProps: ({ resolvedTokens }) => ({
             title: `${resolvedTokens[pool.token0].symbol} / ${

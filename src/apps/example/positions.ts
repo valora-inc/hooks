@@ -1,6 +1,7 @@
 import { Address, parseEther } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
+import {NetworkId} from "../../api/networkId";
 
 const CELO_NATIVE_ADDRESS: Address =
   '0x471ece3750da237f93b8e339c536989b8978a438'
@@ -17,11 +18,11 @@ const hook: PositionsHook = {
     }
   },
 
-  async getPositionDefinitions(network: string, _address: string) {
+  async getPositionDefinitions(networkId: NetworkId, _address: string) {
     //
     // This example pretend position only exists on Celo.
     //
-    if (network !== 'celo') {
+    if (networkId !== NetworkId['celo-mainnet']) {
       return []
     }
 
@@ -42,11 +43,11 @@ const hook: PositionsHook = {
     const tokens = [
       {
         address: CELO_NATIVE_ADDRESS,
-        network,
+        networkId,
       },
       {
         address: CUSD_ADDRESS,
-        network,
+        networkId,
       },
     ]
 
@@ -63,7 +64,7 @@ const hook: PositionsHook = {
       {
         // Position Hooks type, see https://docs.valora.xyz/hooks/
         type: 'contract-position-definition',
-        network,
+        networkId,
         // This serves an ID and by convention it should be the contract holding
         // the underlying position. The runtime passed this addresses to any
         // shortcut definitions that might execute on this position.

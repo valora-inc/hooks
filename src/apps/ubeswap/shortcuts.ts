@@ -10,7 +10,7 @@ const client = createPublicClient({
 })
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(_network?: string, _address?: string) {
+  async getShortcutDefinitions(_networkId?: NetworkId, _address?: string) {
     return [
       {
         id: 'claim-reward',
@@ -18,7 +18,7 @@ const hook: ShortcutsHook = {
         description: 'Claim rewards for staked liquidity',
         networks: [NetworkId['celo-mainnet']],
         category: 'claim',
-        async onTrigger(network, address, positionAddress) {
+        async onTrigger(networkId, address, positionAddress) {
           // This isn't strictly needed, but will help while we're developing shortcuts
           const { request } = await client.simulateContract({
             address: positionAddress as Address, // This is the farm address
@@ -35,7 +35,7 @@ const hook: ShortcutsHook = {
 
           return [
             {
-              network,
+              networkId,
               from: address,
               to: positionAddress,
               data,

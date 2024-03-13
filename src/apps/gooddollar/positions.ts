@@ -33,7 +33,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
     const ubiContract = {
       address: UBI_ADDRESS,
       abi: ubiSchemeAbi,
@@ -84,9 +84,9 @@ const hook: PositionsHook = {
 
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
-      network,
+      networkId,
       address: UBI_ADDRESS,
-      tokens: [{ address: G$_ADDRESS, network, category: 'claimable' }],
+      tokens: [{ address: G$_ADDRESS, networkId, category: 'claimable' }],
       availableShortcutIds: ['claim-reward'],
       displayProps: {
         title: 'Daily UBI',

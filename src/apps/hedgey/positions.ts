@@ -9,6 +9,7 @@ import { hedgeyContractNames, hedgeyDefaultImageUrl } from './config'
 import { erc20Abi } from '../../abis/erc-20'
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
 import { getHedgeyPlanNfts } from './nfts'
+import {NetworkId} from "../../api/networkId";
 
 const client = createPublicClient({
   chain: celo,
@@ -24,7 +25,7 @@ const hook: PositionsHook = {
     }
   },
 
-  async getPositionDefinitions(network: string, address: string) {
+  async getPositionDefinitions(networkId: NetworkId, address: string) {
     const planNfts = await getHedgeyPlanNfts({ address })
     const now = BigInt(Math.floor(new Date().getTime() / 1000))
 
@@ -78,9 +79,9 @@ const hook: PositionsHook = {
 
         return {
           type: 'contract-position-definition',
-          network,
+          networkId,
           address: planNft.contractAddress,
-          tokens: [{ address: tokenAddress, network, category: 'claimable' }],
+          tokens: [{ address: tokenAddress, networkId, category: 'claimable' }],
           availableShortcutIds: [
             `${planNft.contractAddress}:${planNft.tokenId}`,
           ],

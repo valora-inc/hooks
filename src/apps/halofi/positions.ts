@@ -17,7 +17,7 @@ const hook: PositionsHook = {
         'Grow wealth with crypto, earn rewards, badges & more. We make personal finance fun.',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
     const compatibleGames = await getCompatibleGamesFromAPI()
 
     const contractAddressList = compatibleGames.map(
@@ -47,9 +47,9 @@ const hook: PositionsHook = {
 
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
-        network,
+        networkId,
         address: game.id.toLowerCase(),
-        tokens: [{ address: depositTokenAddress, network }],
+        tokens: [{ address: depositTokenAddress, networkId }],
         displayProps: {
           title: game.gameNameShort,
           description: 'Challenge',
