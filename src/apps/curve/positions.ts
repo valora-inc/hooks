@@ -28,23 +28,25 @@ interface CurveApiResponse {
 
 type PoolSize = 2 | 3
 
-const CURVE_POOL_URLS: Record<string, string> = {
-  celo: 'https://api.curve.fi/api/getFactoryV2Pools-celo',
+const CURVE_BLOCKCHAIN_IDS: Record<string, string> = {
+  celo: 'celo',
 }
 
-async function getAllCurvePools(network: string) {
+async function getAllCurvePools(
+  network: string,
+): Promise<{ address: Address; size: PoolSize }[]> {
+  const blockchainId = CURVE_BLOCKCHAIN_IDS[network]
+  if (!blockchainId) {
+    return []
+  }
   const { data } = await got
-    .get(CURVE_POOL_URLS[network])
+    .get(`https://api.curve.fi/v1/getPools/${blockchainId}/factory`)
     .json<CurveApiResponse>()
 
-  const pools: { address: Address; size: PoolSize }[] = data.poolData.map(
-    (poolInfo) => ({
-      address: poolInfo.address,
-      size: poolInfo.implementation === 'plain3basic' ? 3 : 2,
-    }),
-  )
-
-  return pools
+  return data.poolData.map((poolInfo) => ({
+    address: poolInfo.address,
+    size: poolInfo.implementation === 'plain3basic' ? 3 : 2,
+  }))
 }
 
 export async function getPoolPositionDefinitions(
