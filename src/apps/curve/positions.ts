@@ -40,7 +40,9 @@ const NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID: Record<NetworkId, string | null> = {
   [NetworkId['celo-alfajores']]: null,
 }
 
-async function getAllCurvePools(networkId: NetworkId): Promise<{ address: Address; size: PoolSize }[]> {
+async function getAllCurvePools(
+  networkId: NetworkId,
+): Promise<{ address: Address; size: PoolSize }[]> {
   const blockchainId = NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID[networkId]
   if (blockchainId === null) {
     return []
