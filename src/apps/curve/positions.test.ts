@@ -1,5 +1,5 @@
 import { getAllCurvePools } from './positions'
-import {NetworkId} from "../../api/networkId";
+import { NetworkId } from '../../api/networkId'
 
 jest.mock('got', () => ({
   get: jest.fn().mockImplementation((url: string) => {

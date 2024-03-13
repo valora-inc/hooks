@@ -3,7 +3,7 @@ import { celo } from 'viem/chains'
 import { ShortcutsHook } from '../../types/shortcuts'
 import { getHedgeyPlanNfts } from './nfts'
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
-import {NetworkId} from "../../api/networkId";
+import { NetworkId } from '../../api/networkId'
 
 const client = createPublicClient({
   chain: celo,

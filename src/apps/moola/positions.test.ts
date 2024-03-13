@@ -1,5 +1,5 @@
 import hook from './positions'
-import {NetworkId} from "../../api/networkId";
+import { NetworkId } from '../../api/networkId'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
