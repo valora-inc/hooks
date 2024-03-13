@@ -32,7 +32,7 @@ const CURVE_BLOCKCHAIN_IDS: Record<string, string> = {
   celo: 'celo',
 }
 
-async function getAllCurvePools(
+export async function getAllCurvePools(
   network: string,
 ): Promise<{ address: Address; size: PoolSize }[]> {
   const blockchainId = CURVE_BLOCKCHAIN_IDS[network]
