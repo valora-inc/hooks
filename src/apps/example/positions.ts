@@ -1,7 +1,7 @@
 import { Address, parseEther } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
-import {NetworkId} from "../../api/networkId";
+import { NetworkId } from '../../api/networkId'
 
 const CELO_NATIVE_ADDRESS: Address =
   '0x471ece3750da237f93b8e339c536989b8978a438'

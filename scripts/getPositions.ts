@@ -4,7 +4,7 @@ import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/types/positions'
 import { getPositions } from '../src/runtime/getPositions'
-import {NetworkId} from "../src/api/networkId";
+import { NetworkId } from '../src/api/networkId'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')

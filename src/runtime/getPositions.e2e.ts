@@ -1,9 +1,10 @@
 import { getPositions } from './getPositions'
+import { NetworkId } from '../api/networkId'
 
 describe('getPositions', () => {
   it('should get the address positions successfully', async () => {
     const positions = await getPositions(
-      'celo',
+      NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
     // Simple check to make sure we got some definitions
@@ -12,7 +13,7 @@ describe('getPositions', () => {
 
   it('should get the address positions successfully for a specific app', async () => {
     const positions = await getPositions(
-      'celo',
+      NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       ['halofi'],
     )
@@ -25,9 +26,11 @@ describe('getPositions', () => {
 
   it("should throw an error if the app doesn't exist", async () => {
     await expect(
-      getPositions('celo', '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d', [
-        'does-not-exist',
-      ]),
+      getPositions(
+        NetworkId['celo-mainnet'],
+        '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+        ['does-not-exist'],
+      ),
     ).rejects.toThrow(
       /No app with id 'does-not-exist' found, available apps: \w+/,
     )
