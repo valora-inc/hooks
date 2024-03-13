@@ -31,6 +31,12 @@ const argv = yargs(process.argv.slice(2))
         return array.flatMap((v) => v.split(','))
       },
     },
+    getTokensInfoUrl: {
+      alias: 'g',
+      describe: 'URL to get token info from',
+      type: 'string',
+      default: 'https://api.mainnet.valora.xyz/getTokensInfo',
+    }
   })
   .parseSync()
 
@@ -49,7 +55,7 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await getPositions(argv.networkId, argv.address, argv.apps)
+  const positions = await getPositions(argv.networkId, argv.address, argv.apps, argv.getTokensInfoUrl)
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(

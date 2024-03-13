@@ -2,11 +2,21 @@ import got from 'got'
 import BigNumber from 'bignumber.js'
 import {
   Address,
+  Chain,
   ContractFunctionExecutionError,
   createPublicClient,
   http,
 } from 'viem'
-import { celo } from 'viem/chains'
+import {
+  celo,
+  optimism,
+  celoAlfajores,
+  optimismSepolia,
+  sepolia,
+  arbitrum,
+  arbitrumSepolia,
+  mainnet,
+} from 'viem/chains'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -31,12 +41,15 @@ import { logger } from '../log'
 import { NetworkId } from '../api/networkId'
 
 interface RawTokenInfo {
-  address: string
-  name?: string
+  address?: string
+  name: string
   symbol: string
   decimals: number
-  usdPrice?: string
   imageUrl: string
+  tokenId: string
+  networkId: NetworkId
+  isNative?: boolean
+  priceUsd?: string
 }
 
 interface TokenInfo extends Omit<AbstractToken, 'balance'> {
@@ -51,41 +64,59 @@ type AppPositionDefinition = PositionDefinition & {
   appId: string
 }
 
-const client = createPublicClient({
-  chain: celo,
-  transport: http(),
-})
+const networkIdToViemChain: Record<NetworkId, Chain> = {
+  [NetworkId['celo-mainnet']]: celo,
+  [NetworkId['ethereum-mainnet']]: mainnet,
+  [NetworkId['arbitrum-one']]: arbitrum,
+  [NetworkId['op-mainnet']]: optimism,
+  [NetworkId['celo-alfajores']]: celoAlfajores,
+  [NetworkId['ethereum-sepolia']]: sepolia,
+  [NetworkId['arbitrum-sepolia']]: arbitrumSepolia,
+  [NetworkId['op-sepolia']]: optimismSepolia,
+}
 
-async function getBaseTokensInfo(): Promise<TokensInfo> {
+function getClient(networkId: NetworkId) {
+  return createPublicClient({
+    chain: networkIdToViemChain[networkId],
+    transport: http(),
+  })
+}
+
+async function getBaseTokensInfo(
+  getTokensInfoUrl: string,
+): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
-    .get(
-      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getRtdbTokensInfo',
-    )
+    .get(getTokensInfoUrl)
     .json<{ tokens: Record<string, RawTokenInfo> }>()
 
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}
-  for (const [address, tokenInfo] of Object.entries(data.tokens)) {
-    const addressLowerCase = address.toLowerCase()
-    tokensInfo[addressLowerCase] = {
-      networkId: NetworkId['celo-mainnet'], // TODO: adjust for other networks
-      address: addressLowerCase,
+  for (const [_tokenId, tokenInfo] of Object.entries(data.tokens)) {
+    if (!tokenInfo.address) {
+      continue
+    }
+    tokensInfo[tokenInfo.address] = {
+      networkId: tokenInfo.networkId,
+      address: tokenInfo.address,
       symbol: tokenInfo.symbol,
       decimals: tokenInfo.decimals,
       imageUrl: tokenInfo.imageUrl,
-      priceUsd: toSerializedDecimalNumber(tokenInfo.usdPrice ?? 0),
+      priceUsd: toSerializedDecimalNumber(tokenInfo.priceUsd ?? 0),
     }
   }
   return tokensInfo
 }
 
-async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
+async function getERC20TokenInfo(
+  address: Address,
+  networkId: NetworkId,
+): Promise<TokenInfo> {
   const erc20Contract = {
     address: address,
     abi: erc20Abi,
   } as const
-  const [symbol, decimals] = await client.multicall({
+  const [symbol, decimals] = await getClient(networkId).multicall({
     contracts: [
       {
         ...erc20Contract,
@@ -100,7 +131,7 @@ async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
   })
 
   return {
-    networkId: NetworkId['celo-mainnet'], //fixme
+    networkId,
     address: address,
     symbol: symbol,
     decimals: decimals,
@@ -180,7 +211,9 @@ async function resolveAppTokenPosition(
     address: positionDefinition.address as Address,
     abi: erc20Abi,
   } as const
-  const [balance, totalSupply] = await client.multicall({
+  const [balance, totalSupply] = await getClient(
+    positionDefinition.networkId,
+  ).multicall({
     contracts: [
       {
         ...appTokenContract,
@@ -299,6 +332,7 @@ export async function getPositions(
   networkId: NetworkId,
   address: string,
   appIds: string[] = [],
+  getTokensInfoUrl: string,
 ) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
@@ -324,7 +358,7 @@ export async function getPositions(
   logger.debug({ definitions }, 'positions definitions')
 
   // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo()
+  const baseTokensInfo = await getBaseTokensInfo(getTokensInfoUrl)
 
   let unlistedBaseTokensInfo: TokensInfo = {}
   let definitionsToResolve: AppPositionDefinition[] = definitions
@@ -385,6 +419,7 @@ export async function getPositions(
               // Assume the token is an ERC20 token
               const erc20TokenInfo = await getERC20TokenInfo(
                 tokenDefinition.address as Address,
+                networkId,
               )
               newUnlistedBaseTokensInfo[tokenDefinition.address] =
                 erc20TokenInfo
@@ -420,11 +455,13 @@ export async function getPositions(
   const appTokensInfo = await Promise.all(
     Object.values(visitedDefinitions)
       .filter(
-        (position) =>
+        (position): position is AppPositionDefinition =>
           position?.type === 'app-token-definition' &&
           !baseTokensByAddress[position.address],
       )
-      .map((definition) => getERC20TokenInfo(definition!.address as Address)),
+      .map((definition) =>
+        getERC20TokenInfo(definition.address as Address, definition.networkId),
+      ),
   )
   const appTokensByAddress: TokensInfo = {}
   for (const tokenInfo of appTokensInfo) {

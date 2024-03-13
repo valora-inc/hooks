@@ -97,7 +97,8 @@ export interface AbstractPosition {
 }
 
 export interface AbstractToken {
-  address: string // Example: 0x...
+  // tokenId: string // Example: celo-mainnet:0x123... // todo use this so native assets can be included
+  address: string // Example: 0x... // todo make optional once native assets are included
   networkId: NetworkId // Example: celo-mainnet
 
   // These would be resolved dynamically

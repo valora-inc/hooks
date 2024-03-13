@@ -6,6 +6,8 @@ describe('getPositions', () => {
     const positions = await getPositions(
       NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      [],
+      'https://api.mainnet.valora.xyz/getTokensInfo',
     )
     // Simple check to make sure we got some definitions
     expect(positions.length).toBeGreaterThan(0)
@@ -16,6 +18,7 @@ describe('getPositions', () => {
       NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       ['halofi'],
+      'https://api.mainnet.valora.xyz/getTokensInfo',
     )
     // Simple check to make sure we got some definitions
     expect(positions.length).toBeGreaterThan(0)
@@ -30,6 +33,7 @@ describe('getPositions', () => {
         NetworkId['celo-mainnet'],
         '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         ['does-not-exist'],
+        'https://api.mainnet.valora.xyz/getTokensInfo',
       ),
     ).rejects.toThrow(
       /No app with id 'does-not-exist' found, available apps: \w+/,
