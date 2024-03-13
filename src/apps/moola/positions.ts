@@ -8,6 +8,7 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { DebtTokenDefinition, MOOLA_DEBT_TOKENS } from './debtTokens'
+import {NetworkId} from "../../api/networkId";
 
 const client = createPublicClient({
   chain: celo,
@@ -20,9 +21,9 @@ function getAppTokenPositionDefinition(
 ): AppTokenPositionDefinition {
   return {
     type: 'app-token-definition',
-    network: network,
+    networkId,
     address: debtTokenDefinition.debtTokenAddress,
-    tokens: [{ address: debtTokenDefinition.baseTokenAddress, network }],
+    tokens: [{ address: debtTokenDefinition.baseTokenAddress, networkId }],
     displayProps: {
       title: debtTokenDefinition.title,
       description: debtTokenDefinition.description,

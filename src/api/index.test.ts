@@ -93,7 +93,7 @@ describe('GET /getPositions', () => {
     await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
       })
       .expect(200)
@@ -105,7 +105,7 @@ describe('GET /getPositions', () => {
     const response = await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo',
+        networkId: 'celo-mainnet',
       })
       .expect(400)
     expect(response.body).toMatchInlineSnapshot(`
@@ -146,7 +146,7 @@ describe('POST /triggerShortcut', () => {
     const response = await request(server)
       .post('/triggerShortcut')
       .send({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: TEST_SHORTCUTS[0].id,
@@ -158,7 +158,7 @@ describe('POST /triggerShortcut', () => {
       data: {
         transactions: [
           {
-            network: 'celo',
+            networkId: 'celo-mainnet',
             from: WALLET_ADDRESS.toLowerCase(),
             to: TEST_POSITIONS[0].address,
             data: '0xTEST',
@@ -173,7 +173,7 @@ describe('POST /triggerShortcut', () => {
     const response = await request(server)
       .post('/triggerShortcut')
       .send({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: 'flarf',

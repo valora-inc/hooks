@@ -1,4 +1,5 @@
 import hook from './positions'
+import {NetworkId} from "../../api/networkId";
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -16,7 +17,7 @@ describe('getPositionDefinitions', () => {
       [[], []], // pending withdrawals
     ])
     const positions = await hook.getPositionDefinitions(
-      'celo',
+      NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
 
@@ -29,7 +30,7 @@ describe('getPositionDefinitions', () => {
       [[], []], // pending withdrawals
     ])
     const positions = await hook.getPositionDefinitions(
-      'celo',
+      NetworkId['celo-mainnet'],
       '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
     )
 

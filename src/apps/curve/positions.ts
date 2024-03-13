@@ -44,7 +44,7 @@ export async function getAllCurvePools(
   networkId: NetworkId,
 ): Promise<{ address: Address; size: PoolSize }[]> {
   const blockchainId = NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID[networkId]
-  if (blockchainId === null) {
+  if (!blockchainId) {
     return []
   }
   const { data } = await got

@@ -44,7 +44,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
     const lockedGoldContract = {
       address: LOCKED_GOLD_ADDRESS,
       abi: LockedGoldAbi,
@@ -102,9 +102,9 @@ const hook: PositionsHook = {
 
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
-      network,
+      networkId,
       address: LOCKED_GOLD_ADDRESS,
-      tokens: [{ address: CELO_ADDRESS, network }],
+      tokens: [{ address: CELO_ADDRESS, networkId }],
       displayProps: {
         title: 'Locked CELO',
         description: '', // TODO

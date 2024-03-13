@@ -2,7 +2,7 @@ import { NetworkId } from '../api/networkId'
 
 export interface ShortcutsHook {
   getShortcutDefinitions(
-    network?: string,
+    networkId?: NetworkId,
     address?: string,
   ): Promise<ShortcutDefinition[]>
 }

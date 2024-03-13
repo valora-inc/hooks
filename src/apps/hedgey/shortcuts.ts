@@ -3,6 +3,7 @@ import { celo } from 'viem/chains'
 import { ShortcutsHook } from '../../types/shortcuts'
 import { getHedgeyPlanNfts } from './nfts'
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
+import {NetworkId} from "../../api/networkId";
 
 const client = createPublicClient({
   chain: celo,
@@ -10,8 +11,8 @@ const client = createPublicClient({
 })
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(network?: string, address?: string) {
-    if (network !== 'celo' || !address) {
+  async getShortcutDefinitions(networkId?: NetworkId, address?: string) {
+    if (networkId !== NetworkId['celo-mainnet'] || !address) {
       return []
     }
 
@@ -23,7 +24,7 @@ const hook: ShortcutsHook = {
       description: 'Claim vested rewards',
       networks: ['celo'],
       category: 'claim',
-      async onTrigger(network, address, positionAddress) {
+      async onTrigger(networkId, address, positionAddress) {
         // positionAddress === planNft.contractAddress
         const { request } = await client.simulateContract({
           address: positionAddress as Address,
@@ -41,7 +42,7 @@ const hook: ShortcutsHook = {
 
         return [
           {
-            network,
+            networkId,
             from: address,
             to: positionAddress as Address,
             data,

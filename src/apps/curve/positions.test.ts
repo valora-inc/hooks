@@ -1,4 +1,5 @@
 import { getAllCurvePools } from './positions'
+import {NetworkId} from "../../api/networkId";
 
 jest.mock('got', () => ({
   get: jest.fn().mockImplementation((url: string) => {
@@ -219,12 +220,15 @@ const mockResponse = {
 
 describe('curve positions', () => {
   describe('getAllCurvePools', () => {
-    it('gives empty list for unknown network', async () => {
-      const result = await getAllCurvePools('unknown')
+    it('gives empty list for unknown or unsupported network', async () => {
+      const result = await getAllCurvePools('unknown' as NetworkId)
       expect(result).toEqual([])
+
+      const result2 = await getAllCurvePools(NetworkId['ethereum-sepolia'])
+      expect(result2).toEqual([])
     })
     it('gives list of pools for celo', async () => {
-      const result = await getAllCurvePools('celo')
+      const result = await getAllCurvePools(NetworkId['celo-mainnet'])
       expect(result).toEqual([
         {
           address: '0x998395fEd908d33CF27115A1D9Ab6555def6cd45',
