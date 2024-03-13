@@ -58,7 +58,7 @@ function createApp() {
         networkId,
         address,
         config.POSITION_IDS,
-        config.GET_TOKENS_INFO_URL
+        config.GET_TOKENS_INFO_URL,
       )
       res.send({ message: 'OK', data: positions })
     }),
