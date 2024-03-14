@@ -6,10 +6,17 @@ import { getTestServer } from '@google-cloud/functions-framework/testing'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
 import { Position } from '../types/positions'
-import './index'
 import { SerializedDecimalNumber } from '../types/numbers'
 import { NetworkId } from './networkId'
-
+import { getConfig } from './config'
+jest.mock('./config')
+jest.mocked(getConfig).mockReturnValue({
+  POSITION_IDS: [],
+  GET_TOKENS_INFO_URL: 'https://valoraapp.com/mock-endpoint',
+  GOOGLE_CLOUD_PROJECT: 'dev-project',
+  SHORTCUT_IDS: [],
+})
+import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
 jest.mock('../runtime/getPositions')
 jest.mock('../runtime/getShortcuts')
 
@@ -67,7 +74,7 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
     id: 'claim-reward',
     name: 'Claim',
     description: 'Claim rewards for staked liquidity',
-    networks: ['celo'],
+    networkIds: [NetworkId['celo-mainnet']],
     category: 'claim',
     async onTrigger(networkId, address, positionAddress) {
       // Bogus implementation for testing

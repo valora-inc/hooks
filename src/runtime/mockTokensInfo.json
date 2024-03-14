@@ -1,0 +1,165 @@
+{
+  "celo-mainnet:native": {
+    "address": "0x471ece3750da237f93b8e339c536989b8978a438",
+    "decimals": 18,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png",
+    "isFeeCurrency": true,
+    "canTransferWithComment": true,
+    "name": "Celo",
+    "symbol": "CELO",
+    "isSwappable": true,
+    "isNative": true,
+    "showZeroBalance": true,
+    "isCashInEligible": true,
+    "isCashOutEligible": true,
+    "infoUrl": "https://www.coingecko.com/en/coins/celo",
+    "networkId": "celo-mainnet",
+    "tokenId": "celo-mainnet:native",
+    "isCoreToken": true,
+    "priceUsd": "1.46418973149988",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "1.49688524807471",
+        "at": 1710290227589
+      }
+    }
+  },
+  "celo-mainnet:0x00400fcbf0816bebb94654259de7273f4a05c762": {
+    "address": "0x00400fcbf0816bebb94654259de7273f4a05c762",
+    "decimals": 18,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/POOF.png",
+    "name": "PoofCash",
+    "symbol": "POOF",
+    "infoUrl": "https://www.coingecko.com/en/coins/poofcash",
+    "networkId": "celo-mainnet",
+    "tokenId": "celo-mainnet:0x00400fcbf0816bebb94654259de7273f4a05c762",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png",
+    "priceUsd": "0.000432413252926883",
+    "priceFetchedAt": 1710375191184
+  },
+  "ethereum-mainnet:native": {
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": 18,
+    "isNative": true,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ETH.png",
+    "showZeroBalance": true,
+    "infoUrl": "https://www.coingecko.com/en/coins/ethereum",
+    "minimumAppVersionToSwap": "1.72.0",
+    "isCashInEligible": true,
+    "networkId": "ethereum-mainnet",
+    "tokenId": "ethereum-mainnet:native",
+    "priceUsd": "3992.64",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "3976.27",
+        "at": 1710290227589
+      }
+    }
+  },
+  "ethereum-mainnet:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": {
+    "name": "Wrapped Ether",
+    "symbol": "WETH",
+    "decimals": 18,
+    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/WETH.png",
+    "infoUrl": "https://www.coingecko.com/en/coins/ethereum",
+    "minimumAppVersionToSwap": "1.72.0",
+    "networkId": "ethereum-mainnet",
+    "tokenId": "ethereum-mainnet:0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ETH.png",
+    "priceUsd": "4000.1615795126",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "3990.81686263612",
+        "at": 1710290227589
+      }
+    }
+  },
+  "arbitrum-one:native": {
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": 18,
+    "isNative": true,
+    "isL2Native": true,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ETH.png",
+    "infoUrl": "https://www.coingecko.com/en/coins/ethereum",
+    "minimumAppVersionToSwap": "1.77.0",
+    "isCashInEligible": true,
+    "networkId": "arbitrum-one",
+    "tokenId": "arbitrum-one:native",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ARB.png",
+    "priceUsd": "3992.64",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "3976.27",
+        "at": 1710290227589
+      }
+    }
+  },
+  "arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831": {
+    "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "decimals": 6,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/USDC.png",
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "minimumAppVersionToSwap": "1.77.0",
+    "isCashInEligible": true,
+    "networkId": "arbitrum-one",
+    "tokenId": "arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ARB.png",
+    "priceUsd": "1.00206954673564",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "1.00286398082106",
+        "at": 1710290227589
+      }
+    }
+  },
+  "op-mainnet:native": {
+    "name": "Ether",
+    "symbol": "ETH",
+    "decimals": 18,
+    "isNative": true,
+    "isL2Native": true,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/ETH.png",
+    "infoUrl": "https://www.coingecko.com/en/coins/ethereum",
+    "minimumAppVersionToSwap": "1.77.0",
+    "isCashInEligible": true,
+    "networkId": "op-mainnet",
+    "tokenId": "op-mainnet:native",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/OP.png",
+    "priceUsd": "3992.64",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "3976.27",
+        "at": 1710290227589
+      }
+    }
+  },
+  "op-mainnet:0x4200000000000000000000000000000000000042": {
+    "name": "Optimism",
+    "symbol": "OP",
+    "address": "0x4200000000000000000000000000000000000042",
+    "decimals": 18,
+    "imageUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/OP.png",
+    "minimumAppVersionToSwap": "1.77.0",
+    "networkId": "op-mainnet",
+    "tokenId": "op-mainnet:0x4200000000000000000000000000000000000042",
+    "networkIconUrl": "https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/OP.png",
+    "priceUsd": "4.38916401440895",
+    "priceFetchedAt": 1710377278942,
+    "historicalPricesUsd": {
+      "lastDay": {
+        "price": "4.39150296828038",
+        "at": 1710290227589
+      }
+    }
+  }
+}

@@ -11,7 +11,7 @@ export interface ShortcutDefinition {
   id: string // Example: claim-reward
   name: string // Example: Claim
   description: string // Example: Claim your reward
-  networks: string[] // Example: ['celo']
+  networkIds: NetworkId[] // Example: ['celo-mainnet']
   category?: 'claim' // We'll add more categories later
   onTrigger: (
     networkId: NetworkId,

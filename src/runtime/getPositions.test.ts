@@ -8,6 +8,8 @@ import {
 import { toDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
 import { NetworkId } from '../api/networkId'
+import got from 'got'
+import * as mockTokensInfo from './mockTokensInfo.json'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -19,6 +21,7 @@ jest.mock('viem', () => ({
 const mockMulticall = jest.fn()
 
 const getHooksSpy = jest.spyOn(hooks, 'getHooks')
+const getSpy = jest.spyOn(got, 'get')
 
 const lockedCeloTestHook: PositionsHook = {
   getInfo() {
@@ -76,9 +79,14 @@ describe(getPositions, () => {
       'locked-celo-test': lockedCeloTestHook,
       'failing-hook': failingTestHook,
     })
+    getSpy.mockReturnValue({
+      json: jest.fn().mockResolvedValue(mockTokensInfo),
+    } as any)
     const positions = await getPositions(
       NetworkId['celo-mainnet'],
       '0x0000000000000000000000000000000000007e57',
+      [],
+      'mock-token-info-url',
     )
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
@@ -136,6 +144,8 @@ describe(getPositions, () => {
       getPositions(
         NetworkId['celo-mainnet'],
         '0x0000000000000000000000000000000000007e57',
+        [],
+        'mock-get-tokens-info-url',
       ),
     ).rejects.toThrow(
       "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo-mainnet)",

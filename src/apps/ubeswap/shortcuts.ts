@@ -16,7 +16,7 @@ const hook: ShortcutsHook = {
         id: 'claim-reward',
         name: 'Claim',
         description: 'Claim rewards for staked liquidity',
-        networks: [NetworkId['celo-mainnet']],
+        networkIds: [NetworkId['celo-mainnet']],
         category: 'claim',
         async onTrigger(networkId, address, positionAddress) {
           // This isn't strictly needed, but will help while we're developing shortcuts

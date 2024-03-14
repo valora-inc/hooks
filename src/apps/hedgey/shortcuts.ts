@@ -22,7 +22,7 @@ const hook: ShortcutsHook = {
       id: `${planNft.contractAddress}:${planNft.tokenId}`,
       name: 'Claim',
       description: 'Claim vested rewards',
-      networks: ['celo'],
+      networkIds: [NetworkId['celo-mainnet']],
       category: 'claim',
       async onTrigger(networkId, address, positionAddress) {
         // positionAddress === planNft.contractAddress

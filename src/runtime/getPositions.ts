@@ -84,16 +84,18 @@ function getClient(networkId: NetworkId) {
 
 async function getBaseTokensInfo(
   getTokensInfoUrl: string,
+  networkId: NetworkId
 ): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
     .get(getTokensInfoUrl)
-    .json<{ tokens: Record<string, RawTokenInfo> }>()
+    .json<Record<string, RawTokenInfo>>()
 
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}
-  for (const [_tokenId, tokenInfo] of Object.entries(data.tokens)) {
-    if (!tokenInfo.address) {
+  for (const [_tokenId, tokenInfo] of Object.entries(data)) {
+    if (!tokenInfo.address || tokenInfo.networkId !== networkId) {
+      // skip native assets and tokens from other networks
       continue
     }
     tokensInfo[tokenInfo.address] = {
@@ -358,7 +360,7 @@ export async function getPositions(
   logger.debug({ definitions }, 'positions definitions')
 
   // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo(getTokensInfoUrl)
+  const baseTokensInfo = await getBaseTokensInfo(getTokensInfoUrl, networkId)
 
   let unlistedBaseTokensInfo: TokensInfo = {}
   let definitionsToResolve: AppPositionDefinition[] = definitions
