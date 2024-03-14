@@ -7,7 +7,9 @@ describe('getPositions', () => {
   let getTokensInfoUrl: string
   beforeAll(() => {
     // use the same API to get tokens info as we use in production
-    const envFileContent = yaml.load(fs.readFileSync('src/api/production.yaml', 'utf8')) as Record<string, string>
+    const envFileContent = yaml.load(
+      fs.readFileSync('src/api/production.yaml', 'utf8'),
+    ) as Record<string, string>
     getTokensInfoUrl = envFileContent['GET_TOKENS_INFO_URL']
   })
   it('should get the address positions successfully', async () => {

@@ -84,7 +84,7 @@ function getClient(networkId: NetworkId) {
 
 async function getBaseTokensInfo(
   getTokensInfoUrl: string,
-  networkId: NetworkId
+  networkId: NetworkId,
 ): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
