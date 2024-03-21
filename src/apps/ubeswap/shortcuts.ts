@@ -3,27 +3,20 @@ import { celo } from 'viem/chains'
 import { ShortcutsHook } from '../../types/shortcuts'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import { NetworkId } from '../../api/networkId'
-import {logger} from "../../log";
 
 const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
 
-const SUPPORTED_NETWORKS = [NetworkId['celo-mainnet']]
-
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(networkId?: NetworkId, _address?: string) {
-    if (!networkId || !SUPPORTED_NETWORKS.includes(networkId)) {
-      logger.info(`Unsupported network for ubeswap: ${networkId}. Returning empty list of shortcut definitions.`)
-      return []
-    }
+  async getShortcutDefinitions(_networkId?: NetworkId, _address?: string) {
     return [
       {
         id: 'claim-reward',
         name: 'Claim',
         description: 'Claim rewards for staked liquidity',
-        networkIds: SUPPORTED_NETWORKS,
+        networkIds: [NetworkId['celo-mainnet']],
         category: 'claim',
         async onTrigger(networkId, address, positionAddress) {
           // This isn't strictly needed, but will help while we're developing shortcuts
