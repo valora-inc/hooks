@@ -4,15 +4,23 @@ import { ShortcutsHook } from '../../types/shortcuts'
 import { getHedgeyPlanNfts } from './nfts'
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
 import { NetworkId } from '../../api/networkId'
+import {logger} from "../../log";
 
 const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
 
+const SUPPORTED_NETWORKS: NetworkId[] = [NetworkId['celo-mainnet']]
+
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId?: NetworkId, address?: string) {
-    if (networkId !== NetworkId['celo-mainnet'] || !address) {
+    if (!networkId || !SUPPORTED_NETWORKS.includes(networkId)) {
+      logger.info(`Unsupported network for hedgey: ${networkId}. Returning empty list of shortcut definitions.`)
+      return []
+    }
+    if (!address) {
+      logger.info(`No address provided for hedgey. Returning empty list of shortcut definitions.`)
       return []
     }
 
@@ -22,7 +30,7 @@ const hook: ShortcutsHook = {
       id: `${planNft.contractAddress}:${planNft.tokenId}`,
       name: 'Claim',
       description: 'Claim vested rewards',
-      networkIds: [NetworkId['celo-mainnet']],
+      networkIds: SUPPORTED_NETWORKS,
       category: 'claim',
       async onTrigger(networkId, address, positionAddress) {
         // positionAddress === planNft.contractAddress
