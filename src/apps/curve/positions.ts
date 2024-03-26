@@ -1,4 +1,4 @@
-import { Address } from 'viem'
+import { Address, ContractFunctionParameters } from 'viem'
 import got from 'got'
 import {
   AppTokenPositionDefinition,
@@ -18,6 +18,7 @@ interface CurveApiResponse {
     poolData: {
       address: Address
       implementation: string
+      coins: Object[]
     }[]
   }
 }
@@ -105,6 +106,28 @@ async function getPoolPositionDefinition(
     allowFailure: false,
   })) as Address[]
 
+  const balancesFunctionCallParams: ContractFunctionParameters[] = [
+    // get_balances can be used for older pool versions like 0.3.1 (example: https://celoscan.io/address/0xAF7Ee5Ba02dC9879D24cb16597cd854e13f3aDa8#readContract )
+    //   but not in new versions like 0.3.7 (example: https://etherscan.io/address/0x21e27a5e5513d6e65c4f830167390997aa84843a#code )
+    {
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(0)],
+    },
+    {
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(1)],
+    },
+  ]
+  if (poolSize === 3) {
+    balancesFunctionCallParams.push({
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(2)],
+    })
+  }
+
   const position: AppTokenPositionDefinition = {
     type: 'app-token-definition',
     networkId,
@@ -125,13 +148,13 @@ async function getPoolPositionDefinition(
       }
     },
     pricePerShare: async ({ tokensByAddress }) => {
-      const [balances, totalSupply] = await client.multicall({
+      const [totalSupply, ...balances] = (await client.multicall({
         contracts: [
-          { ...poolTokenContract, functionName: 'get_balances' },
           { ...poolTokenContract, functionName: 'totalSupply' },
+          ...balancesFunctionCallParams,
         ],
         allowFailure: false,
-      })
+      })) as bigint[]
       const poolToken = tokensByAddress[poolAddress.toLowerCase()]
       const tokens = tokenAddresses.map(
         (tokenAddress) => tokensByAddress[tokenAddress.toLowerCase()],
