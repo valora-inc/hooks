@@ -1,5 +1,4 @@
-import { Address, createPublicClient, http } from 'viem'
-import { celo } from 'viem/chains'
+import { Address } from 'viem'
 import got from 'got'
 import {
   AppTokenPositionDefinition,
@@ -10,11 +9,7 @@ import { curveTripoolAbi } from './abis/curve-tripool'
 import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { NetworkId } from '../../api/networkId'
-
-const client = createPublicClient({
-  chain: celo,
-  transport: http(),
-})
+import { getClient } from '../../runtime/client'
 
 interface CurveApiResponse {
   success: boolean
@@ -64,6 +59,7 @@ export async function getPoolPositionDefinitions(
   const pools = await getAllCurvePools(networkId)
 
   // call balanceOf to check if user has balance on a pool
+  const client = getClient(networkId)
   const result = await client.multicall({
     contracts: pools.map(
       (pool) =>
@@ -97,7 +93,7 @@ async function getPoolPositionDefinition(
     address: poolAddress,
     abi: poolSize === 3 ? curveTripoolAbi : curvePoolAbi,
   }
-
+  const client = getClient(networkId)
   const tokenAddresses = (await client.multicall({
     contracts: Array.from({ length: poolSize }, (_, index) =>
       BigInt(index),

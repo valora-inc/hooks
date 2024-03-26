@@ -1,22 +1,6 @@
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import {
-  Address,
-  Chain,
-  ContractFunctionExecutionError,
-  createPublicClient,
-  http,
-} from 'viem'
-import {
-  celo,
-  optimism,
-  celoAlfajores,
-  optimismSepolia,
-  sepolia,
-  arbitrum,
-  arbitrumSepolia,
-  mainnet,
-} from 'viem/chains'
+import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -39,6 +23,7 @@ import {
 import { getHooks } from './getHooks'
 import { logger } from '../log'
 import { NetworkId } from '../api/networkId'
+import { getClient } from './client'
 
 interface RawTokenInfo {
   address?: string
@@ -62,24 +47,6 @@ type DefinitionsByAddress = Record<string, AppPositionDefinition | undefined>
 
 type AppPositionDefinition = PositionDefinition & {
   appId: string
-}
-
-const networkIdToViemChain: Record<NetworkId, Chain> = {
-  [NetworkId['celo-mainnet']]: celo,
-  [NetworkId['ethereum-mainnet']]: mainnet,
-  [NetworkId['arbitrum-one']]: arbitrum,
-  [NetworkId['op-mainnet']]: optimism,
-  [NetworkId['celo-alfajores']]: celoAlfajores,
-  [NetworkId['ethereum-sepolia']]: sepolia,
-  [NetworkId['arbitrum-sepolia']]: arbitrumSepolia,
-  [NetworkId['op-sepolia']]: optimismSepolia,
-}
-
-function getClient(networkId: NetworkId) {
-  return createPublicClient({
-    chain: networkIdToViemChain[networkId],
-    transport: http(),
-  })
 }
 
 async function getBaseTokensInfo(
