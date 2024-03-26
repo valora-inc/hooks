@@ -77,10 +77,26 @@ async function getBaseTokensInfo(
   return tokensInfo
 }
 
+const ETHER_HEX_IDENTIFIER = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' // curve and some other dapps use this address as an identifier for the native asset
+
 async function getERC20TokenInfo(
   address: Address,
   networkId: NetworkId,
 ): Promise<TokenInfo> {
+  const imageUrl = ''
+  const priceUsd = toSerializedDecimalNumber(0)
+
+  if (address.toLowerCase() === ETHER_HEX_IDENTIFIER) {
+    return {
+      networkId,
+      address,
+      symbol: 'ETH',
+      decimals: 18,
+      imageUrl,
+      priceUsd,
+    }
+  }
+
   const erc20Contract = {
     address: address,
     abi: erc20Abi,
@@ -104,8 +120,8 @@ async function getERC20TokenInfo(
     address: address,
     symbol: symbol,
     decimals: decimals,
-    imageUrl: '',
-    priceUsd: toSerializedDecimalNumber(0), // Should we use undefined?
+    priceUsd,
+    imageUrl,
   }
 }
 
