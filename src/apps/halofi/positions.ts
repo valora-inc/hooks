@@ -7,6 +7,7 @@ import { Address, zeroAddress } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { getCompatibleGamesFromAPI } from './haloFiApi'
 import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
+import { NetworkId } from '../../api/networkId'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -18,6 +19,12 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
+    if (
+      networkId !== NetworkId['celo-mainnet']
+    ) {
+      // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const compatibleGames = await getCompatibleGamesFromAPI()
 
     const contractAddressList = compatibleGames.map(

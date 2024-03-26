@@ -7,6 +7,7 @@ import { celo } from 'viem/chains'
 import { toDecimalNumber } from '../../types/numbers'
 import { ubiSchemeAbi } from './abis/ubi-scheme'
 import { identityAbi } from './abis/identity'
+import { NetworkId } from '../../api/networkId'
 
 // From https://github.com/GoodDollar/GoodProtocol/blob/b713457581d7cd7148dea9d5107883779442650e/releases/deployment.json#L480C23-L480C65
 const UBI_ADDRESS = '0x43d72Ff17701B2DA814620735C39C620Ce0ea4A1'
@@ -34,6 +35,12 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
+    if (
+      networkId !== NetworkId['celo-mainnet']
+    ) {
+      // hook implementation currently hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const ubiContract = {
       address: UBI_ADDRESS,
       abi: ubiSchemeAbi,

@@ -41,7 +41,13 @@ const hook: PositionsHook = {
       description: 'Moola debt tokens',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (
+      networkId !== NetworkId['celo-mainnet']
+    ) {
+      // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const debtTokenBalances = await client.multicall({
       contracts: MOOLA_DEBT_TOKENS.map(({ debtTokenAddress }) => ({
         address: debtTokenAddress,
@@ -54,7 +60,7 @@ const hook: PositionsHook = {
 
     return MOOLA_DEBT_TOKENS.filter((_, i) => debtTokenBalances[i]).map(
       (debtTokenDefinition) =>
-        getAppTokenPositionDefinition(debtTokenDefinition, network),
+        getAppTokenPositionDefinition(debtTokenDefinition, networkId),
     )
   },
 }

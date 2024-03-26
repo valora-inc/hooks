@@ -1,13 +1,9 @@
-import { Address, createPublicClient, http } from 'viem'
-import { celo } from 'viem/chains'
+import { Address } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
 import { userPositionsAbi } from './abis/user-positions'
-
-const client = createPublicClient({
-  chain: celo,
-  transport: http(),
-})
+import { getClient } from '../../runtime/client'
+import { NetworkId } from '../../api/networkId'
 
 // Standard Uniswap v3 addresses on CELO
 const UNISWAP_V3_FACTORY_ADDRESS = '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc'
@@ -27,6 +23,13 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
+    if (
+      networkId !== NetworkId['celo-mainnet']
+    ) {
+      // hook implementation currently hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
+    const client = getClient(networkId)
     const userPools = await client.readContract({
       abi: userPositionsAbi,
       address: USER_POSITIONS_MULTICALL_ADDRESS,

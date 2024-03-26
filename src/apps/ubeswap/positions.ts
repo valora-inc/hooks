@@ -258,10 +258,16 @@ const hook: PositionsHook = {
       description: 'Decentralized exchange on Celo',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (
+      networkId !== NetworkId['celo-mainnet']
+    ) {
+      // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const [poolDefinitions, farmDefinitions] = await Promise.all([
-      getPoolPositionDefinitions(network, address),
-      getFarmPositionDefinitions(network, address),
+      getPoolPositionDefinitions(networkId, address),
+      getFarmPositionDefinitions(networkId, address),
     ])
 
     return [...poolDefinitions, ...farmDefinitions]
