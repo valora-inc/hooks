@@ -35,6 +35,7 @@ const TEST_POSITIONS: Position[] = [
       description: 'Pool',
       imageUrl: '',
     },
+    tokenId: 'celo-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
       {
         type: 'base-token',
@@ -44,6 +45,7 @@ const TEST_POSITIONS: Position[] = [
         decimals: 18,
         priceUsd: '0.00015738574843135427' as SerializedDecimalNumber,
         balance: '12445.060074286696111325' as SerializedDecimalNumber,
+        tokenId: 'celo-mainnet:0x62b8b11039fcfe5ab0c56e502b1c372a3d2a9c7a',
       },
       {
         type: 'base-token',
@@ -53,6 +55,7 @@ const TEST_POSITIONS: Position[] = [
         decimals: 18,
         priceUsd: '1' as SerializedDecimalNumber,
         balance: '2.061316226302041758' as SerializedDecimalNumber,
+        tokenId: 'celo-mainnet:0x765de816845861e75a25fca122bb6898b8b1282a',
       },
     ],
     pricePerShare: [

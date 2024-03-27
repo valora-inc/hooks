@@ -8,6 +8,8 @@ import { toDecimalNumber } from '../../types/numbers'
 import { getCompatibleGamesFromAPI } from './haloFiApi'
 import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
 import { NetworkId } from '../../api/networkId'
+import { getTokenId } from '../../runtime/getTokenId'
+import { isNative } from '../runtime/isNative'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -19,9 +21,7 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    if (
-      networkId !== NetworkId['celo-mainnet']
-    ) {
+    if (networkId !== NetworkId['celo-mainnet']) {
       // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }
@@ -63,8 +63,18 @@ const hook: PositionsHook = {
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/halofi.png',
         },
-        balances: async ({ resolvedTokens }) => {
-          const depositToken = resolvedTokens[depositTokenAddress]
+        balances: async ({ resolvedTokensByTokenId }) => {
+          const depositToken =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: depositTokenAddress,
+                networkId,
+                isNative: isNative({
+                  networkId,
+                  address: depositTokenAddress,
+                }),
+              })
+            ]
 
           const playerAmountPaid = toDecimalNumber(
             playerStruct[PlayerStructIndex.netAmountPaid],

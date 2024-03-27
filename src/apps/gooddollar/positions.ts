@@ -35,9 +35,7 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    if (
-      networkId !== NetworkId['celo-mainnet']
-    ) {
+    if (networkId !== NetworkId['celo-mainnet']) {
       // hook implementation currently hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }

@@ -1,9 +1,9 @@
 import {
-  PositionsHook,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPositionDefinition,
   PositionDefinition,
+  PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
 import got from 'got'
@@ -16,6 +16,8 @@ import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
 import { NetworkId } from '../../api/networkId'
+import { getTokenId } from '../../runtime/getTokenId'
+import { isNative } from '../runtime/isNative'
 
 const client = createPublicClient({
   chain: celo,
@@ -64,9 +66,29 @@ async function getPoolPositionDefinition(
       address: token.toLowerCase(),
       networkId,
     })),
-    displayProps: ({ resolvedTokens }) => {
-      const token0 = resolvedTokens[token0Address.toLowerCase()]
-      const token1 = resolvedTokens[token1Address.toLowerCase()]
+    displayProps: ({ resolvedTokensByTokenId }) => {
+      const token0 =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token0Address,
+            isNative: isNative({
+              networkId: networkId,
+              address: token0Address,
+            }),
+          })
+        ]
+      const token1 =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token1Address,
+            isNative: isNative({
+              networkId: networkId,
+              address: token1Address,
+            }),
+          })
+        ]
       return {
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
@@ -74,7 +96,7 @@ async function getPoolPositionDefinition(
           'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/ubeswap.png',
       }
     },
-    pricePerShare: async ({ tokensByAddress }) => {
+    pricePerShare: async ({ tokensByTokenId }) => {
       const [[reserve0, reserve1], totalSupply] = await client.multicall({
         contracts: [
           {
@@ -88,9 +110,32 @@ async function getPoolPositionDefinition(
         ],
         allowFailure: false,
       })
-      const poolToken = tokensByAddress[poolAddress.toLowerCase()]
-      const token0 = tokensByAddress[token0Address.toLowerCase()]
-      const token1 = tokensByAddress[token1Address.toLowerCase()]
+      const poolToken =
+        tokensByTokenId[
+          getTokenId({ networkId, isNative: false, address: poolAddress })
+        ]
+      const token0 =
+        tokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token0Address,
+            isNative: isNative({
+              networkId: networkId,
+              address: token0Address,
+            }),
+          })
+        ]
+      const token1 =
+        tokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token1Address,
+            isNative: isNative({
+              networkId: networkId,
+              address: token1Address,
+            }),
+          })
+        ]
       const reserves = [
         toDecimalNumber(reserve0, token0.decimals),
         toDecimalNumber(reserve1, token1.decimals),
@@ -196,9 +241,13 @@ async function getFarmPositionDefinitions(
             category: 'claimable',
           },
         ],
-        displayProps: ({ resolvedTokens }) => {
-          const poolToken = resolvedTokens[
-            farm.lpAddress.toLowerCase()
+        displayProps: ({ resolvedTokensByTokenId }) => {
+          const poolToken = resolvedTokensByTokenId[
+            getTokenId({
+              networkId,
+              address: farm.lpAddress,
+              isNative: false,
+            })
           ] as AppTokenPosition
           return {
             title: poolToken.displayProps.title,
@@ -207,8 +256,15 @@ async function getFarmPositionDefinitions(
           }
         },
         availableShortcutIds: ['claim-reward'],
-        balances: async ({ resolvedTokens }) => {
-          const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
+        balances: async ({ resolvedTokensByTokenId }) => {
+          const poolToken =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: farm.lpAddress,
+                networkId,
+                isNative: false,
+              })
+            ]
           const share = new BigNumber(farm.balance.toString()).div(
             farm.totalSupply.toString(),
           )
@@ -232,8 +288,15 @@ async function getFarmPositionDefinitions(
             toDecimalNumber(poolBalance, poolToken.decimals),
           ) as DecimalNumber
 
-          const rewardsToken =
-            resolvedTokens[farm.rewardsTokenAddress.toLowerCase()]
+          const rewardsTokenId = getTokenId({
+            address: farm.rewardsTokenAddress,
+            networkId,
+            isNative: isNative({
+              networkId,
+              address: farm.rewardsTokenAddress,
+            }),
+          })
+          const rewardsToken = resolvedTokensByTokenId[rewardsTokenId]
           const rewardsBalance = toDecimalNumber(
             farm.rewardsEarned,
             rewardsToken.decimals,
@@ -259,9 +322,7 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    if (
-      networkId !== NetworkId['celo-mainnet']
-    ) {
+    if (networkId !== NetworkId['celo-mainnet']) {
       // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }

@@ -28,7 +28,7 @@ export interface TokenDefinition {
 export type TokenCategory = 'claimable' // We could add more categories later
 
 export interface DisplayPropsContext {
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>
 }
 
 export interface DisplayProps {
@@ -49,7 +49,7 @@ export interface AbstractPositionDefinition {
 }
 
 export interface PricePerShareContext {
-  tokensByAddress: Record<string, Omit<AbstractToken, 'balance'>>
+  tokensByTokenId: Record<string, Omit<AbstractToken, 'balance'>>
 }
 
 export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
@@ -60,7 +60,7 @@ export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
 }
 
 export interface BalancesContext {
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>
 }
 
 export interface ContractPositionDefinition extends AbstractPositionDefinition {
@@ -97,8 +97,8 @@ export interface AbstractPosition {
 }
 
 export interface AbstractToken {
-  // tokenId: string // Example: celo-mainnet:0x123... // todo use this so native assets can be included
-  address: string // Example: 0x... // todo make optional once native assets are included
+  tokenId: string // Example: celo-mainnet:0x123...
+  address?: string // Example: 0x...
   networkId: NetworkId // Example: celo-mainnet
 
   // These would be resolved dynamically
@@ -112,12 +112,13 @@ export interface BaseToken extends AbstractToken {
   type: 'base-token'
 }
 
-export interface AppTokenPosition extends AbstractPosition, AbstractToken {
-  type: 'app-token'
-  supply: SerializedDecimalNumber // Example: "1000"
-  // Price ratio between the token and underlying token(s)
-  pricePerShare: SerializedDecimalNumber[]
-}
+export type AppTokenPosition = AbstractPosition &
+  AbstractToken & {
+    type: 'app-token'
+    supply: SerializedDecimalNumber // Example: "1000"
+    // Price ratio between the token and underlying token(s)
+    pricePerShare: SerializedDecimalNumber[]
+  }
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'

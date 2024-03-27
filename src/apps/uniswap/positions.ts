@@ -4,6 +4,8 @@ import { PositionsHook } from '../../types/positions'
 import { userPositionsAbi } from './abis/user-positions'
 import { getClient } from '../../runtime/client'
 import { NetworkId } from '../../api/networkId'
+import { getTokenId } from '../../runtime/getTokenId'
+import { isNative } from '../runtime/isNative'
 
 // Standard Uniswap v3 addresses on CELO
 const UNISWAP_V3_FACTORY_ADDRESS = '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc'
@@ -23,9 +25,7 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    if (
-      networkId !== NetworkId['celo-mainnet']
-    ) {
+    if (networkId !== NetworkId['celo-mainnet']) {
       // hook implementation currently hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }
@@ -56,23 +56,49 @@ const hook: PositionsHook = {
             { address: pool.token0, networkId },
             { address: pool.token1, networkId },
           ],
-          displayProps: ({ resolvedTokens }) => ({
-            title: `${resolvedTokens[pool.token0].symbol} / ${
-              resolvedTokens[pool.token1].symbol
+          displayProps: ({ resolvedTokensByTokenId }) => ({
+            title: `${
+              resolvedTokensByTokenId[
+                getTokenId({
+                  address: pool.token0,
+                  networkId,
+                  isNative: isNative({ networkId, address: pool.token0 }),
+                })
+              ].symbol
+            } / ${
+              resolvedTokensByTokenId[
+                getTokenId({
+                  address: pool.token1,
+                  networkId,
+                  isNative: isNative({ networkId, address: pool.token1 }),
+                })
+              ].symbol
             }`,
             description: 'Pool',
             imageUrl:
               'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/uniswap.png',
           }),
-          balances: async ({ resolvedTokens }) => {
+          balances: async ({ resolvedTokensByTokenId }) => {
             return [
               toDecimalNumber(
                 pool.amount0,
-                resolvedTokens[pool.token0].decimals,
+                resolvedTokensByTokenId[
+                  getTokenId({
+                    address: pool.token0,
+                    networkId,
+                    isNative: isNative({ networkId, address: pool.token0 }),
+                  })
+                ].decimals,
               ),
               toDecimalNumber(
                 pool.amount1,
-                resolvedTokens[pool.token1].decimals,
+                resolvedTokensByTokenId[
+                  getTokenId({
+                    address: pool.token1,
+                    networkId,
+                    isNative: isNative({ networkId, address: pool.token1 }),
+                  })
+                ].decimals,
               ),
             ]
           },

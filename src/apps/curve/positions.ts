@@ -10,6 +10,8 @@ import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { NetworkId } from '../../api/networkId'
 import { getClient } from '../../runtime/client'
+import { getTokenId } from '../../runtime/getTokenId'
+import { isNative } from '../runtime/isNative'
 
 interface CurveApiResponse {
   success: boolean
@@ -136,9 +138,16 @@ async function getPoolPositionDefinition(
       address: token.toLowerCase(),
       networkId,
     })),
-    displayProps: ({ resolvedTokens }) => {
+    displayProps: ({ resolvedTokensByTokenId }) => {
       const tokenSymbols = tokenAddresses.map(
-        (tokenAddress) => resolvedTokens[tokenAddress.toLowerCase()].symbol,
+        (tokenAddress) =>
+          resolvedTokensByTokenId[
+            getTokenId({
+              networkId,
+              address: tokenAddress,
+              isNative: isNative({ networkId, address: tokenAddress }),
+            })
+          ].symbol,
       )
       return {
         title: tokenSymbols.join(' / '),
@@ -147,7 +156,7 @@ async function getPoolPositionDefinition(
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/curve.png',
       }
     },
-    pricePerShare: async ({ tokensByAddress }) => {
+    pricePerShare: async ({ tokensByTokenId }) => {
       const [totalSupply, ...balances] = (await client.multicall({
         contracts: [
           { ...poolTokenContract, functionName: 'totalSupply' },
@@ -155,9 +164,21 @@ async function getPoolPositionDefinition(
         ],
         allowFailure: false,
       })) as bigint[]
-      const poolToken = tokensByAddress[poolAddress.toLowerCase()]
+      const poolTokenId = getTokenId({
+        address: poolAddress,
+        isNative: false,
+        networkId,
+      })
+      const poolToken = tokensByTokenId[poolTokenId]
       const tokens = tokenAddresses.map(
-        (tokenAddress) => tokensByAddress[tokenAddress.toLowerCase()],
+        (tokenAddress) =>
+          tokensByTokenId[
+            getTokenId({
+              address: tokenAddress,
+              networkId,
+              isNative: isNative({ networkId, address: tokenAddress }),
+            })
+          ],
       )
       const reserves = balances.map((balance, index) =>
         toDecimalNumber(balance, tokens[index].decimals),
