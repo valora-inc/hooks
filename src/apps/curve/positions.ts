@@ -20,7 +20,6 @@ interface CurveApiResponse {
     poolData: {
       address: Address
       implementation: string
-      coins: Object[]
     }[]
   }
 }

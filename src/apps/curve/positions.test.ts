@@ -4,7 +4,7 @@ import { NetworkId } from '../../api/networkId'
 describe('curve positions', () => {
   // note: curve API response is mocked in test/server.ts
   describe('getAllCurvePools', () => {
-    it('gives empty list for unknown or unsupported network', async () => {
+    it('gives empty list for unknown network', async () => {
       const result = await getAllCurvePools('unknown' as NetworkId)
       expect(result).toEqual([])
 
