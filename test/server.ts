@@ -246,6 +246,151 @@ const handlers = [
       )
     },
   ),
+  rest.get(
+    'https://api.curve.fi/v1/getPools/ethereum/factory',
+    async (_req, res, ctx) => {
+      return res(
+        ctx.json({
+          success: true,
+          data: {
+            poolData: [
+              // truncated list from actual test query to curve api https://api.curve.fi/v1/documentation/#/Pools/get_getPools__blockchainId___registryId_
+              {
+                id: 'factory-v2-0',
+                address: '0x1F71f05CF491595652378Fe94B7820344A551B8E',
+                coinsAddresses: [
+                  '0x96E61422b6A9bA0e068B6c5ADd4fFaBC6a4aae27',
+                  '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+                  '0x0000000000000000000000000000000000000000',
+                  '0x0000000000000000000000000000000000000000',
+                ],
+                decimals: ['18', '18', '0', '0'],
+                virtualPrice: 0,
+                amplificationCoefficient: '100',
+                totalSupply: '20000000000000000',
+                name: 'Curve.fi Factory Plain Pool: ibEUR/sEUR',
+                assetType: '99',
+                implementationAddress:
+                  '0x6523Ac15EC152Cb70a334230F6c5d62C5Bd963f1',
+                symbol: 'ibEUR+sEUR-f',
+                implementation: 'plain2basic',
+                assetTypeName: 'unknown',
+                coins: [
+                  {
+                    address: '0x96E61422b6A9bA0e068B6c5ADd4fFaBC6a4aae27',
+                    usdPrice: 1.0293825320572565,
+                    decimals: '18',
+                    isBasePoolLpToken: false,
+                    symbol: 'ibEUR',
+                    poolBalance: '2440147371390294759297',
+                  },
+                  {
+                    address: '0x57Ab1ec28D129707052df4dF418D58a2D46d5f51',
+                    usdPrice: 1.0017291207272516,
+                    decimals: '18',
+                    isBasePoolLpToken: false,
+                    symbol: 'sUSD',
+                    poolBalance: '2182087364350',
+                  },
+                ],
+                poolUrls: {
+                  swap: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-0/swap',
+                    'https://classic.curve.fi/factory/0',
+                  ],
+                  deposit: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-0/deposit',
+                    'https://classic.curve.fi/factory/0/deposit',
+                  ],
+                  withdraw: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-0/withdraw',
+                    'https://classic.curve.fi/factory/0/withdraw',
+                  ],
+                },
+                lpTokenAddress: '0x1F71f05CF491595652378Fe94B7820344A551B8E',
+                usdTotal: 2511.8450819404607,
+                isMetaPool: false,
+                usdTotalExcludingBasePool: 2511.8450819404607,
+                usesRateOracle: false,
+                isBroken: false,
+              },
+              {
+                id: 'factory-v2-145',
+                address: '0xe7A3b38c39F97E977723bd1239C3470702568e7B',
+                coinsAddresses: [
+                  '0xEE586e7Eaad39207F0549BC65f19e336942C992f',
+                  '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+                  '0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c',
+                  '0x0000000000000000000000000000000000000000',
+                ],
+                decimals: ['18', '18', '6', '0'],
+                virtualPrice: '1003840784416721236',
+                amplificationCoefficient: '10',
+                totalSupply: '207711420092740613091153',
+                name: 'Curve.fi Factory Plain Pool: Euro Pool',
+                assetType: '3',
+                implementationAddress:
+                  '0x9B52F13DF69D79Ec5aAB6D1aCe3157d29B409cC3',
+                symbol: 'europool-f',
+                implementation: 'plain3basic',
+                assetTypeName: 'other',
+                coins: [
+                  {
+                    address: '0xEE586e7Eaad39207F0549BC65f19e336942C992f',
+                    usdPrice: 1.0693998825835587,
+                    decimals: '18',
+                    isBasePoolLpToken: false,
+                    symbol: 'cEUR',
+                    poolBalance: '77041895193731946061232',
+                  },
+                  {
+                    address: '0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8',
+                    usdPrice: 1.086,
+                    decimals: '18',
+                    isBasePoolLpToken: false,
+                    symbol: 'EURA',
+                    poolBalance: '67538628832312070530528',
+                  },
+                  {
+                    address: '0x1aBaEA1f7C830bD89Acc67eC4af516284b1bC33c',
+                    usdPrice: 1.082,
+                    decimals: '6',
+                    isBasePoolLpToken: false,
+                    symbol: 'EURC',
+                    poolBalance: '63987165776',
+                  },
+                ],
+                poolUrls: {
+                  swap: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-145/swap',
+                    'https://classic.curve.fi/factory/145',
+                  ],
+                  deposit: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-145/deposit',
+                    'https://classic.curve.fi/factory/145/deposit',
+                  ],
+                  withdraw: [
+                    'https://curve.fi/#/ethereum/pools/factory-v2-145/withdraw',
+                    'https://classic.curve.fi/factory/145/withdraw',
+                  ],
+                },
+                lpTokenAddress: '0xe7A3b38c39F97E977723bd1239C3470702568e7B',
+                usdTotal: 224969.65795571468,
+                isMetaPool: false,
+                usdTotalExcludingBasePool: 224969.65795571468,
+                gaugeAddress: '0x9f57569eaa61d427deeebac8d9546a745160391c',
+                gaugeRewards: [],
+                gaugeCrvApy: [0.06816638061949697, 0.17041595154874242],
+                gaugeFutureCrvApy: [0.06798905631851226, 0.16997264079628066],
+                usesRateOracle: false,
+                isBroken: false,
+              },
+            ],
+          },
+        }),
+      )
+    },
+  ),
 ]
 
 // This configures a request mocking server with the given request handlers.
