@@ -11,7 +11,7 @@ import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { NetworkId } from '../../api/networkId'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../runtime/isNative'
+import { isNative } from '../../runtime/isNative'
 
 interface CurveApiResponse {
   success: boolean

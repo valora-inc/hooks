@@ -24,7 +24,7 @@ import { logger } from '../log'
 import { NetworkId } from '../api/networkId'
 import { getClient } from './client'
 import { getTokenId } from './getTokenId'
-import { isNative } from '../apps/runtime/isNative'
+import { isNative } from './isNative'
 
 interface RawTokenInfo {
   address?: string

@@ -17,7 +17,7 @@ import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
 import { NetworkId } from '../../api/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../runtime/isNative'
+import { isNative } from '../../runtime/isNative'
 
 const client = createPublicClient({
   chain: celo,

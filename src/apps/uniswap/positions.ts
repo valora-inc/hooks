@@ -5,7 +5,7 @@ import { userPositionsAbi } from './abis/user-positions'
 import { getClient } from '../../runtime/client'
 import { NetworkId } from '../../api/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../runtime/isNative'
+import { isNative } from '../../runtime/isNative'
 
 // Standard Uniswap v3 addresses on CELO
 const UNISWAP_V3_FACTORY_ADDRESS = '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc'
