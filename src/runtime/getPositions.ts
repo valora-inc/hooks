@@ -607,12 +607,12 @@ export async function getPositions(
 
     resolvedPositions[
       getTokenId({
-        networkId: position.networkId,
+        networkId: positionDefinition.networkId,
+        address: positionDefinition.address,
         isNative: isNative({
-          networkId: position.networkId,
-          address: position.address,
+          networkId: positionDefinition.networkId,
+          address: positionDefinition.address,
         }),
-        address: position.address,
       })
     ] = position
   }
