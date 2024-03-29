@@ -37,6 +37,8 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    env:
+      NETWORK_ID_TO_RPC_URL: ${{ secrets.NETWORK_ID_TO_RPC_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
