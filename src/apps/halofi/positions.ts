@@ -9,7 +9,6 @@ import { getCompatibleGamesFromAPI } from './haloFiApi'
 import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
 import { NetworkId } from '../../api/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../../runtime/isNative'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -69,10 +68,6 @@ const hook: PositionsHook = {
               getTokenId({
                 address: depositTokenAddress,
                 networkId,
-                isNative: isNative({
-                  networkId,
-                  address: depositTokenAddress,
-                }),
               })
             ]
 

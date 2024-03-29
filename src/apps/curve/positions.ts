@@ -11,7 +11,6 @@ import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { NetworkId } from '../../api/networkId'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../../runtime/isNative'
 
 interface CurveApiResponse {
   success: boolean
@@ -144,7 +143,6 @@ async function getPoolPositionDefinition(
             getTokenId({
               networkId,
               address: tokenAddress,
-              isNative: isNative({ networkId, address: tokenAddress }),
             })
           ].symbol,
       )
@@ -175,7 +173,6 @@ async function getPoolPositionDefinition(
             getTokenId({
               address: tokenAddress,
               networkId,
-              isNative: isNative({ networkId, address: tokenAddress }),
             })
           ],
       )

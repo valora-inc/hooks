@@ -17,7 +17,6 @@ import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
 import { NetworkId } from '../../api/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
-import { isNative } from '../../runtime/isNative'
 
 const client = createPublicClient({
   chain: celo,
@@ -72,10 +71,6 @@ async function getPoolPositionDefinition(
           getTokenId({
             networkId,
             address: token0Address,
-            isNative: isNative({
-              networkId: networkId,
-              address: token0Address,
-            }),
           })
         ]
       const token1 =
@@ -83,10 +78,6 @@ async function getPoolPositionDefinition(
           getTokenId({
             networkId,
             address: token1Address,
-            isNative: isNative({
-              networkId: networkId,
-              address: token1Address,
-            }),
           })
         ]
       return {
@@ -119,10 +110,6 @@ async function getPoolPositionDefinition(
           getTokenId({
             networkId,
             address: token0Address,
-            isNative: isNative({
-              networkId: networkId,
-              address: token0Address,
-            }),
           })
         ]
       const token1 =
@@ -130,10 +117,6 @@ async function getPoolPositionDefinition(
           getTokenId({
             networkId,
             address: token1Address,
-            isNative: isNative({
-              networkId: networkId,
-              address: token1Address,
-            }),
           })
         ]
       const reserves = [
@@ -291,10 +274,6 @@ async function getFarmPositionDefinitions(
           const rewardsTokenId = getTokenId({
             address: farm.rewardsTokenAddress,
             networkId,
-            isNative: isNative({
-              networkId,
-              address: farm.rewardsTokenAddress,
-            }),
           })
           const rewardsToken = resolvedTokensByTokenId[rewardsTokenId]
           const rewardsBalance = toDecimalNumber(

@@ -191,10 +191,6 @@ async function resolveAppTokenPosition(
         getTokenId({
           networkId: token.networkId,
           address: token.address,
-          isNative: isNative({
-            networkId: token.networkId,
-            address: token.address,
-          }),
         })
       ]
     priceUsd = priceUsd.plus(pricePerShare[i].times(tokenInfo.priceUsd))
@@ -256,10 +252,6 @@ async function resolveAppTokenPosition(
           getTokenId({
             networkId: token.networkId,
             address: token.address,
-            isNative: isNative({
-              networkId: token.networkId,
-              address: token.address,
-            }),
           })
         ],
         toDecimalNumber(balance, positionTokenInfo.decimals),
@@ -303,10 +295,6 @@ async function resolveContractPosition(
           getTokenId({
             networkId: token.networkId,
             address: token.address,
-            isNative: isNative({
-              networkId: token.networkId,
-              address: token.address,
-            }),
           })
         ],
         ...(token.category && { category: token.category }),
@@ -322,10 +310,6 @@ async function resolveContractPosition(
     const tokenId = getTokenId({
       networkId: token.networkId,
       address: token.address,
-      isNative: isNative({
-        networkId: token.networkId,
-        address: token.address,
-      }),
     })
     const tokenInfo = resolvedTokensByTokenId[tokenId]
     balanceUsd = balanceUsd.plus(balances[i].times(tokenInfo.priceUsd))
@@ -407,10 +391,6 @@ export async function getPositions(
     definitionsToResolve = definitionsToResolve.filter((definition) => {
       const definitionTokenId = getTokenId({
         networkId: definition.networkId,
-        isNative: isNative({
-          networkId: definition.networkId,
-          address: definition.address,
-        }),
         address: definition.address,
       })
 
@@ -438,10 +418,6 @@ export async function getPositions(
       (definition) => {
         const definitionTokenId = getTokenId({
           networkId: definition.networkId,
-          isNative: isNative({
-            networkId: definition.networkId,
-            address: definition.address,
-          }),
           address: definition.address,
         })
         return (
@@ -518,10 +494,6 @@ export async function getPositions(
           !baseTokensByTokenId[
             getTokenId({
               networkId: position.networkId,
-              isNative: isNative({
-                networkId: position.networkId,
-                address: position.address,
-              }),
               address: position.address,
             })
           ],
@@ -609,10 +581,6 @@ export async function getPositions(
       getTokenId({
         networkId: positionDefinition.networkId,
         address: positionDefinition.address,
-        isNative: isNative({
-          networkId: positionDefinition.networkId,
-          address: positionDefinition.address,
-        }),
       })
     ] = position
   }
