@@ -8,7 +8,7 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { DebtTokenDefinition, MOOLA_DEBT_TOKENS } from './debtTokens'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 
 const client = createPublicClient({
   chain: celo,

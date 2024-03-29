@@ -7,7 +7,7 @@ import { Address, zeroAddress } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { getCompatibleGamesFromAPI } from './haloFiApi'
 import { PlayerStructIndex, getPlayerStructFromGames } from './haloFiContract'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
 
 const hook: PositionsHook = {

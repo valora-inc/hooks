@@ -1,4 +1,4 @@
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 import { isNative as tokenIsNative } from './isNative'
 
 /**

@@ -11,7 +11,11 @@ import { logger } from '../log'
 import { parseRequest } from './parseRequest'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
-import { LegacyNetwork, legacyNetworkToNetworkId, NetworkId } from './networkId'
+import {
+  LegacyNetwork,
+  legacyNetworkToNetworkId,
+  NetworkId,
+} from '../types/networkId'
 
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)

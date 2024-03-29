@@ -1,5 +1,5 @@
 import { getAllCurvePools } from './positions'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 
 describe('curve positions', () => {
   // note: curve API response is mocked in test/server.ts

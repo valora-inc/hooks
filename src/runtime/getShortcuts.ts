@@ -1,5 +1,5 @@
 import { getHooks } from './getHooks'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 
 export async function getShortcuts(
   networkId?: NetworkId,

@@ -1,5 +1,5 @@
 import { getTokenId } from './getTokenId'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 import { isNative } from './isNative'
 import mocked = jest.mocked
 

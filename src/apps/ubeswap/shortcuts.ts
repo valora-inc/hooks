@@ -2,7 +2,7 @@ import { Address, createPublicClient, http, encodeFunctionData } from 'viem'
 import { celo } from 'viem/chains'
 import { ShortcutsHook } from '../../types/shortcuts'
 import { stakingRewardsAbi } from './abis/staking-rewards'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 
 const client = createPublicClient({
   chain: celo,

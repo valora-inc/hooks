@@ -1,5 +1,5 @@
 import { getPositions } from './getPositions'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 import fs from 'fs'
 import yaml from 'js-yaml'
 

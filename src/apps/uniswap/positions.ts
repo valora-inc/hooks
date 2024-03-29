@@ -3,7 +3,7 @@ import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
 import { userPositionsAbi } from './abis/user-positions'
 import { getClient } from '../../runtime/client'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
 
 // Standard Uniswap v3 addresses on CELO

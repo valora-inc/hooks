@@ -1,5 +1,5 @@
 import hook from './positions'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 
 describe('getPositionDefinitions', () => {
   it('should get the address definitions successfully', async () => {

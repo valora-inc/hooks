@@ -7,7 +7,7 @@ import {
 } from '../types/positions'
 import { toDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 import got from 'got'
 import * as mockTokensInfo from './mockTokensInfo.json'
 

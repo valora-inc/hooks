@@ -1,5 +1,5 @@
 import hook from './shortcuts'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 
 const POSITION_ADDRESS = '0x2cde9919e81b20b4b33dd562a48a84b54c48f00c'
 

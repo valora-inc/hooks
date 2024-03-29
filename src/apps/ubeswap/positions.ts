@@ -15,7 +15,7 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
 
 const client = createPublicClient({

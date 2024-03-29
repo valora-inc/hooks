@@ -1,4 +1,4 @@
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 
 const ETHER_HEX_IDENTIFIER = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' // curve and some other dapps use this address as an identifier for the native asset
 

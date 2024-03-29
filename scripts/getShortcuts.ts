@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import yargs from 'yargs'
 import { getShortcuts } from '../src/runtime/getShortcuts'
-import { NetworkId } from '../src/api/networkId'
+import { NetworkId } from '../src/types/networkId'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --apps app1[,app2]')

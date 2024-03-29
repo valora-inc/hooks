@@ -7,7 +7,7 @@ import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
 import { Position } from '../types/positions'
 import { SerializedDecimalNumber } from '../types/numbers'
-import { NetworkId } from './networkId'
+import { NetworkId } from '../types/networkId'
 import { getConfig } from './config'
 jest.mock('./config')
 jest.mocked(getConfig).mockReturnValue({

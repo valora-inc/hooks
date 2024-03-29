@@ -5,7 +5,7 @@ import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 import { celo } from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
-import { NetworkId } from '../src/api/networkId'
+import { NetworkId } from '../src/types/networkId'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 

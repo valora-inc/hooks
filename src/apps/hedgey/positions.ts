@@ -8,7 +8,7 @@ import { hedgeyContractNames, hedgeyDefaultImageUrl } from './config'
 import { erc20Abi } from '../../abis/erc-20'
 import { tokenVestingPlansAbi } from './abis/token-vesting-plans'
 import { getHedgeyPlanNfts } from './nfts'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
 
 const hook: PositionsHook = {

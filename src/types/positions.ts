@@ -1,5 +1,5 @@
 import { DecimalNumber, SerializedDecimalNumber } from './numbers'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from './networkId'
 
 // Interface that authors will implement
 export interface PositionsHook {

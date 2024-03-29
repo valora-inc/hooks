@@ -21,7 +21,7 @@ import {
 } from '../types/numbers'
 import { getHooks } from './getHooks'
 import { logger } from '../log'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 import { getClient } from './client'
 import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'

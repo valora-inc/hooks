@@ -8,7 +8,7 @@ import {
 import { curveTripoolAbi } from './abis/curve-tripool'
 import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
-import { NetworkId } from '../../api/networkId'
+import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
 

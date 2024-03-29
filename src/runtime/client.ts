@@ -9,7 +9,7 @@ import {
   optimismSepolia,
   sepolia,
 } from 'viem/chains'
-import { NetworkId } from '../api/networkId'
+import { NetworkId } from '../types/networkId'
 
 const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['celo-mainnet']]: celo,
