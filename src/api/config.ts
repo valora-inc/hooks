@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import * as dotenv from 'dotenv'
 import { NetworkId } from '../types/networkId'
-import { loadSecret } from '@valora/secrets-loader'
 
 export interface Config {
   GET_TOKENS_INFO_URL: string
@@ -11,30 +10,35 @@ export interface Config {
   SHORTCUT_IDS: string[]
 }
 
-export async function getConfig(): Promise<Config> {
-  dotenv.config()
-
-  if (process.env.SECRET_NAME) {
-    const secretData = await loadSecret(process.env.SECRET_NAME)
-    process.env = { ...process.env, ...secretData }
+export function networkIdToRpcUrlTransform(val: string | undefined) {
+  if (!val) {
+    return {}
   }
+  // expected format: network id/rpc url pairs joined by |, and pairs separated by spaces
+  // example: 'ethereum-mainnet|https://my-endpoint-name.quiknode.pro/my-api-key celo-mainnet|https://forno.celo.org'
+  const pairs: [networkId: NetworkId, rpcUrl: string][] = val
+    .split(' ')
+    .map((pairString: string) => {
+      const [networkIdString, rpcUrl] = pairString.split('|')
+      if (rpcUrl === '') {
+        throw new Error(`Invalid rpc url for network id: ${networkIdString}`)
+      }
+      if (!(networkIdString in NetworkId)) {
+        throw new Error(`Invalid network id: ${networkIdString}`)
+      }
+      return [networkIdString as NetworkId, rpcUrl]
+    })
+  return Object.fromEntries(pairs)
+}
 
+export function getConfig(): Config {
+  dotenv.config()
   const sharedSchema = z.object({
     GET_TOKENS_INFO_URL: z.string(),
-    NETWORK_ID_TO_RPC_URL: z.string().transform((val) => {
-      // expected format: network id/rpc url pairs joined by |, and pairs separated by spaces
-      // example: 'ethereum-mainnet|https://my-endpoint-name.quiknode.pro/my-api-key celo-mainnet|https://forno.celo.org'
-      const pairs: [networkId: NetworkId, rpcUrl: string][] = val
-        .split(' ')
-        .map((pairString: string) => {
-          const [networkIdString, rpcUrl] = pairString.split('|')
-          if (!(networkIdString in NetworkId)) {
-            throw new Error(`Invalid network id: ${networkIdString}`)
-          }
-          return [networkIdString as NetworkId, rpcUrl]
-        })
-      return Object.fromEntries(pairs)
-    }),
+    NETWORK_ID_TO_RPC_URL: z
+      .string()
+      .optional()
+      .transform(networkIdToRpcUrlTransform),
   })
 
   const productionSchema = z.intersection(

@@ -11,7 +11,7 @@ import { NetworkId } from '../types/networkId'
 import { getConfig } from './config'
 
 jest.mock('./config')
-jest.mocked(getConfig).mockResolvedValue({
+jest.mocked(getConfig).mockReturnValue({
   POSITION_IDS: [],
   GET_TOKENS_INFO_URL: 'https://valoraapp.com/mock-endpoint',
   GOOGLE_CLOUD_PROJECT: 'dev-project',

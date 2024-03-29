@@ -33,14 +33,13 @@
     "start": "ts-node ./scripts/start.ts",
     "deploy:staging": "gcloud beta functions deploy --gen2 --project=celo-mobile-alfajores --region=us-central1 --runtime=nodejs18 --env-vars-file=src/api/staging.yaml --update-labels \"valora-repo=hooks,commit-sha=$(git rev-parse HEAD)\"",
     "deploy:staging:http": "yarn deploy:staging --trigger-http --allow-unauthenticated",
-    "deploy:production": "gcloud beta functions deploy --gen2 --memory=512MB --project=celo-mobile-mainnet --region=us-central1 --runtime=nodejs18 --env-vars-file=src/api/production.yaml --update-labels \"valora-repo=hooks,commit-sha=$(git rev-parse HEAD)\"",
+    "deploy:production": "gcloud beta functions deploy --gen2 --memory=512MB --project=celo-mobile-mainnet --region=us-central1 --runtime=nodejs18 --env-vars-file=src/api/production.yaml --update-labels \"valora-repo=hooks,commit-sha=$(git rev-parse HEAD)\" --set-secrets=NETWORK_ID_TO_RPC_URL=hooks-rpc-urls:latest",
     "deploy:production:http": "yarn deploy:production --trigger-http --allow-unauthenticated"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.3.0",
     "@valora/http-handler": "^0.0.1",
     "@valora/logging": "^1.3.12",
-    "@valora/secrets-loader": "^1.0.0",
     "bignumber.js": "^9.1.2",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
