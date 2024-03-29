@@ -25,6 +25,6 @@ const networkIdToViemChain: Record<NetworkId, Chain> = {
 export function getClient(networkId: NetworkId) {
   return createPublicClient({
     chain: networkIdToViemChain[networkId],
-    transport: http(),
+    transport: http(), // fixme defaults to public rpc url
   })
 }

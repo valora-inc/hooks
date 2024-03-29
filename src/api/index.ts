@@ -26,8 +26,8 @@ const backwardsCompatibleNetworkSchema = z.union([
   z.object({ networkId: z.nativeEnum(NetworkId) }), // current schema: any member of NetworkId enum passed as 'networkId' field on the request
 ])
 
-function createApp() {
-  const config = getConfig()
+async function createApp() {
+  const config = await getConfig()
 
   const app = express()
   app.use(

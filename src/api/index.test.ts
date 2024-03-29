@@ -9,12 +9,14 @@ import { Position } from '../types/positions'
 import { SerializedDecimalNumber } from '../types/numbers'
 import { NetworkId } from '../types/networkId'
 import { getConfig } from './config'
+
 jest.mock('./config')
-jest.mocked(getConfig).mockReturnValue({
+jest.mocked(getConfig).mockResolvedValue({
   POSITION_IDS: [],
   GET_TOKENS_INFO_URL: 'https://valoraapp.com/mock-endpoint',
   GOOGLE_CLOUD_PROJECT: 'dev-project',
   SHORTCUT_IDS: [],
+  NETWORK_ID_TO_RPC_URL: {}
 })
 import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
 jest.mock('../runtime/getPositions')
