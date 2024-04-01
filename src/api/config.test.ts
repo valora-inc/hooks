@@ -9,7 +9,7 @@ describe('config', () => {
         'ethereum-mainnet': 'https://my-endpoint-name.quiknode.pro/my-api-key',
         'celo-mainnet': 'https://forno.celo.org',
       }
-      expect(networkIdToRpcUrlTransform(input)).toEqual(expected)
+      expect(networkIdToRpcUrlTransform(input)).toStrictEqual(expected)
     })
     it('throws an error if the network id is invalid', () => {
       const input =
@@ -25,7 +25,7 @@ describe('config', () => {
       )
     })
     it('returns an empty object if the input is empty', () => {
-      expect(networkIdToRpcUrlTransform('')).toEqual({})
+      expect(networkIdToRpcUrlTransform('')).toStrictEqual({})
     })
   })
 })
