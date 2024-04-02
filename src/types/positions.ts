@@ -1,13 +1,16 @@
 import { DecimalNumber, SerializedDecimalNumber } from './numbers'
+import { NetworkId } from './networkId'
 
 // Interface that authors will implement
 export interface PositionsHook {
   getInfo(): AppInfo
+
   // Get position definitions for a given address
   getPositionDefinitions(
-    network: string,
+    networkId: NetworkId,
     address: string,
   ): Promise<PositionDefinition[]>
+
   // Get an app token definition from a token definition
   // This is needed when a position definition has one ore more intermediary app tokens, which are not base tokens.
   // For instance a farm position composed of a LP token.
@@ -19,13 +22,13 @@ export interface PositionsHook {
 
 export interface TokenDefinition {
   address: string
-  network: string
+  networkId: NetworkId
 }
 
 export type TokenCategory = 'claimable' // We could add more categories later
 
 export interface DisplayPropsContext {
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>
 }
 
 export interface DisplayProps {
@@ -35,7 +38,7 @@ export interface DisplayProps {
 }
 
 export interface AbstractPositionDefinition {
-  network: string
+  networkId: NetworkId
   address: string
   displayProps: ((context: DisplayPropsContext) => DisplayProps) | DisplayProps
   tokens: (TokenDefinition & {
@@ -46,7 +49,7 @@ export interface AbstractPositionDefinition {
 }
 
 export interface PricePerShareContext {
-  tokensByAddress: Record<string, Omit<AbstractToken, 'balance'>>
+  tokensByTokenId: Record<string, Omit<AbstractToken, 'balance'>>
 }
 
 export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
@@ -57,7 +60,7 @@ export interface AppTokenPositionDefinition extends AbstractPositionDefinition {
 }
 
 export interface BalancesContext {
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>
 }
 
 export interface ContractPositionDefinition extends AbstractPositionDefinition {
@@ -81,7 +84,7 @@ export interface AppInfo {
 
 export interface AbstractPosition {
   address: string // Example: 0x...
-  network: string // Example: celo
+  networkId: NetworkId // Example: celo-mainnet
   appId: string // Example: ubeswap
   appName: string // Example: Ubeswap
   /**
@@ -94,8 +97,9 @@ export interface AbstractPosition {
 }
 
 export interface AbstractToken {
-  address: string // Example: 0x...
-  network: string // Example: celo
+  tokenId: string // Example: celo-mainnet:0x123...
+  address?: string // Example: 0x...
+  networkId: NetworkId // Example: celo-mainnet
 
   // These would be resolved dynamically
   symbol: string // Example: cUSD
@@ -108,12 +112,13 @@ export interface BaseToken extends AbstractToken {
   type: 'base-token'
 }
 
-export interface AppTokenPosition extends AbstractPosition, AbstractToken {
-  type: 'app-token'
-  supply: SerializedDecimalNumber // Example: "1000"
-  // Price ratio between the token and underlying token(s)
-  pricePerShare: SerializedDecimalNumber[]
-}
+export type AppTokenPosition = AbstractPosition &
+  AbstractToken & {
+    type: 'app-token'
+    supply: SerializedDecimalNumber // Example: "1000"
+    // Price ratio between the token and underlying token(s)
+    pricePerShare: SerializedDecimalNumber[]
+  }
 
 export interface ContractPosition extends AbstractPosition {
   type: 'contract-position'

@@ -7,6 +7,9 @@ import {
 } from '../types/positions'
 import { toDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
+import { NetworkId } from '../types/networkId'
+import got from 'got'
+import * as mockTokensInfo from './mockTokensInfo.json'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -18,6 +21,7 @@ jest.mock('viem', () => ({
 const mockMulticall = jest.fn()
 
 const getHooksSpy = jest.spyOn(hooks, 'getHooks')
+const getSpy = jest.spyOn(got, 'get')
 
 const lockedCeloTestHook: PositionsHook = {
   getInfo() {
@@ -27,13 +31,13 @@ const lockedCeloTestHook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(network, _address) {
+  async getPositionDefinitions(networkId, _address) {
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
-      network,
+      networkId,
       address: '0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e',
       tokens: [
-        { address: '0x471ece3750da237f93b8e339c536989b8978a438', network },
+        { address: '0x471ece3750da237f93b8e339c536989b8978a438', networkId },
       ],
       displayProps: {
         title: 'Locked CELO Test',
@@ -75,9 +79,14 @@ describe(getPositions, () => {
       'locked-celo-test': lockedCeloTestHook,
       'failing-hook': failingTestHook,
     })
+    getSpy.mockReturnValue({
+      json: jest.fn().mockResolvedValue(mockTokensInfo),
+    } as any)
     const positions = await getPositions(
-      'celo',
+      NetworkId['celo-mainnet'],
       '0x0000000000000000000000000000000000007e57',
+      [],
+      'mock-token-info-url',
     )
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
@@ -97,14 +106,17 @@ describe(getPositions, () => {
           description: '',
         }
       },
-      async getPositionDefinitions(network, _address) {
+      async getPositionDefinitions(networkId, _address) {
         const position: AppTokenPositionDefinition = {
           type: 'app-token-definition',
-          network,
+          networkId,
           address: '0xda7f463c27ec862cfbf2369f3f74c364d050d93f',
           tokens: [
             // Intermediary token that would need to be resolved
-            { address: '0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e', network },
+            {
+              address: '0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e',
+              networkId,
+            },
           ],
           displayProps: {
             title: 'Test Hook',
@@ -129,9 +141,14 @@ describe(getPositions, () => {
       'test-hook': testHook,
     })
     await expect(
-      getPositions('celo', '0x0000000000000000000000000000000000007e57'),
+      getPositions(
+        NetworkId['celo-mainnet'],
+        '0x0000000000000000000000000000000000007e57',
+        [],
+        'mock-get-tokens-info-url',
+      ),
     ).rejects.toThrow(
-      "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo)",
+      "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo-mainnet)",
     )
   })
 })

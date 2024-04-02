@@ -1,8 +1,8 @@
-import { HttpFunction, http } from '@google-cloud/functions-framework'
+import { http, HttpFunction } from '@google-cloud/functions-framework'
 import { createLoggingMiddleware } from '@valora/logging'
 import {
-  HttpError,
   asyncHandler as valoraAsyncHandler,
+  HttpError,
 } from '@valora/http-handler'
 import express from 'express'
 import { z } from 'zod'
@@ -11,10 +11,20 @@ import { logger } from '../log'
 import { parseRequest } from './parseRequest'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
+import {
+  LegacyNetwork,
+  legacyNetworkToNetworkId,
+  NetworkId,
+} from '../types/networkId'
 
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
+
+const backwardsCompatibleNetworkSchema = z.union([
+  z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
+  z.object({ networkId: z.nativeEnum(NetworkId) }), // current schema: any member of NetworkId enum passed as 'networkId' field on the request
+])
 
 function createApp() {
   const config = getConfig()
@@ -28,24 +38,31 @@ function createApp() {
   )
 
   const getHooksRequestSchema = z.object({
-    query: z.object({
-      network: z.string({ required_error: 'network is required' }),
-      address: z
-        .string({ required_error: 'address is required' })
-        .regex(/^0x[a-fA-F0-9]{40}$/)
-        .transform((val) => val.toLowerCase()),
-    }),
+    query: z.intersection(
+      z.object({
+        address: z
+          .string({ required_error: 'address is required' })
+          .regex(/^0x[a-fA-F0-9]{40}$/)
+          .transform((val) => val.toLowerCase()),
+      }),
+      backwardsCompatibleNetworkSchema,
+    ),
   })
 
   app.get(
     '/getPositions',
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
-      const { network, address } = parsedRequest.query
+      const { address } = parsedRequest.query
+      const networkId =
+        'network' in parsedRequest.query
+          ? legacyNetworkToNetworkId[parsedRequest.query.network]
+          : parsedRequest.query.networkId
       const positions = await getPositions(
-        network,
+        networkId,
         address,
         config.POSITION_IDS,
+        config.GET_TOKENS_INFO_URL,
       )
       res.send({ message: 'OK', data: positions })
     }),
@@ -67,9 +84,13 @@ function createApp() {
     '/v2/getShortcuts',
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
-      const { network, address } = parsedRequest.query
+      const { address } = parsedRequest.query
+      const networkId =
+        'network' in parsedRequest.query
+          ? legacyNetworkToNetworkId[parsedRequest.query.network]
+          : parsedRequest.query.networkId
       const shortcuts = await getShortcuts(
-        network,
+        networkId,
         address,
         config.SHORTCUT_IDS,
       )
@@ -78,19 +99,21 @@ function createApp() {
   )
 
   const triggerShortcutRequestSchema = z.object({
-    body: z.object({
-      network: z.string({ required_error: 'network is required' }),
-      address: z
-        .string({ required_error: 'address is required' })
-        .regex(/^0x[a-fA-F0-9]{40}$/)
-        .transform((val) => val.toLowerCase()),
-      appId: z.string({ required_error: 'appId is required' }),
-      shortcutId: z.string({ required_error: 'shortcutId is required' }),
-      positionAddress: z
-        .string({ required_error: 'positionAddress is required' })
-        .regex(/^0x[a-fA-F0-9]{40}$/)
-        .transform((val) => val.toLowerCase()),
-    }),
+    body: z.intersection(
+      z.object({
+        address: z
+          .string({ required_error: 'address is required' })
+          .regex(/^0x[a-fA-F0-9]{40}$/)
+          .transform((val) => val.toLowerCase()),
+        appId: z.string({ required_error: 'appId is required' }),
+        shortcutId: z.string({ required_error: 'shortcutId is required' }),
+        positionAddress: z
+          .string({ required_error: 'positionAddress is required' })
+          .regex(/^0x[a-fA-F0-9]{40}$/)
+          .transform((val) => val.toLowerCase()),
+      }),
+      backwardsCompatibleNetworkSchema,
+    ),
   })
 
   app.post(
@@ -101,10 +124,14 @@ function createApp() {
         triggerShortcutRequestSchema,
       )
 
-      const { network, address, appId, shortcutId, positionAddress } =
-        parsedRequest.body
+      const { address, appId, shortcutId, positionAddress } = parsedRequest.body
 
-      const shortcuts = await getShortcuts(network, address, [appId])
+      const networkId =
+        'network' in parsedRequest.body
+          ? legacyNetworkToNetworkId[parsedRequest.body.network]
+          : parsedRequest.body.networkId
+
+      const shortcuts = await getShortcuts(networkId, address, [appId])
 
       const shortcut = shortcuts.find((s) => s.id === shortcutId)
       if (!shortcut) {
@@ -117,7 +144,7 @@ function createApp() {
       }
 
       const transactions = await shortcut.onTrigger(
-        network,
+        networkId,
         address,
         positionAddress,
       )

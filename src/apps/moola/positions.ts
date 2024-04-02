@@ -8,6 +8,7 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { DebtTokenDefinition, MOOLA_DEBT_TOKENS } from './debtTokens'
+import { NetworkId } from '../../types/networkId'
 
 const client = createPublicClient({
   chain: celo,
@@ -16,13 +17,13 @@ const client = createPublicClient({
 
 function getAppTokenPositionDefinition(
   debtTokenDefinition: DebtTokenDefinition,
-  network: string,
+  networkId: NetworkId,
 ): AppTokenPositionDefinition {
   return {
     type: 'app-token-definition',
-    network: network,
+    networkId,
     address: debtTokenDefinition.debtTokenAddress,
-    tokens: [{ address: debtTokenDefinition.baseTokenAddress, network }],
+    tokens: [{ address: debtTokenDefinition.baseTokenAddress, networkId }],
     displayProps: {
       title: debtTokenDefinition.title,
       description: debtTokenDefinition.description,
@@ -40,7 +41,11 @@ const hook: PositionsHook = {
       description: 'Moola debt tokens',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (networkId !== NetworkId['celo-mainnet']) {
+      // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const debtTokenBalances = await client.multicall({
       contracts: MOOLA_DEBT_TOKENS.map(({ debtTokenAddress }) => ({
         address: debtTokenAddress,
@@ -53,7 +58,7 @@ const hook: PositionsHook = {
 
     return MOOLA_DEBT_TOKENS.filter((_, i) => debtTokenBalances[i]).map(
       (debtTokenDefinition) =>
-        getAppTokenPositionDefinition(debtTokenDefinition, network),
+        getAppTokenPositionDefinition(debtTokenDefinition, networkId),
     )
   },
 }

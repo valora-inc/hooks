@@ -11,6 +11,7 @@ import {
 import { celo } from 'viem/chains'
 import { LockedGoldAbi } from './abis/locked-gold'
 import { toDecimalNumber } from '../../types/numbers'
+import { NetworkId } from '../../types/networkId'
 
 const CELO_ADDRESS = '0x471ece3750da237f93b8e339c536989b8978a438'
 const LOCKED_GOLD_ADDRESS = '0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e'
@@ -44,7 +45,11 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (networkId !== NetworkId['celo-mainnet']) {
+      // dapp is only on Celo and hook implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const lockedGoldContract = {
       address: LOCKED_GOLD_ADDRESS,
       abi: LockedGoldAbi,
@@ -102,9 +107,9 @@ const hook: PositionsHook = {
 
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
-      network,
+      networkId,
       address: LOCKED_GOLD_ADDRESS,
-      tokens: [{ address: CELO_ADDRESS, network }],
+      tokens: [{ address: CELO_ADDRESS, networkId }],
       displayProps: {
         title: 'Locked CELO',
         description: '', // TODO

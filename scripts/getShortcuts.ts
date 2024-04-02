@@ -2,15 +2,16 @@
 /* eslint-disable no-console */
 import yargs from 'yargs'
 import { getShortcuts } from '../src/runtime/getShortcuts'
+import { NetworkId } from '../src/types/networkId'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --apps app1[,app2]')
   .options({
-    network: {
+    networkId: {
       alias: 'n',
-      describe: 'Network to get positions for',
-      choices: ['celo', 'celoAlfajores'],
-      default: 'celo',
+      describe: 'Network ID to get positions for',
+      choices: Object.values(NetworkId),
+      default: NetworkId['celo-mainnet'],
     },
     address: {
       alias: 'a',
@@ -31,7 +32,7 @@ const argv = yargs(process.argv.slice(2))
   .parseSync()
 
 void (async () => {
-  const shortcuts = await getShortcuts(argv.network, argv.address, argv.apps)
+  const shortcuts = await getShortcuts(argv.networkId, argv.address, argv.apps)
   console.log('shortcuts', JSON.stringify(shortcuts, null, ' '))
 
   console.table(shortcuts)

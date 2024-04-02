@@ -1,12 +1,6 @@
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import {
-  Address,
-  ContractFunctionExecutionError,
-  createPublicClient,
-  http,
-} from 'viem'
-import { celo } from 'viem/chains'
+import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -18,7 +12,6 @@ import {
   DisplayProps,
   Position,
   PositionDefinition,
-  PricePerShareContext,
   Token,
 } from '../types/positions'
 import {
@@ -28,63 +21,86 @@ import {
 } from '../types/numbers'
 import { getHooks } from './getHooks'
 import { logger } from '../log'
+import { NetworkId } from '../types/networkId'
+import { getClient } from './client'
+import { getTokenId } from './getTokenId'
+import { isNative } from './isNative'
 
 interface RawTokenInfo {
-  address: string
-  name?: string
+  address?: string
+  name: string
   symbol: string
   decimals: number
-  usdPrice?: string
   imageUrl: string
+  tokenId: string
+  networkId: NetworkId
+  isNative?: boolean
+  priceUsd?: string
 }
 
 interface TokenInfo extends Omit<AbstractToken, 'balance'> {
   imageUrl: string
 }
 
-type TokensInfo = Record<string, TokenInfo | undefined>
+type TokensInfo = Record<string, TokenInfo>
 
-type DefinitionsByAddress = Record<string, AppPositionDefinition | undefined>
+type DefinitionsByTokenId = Record<string, AppPositionDefinition | undefined>
 
 type AppPositionDefinition = PositionDefinition & {
   appId: string
 }
 
-const client = createPublicClient({
-  chain: celo,
-  transport: http(),
-})
-
-async function getBaseTokensInfo(): Promise<TokensInfo> {
+async function getBaseTokensInfo(
+  getTokensInfoUrl: string,
+  networkId: NetworkId,
+): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
-    .get(
-      'https://us-central1-celo-mobile-mainnet.cloudfunctions.net/getRtdbTokensInfo',
-    )
-    .json<{ tokens: Record<string, RawTokenInfo> }>()
+    .get(getTokensInfoUrl)
+    .json<Record<string, RawTokenInfo>>()
 
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}
-  for (const [address, tokenInfo] of Object.entries(data.tokens)) {
-    const addressLowerCase = address.toLowerCase()
-    tokensInfo[addressLowerCase] = {
-      network: 'celo', // TODO: adjust for other networks
-      address: addressLowerCase,
-      symbol: tokenInfo.symbol,
-      decimals: tokenInfo.decimals,
-      imageUrl: tokenInfo.imageUrl,
-      priceUsd: toSerializedDecimalNumber(tokenInfo.usdPrice ?? 0),
+  for (const [tokenId, tokenInfo] of Object.entries(data)) {
+    if (tokenInfo.networkId !== networkId) {
+      continue
+    }
+    tokensInfo[tokenId] = {
+      ...tokenInfo,
+      priceUsd: toSerializedDecimalNumber(tokenInfo.priceUsd ?? 0),
     }
   }
   return tokensInfo
 }
 
-async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
+async function getERC20TokenInfo(
+  address: Address,
+  networkId: NetworkId,
+): Promise<TokenInfo> {
+  const imageUrl = ''
+  const priceUsd = toSerializedDecimalNumber(0)
+
+  if (isNative({ address, networkId })) {
+    return {
+      address: undefined,
+      networkId,
+      symbol: 'ETH',
+      decimals: 18,
+      imageUrl,
+      priceUsd,
+      tokenId: getTokenId({
+        networkId: networkId,
+        isNative: true,
+        address: undefined, // address isn't used for native assets' token id at this time, but even if it was, we would probably not use 0xeee... because it is misleading and bug prone (no actual smart contract with that address exists) and not universal
+      }),
+    }
+  }
+
   const erc20Contract = {
     address: address,
     abi: erc20Abi,
   } as const
-  const [symbol, decimals] = await client.multicall({
+  const [symbol, decimals] = await getClient(networkId).multicall({
     contracts: [
       {
         ...erc20Contract,
@@ -99,12 +115,13 @@ async function getERC20TokenInfo(address: Address): Promise<TokenInfo> {
   })
 
   return {
-    network: 'celo',
-    address: address,
-    symbol: symbol,
-    decimals: decimals,
-    imageUrl: '',
-    priceUsd: toSerializedDecimalNumber(0), // Should we use undefined?
+    tokenId: getTokenId({ networkId: networkId, isNative: false, address }),
+    networkId,
+    address,
+    symbol,
+    decimals,
+    priceUsd,
+    imageUrl,
   }
 }
 
@@ -141,10 +158,10 @@ function tokenWithUnderlyingBalance<T extends Token>(
 
 function getDisplayProps(
   positionDefinition: PositionDefinition,
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>,
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
 ): DisplayProps {
   if (typeof positionDefinition.displayProps === 'function') {
-    return positionDefinition.displayProps({ resolvedTokens })
+    return positionDefinition.displayProps({ resolvedTokensByTokenId })
   } else {
     return positionDefinition.displayProps
   }
@@ -153,15 +170,15 @@ function getDisplayProps(
 async function resolveAppTokenPosition(
   address: string,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
-  tokensByAddress: TokensInfo,
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>,
+  tokensByTokenId: TokensInfo,
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
   appInfo: AppInfo,
 ): Promise<AppTokenPosition> {
   let pricePerShare: DecimalNumber[]
   if (typeof positionDefinition.pricePerShare === 'function') {
     pricePerShare = await positionDefinition.pricePerShare({
-      tokensByAddress,
-    } as PricePerShareContext)
+      tokensByTokenId,
+    })
   } else {
     pricePerShare = positionDefinition.pricePerShare
   }
@@ -169,17 +186,32 @@ async function resolveAppTokenPosition(
   let priceUsd = new BigNumber(0)
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
-    const tokenInfo = tokensByAddress[token.address]!
+    const tokenInfo =
+      tokensByTokenId[
+        getTokenId({
+          networkId: token.networkId,
+          address: token.address,
+        })
+      ]
     priceUsd = priceUsd.plus(pricePerShare[i].times(tokenInfo.priceUsd))
   }
 
-  const positionTokenInfo = tokensByAddress[positionDefinition.address]!
+  const positionTokenInfo =
+    tokensByTokenId[
+      getTokenId({
+        networkId: positionDefinition.networkId,
+        isNative: false,
+        address: positionDefinition.address,
+      })
+    ]!
 
   const appTokenContract = {
     address: positionDefinition.address as Address,
     abi: erc20Abi,
   } as const
-  const [balance, totalSupply] = await client.multicall({
+  const [balance, totalSupply] = await getClient(
+    positionDefinition.networkId,
+  ).multicall({
     contracts: [
       {
         ...appTokenContract,
@@ -194,12 +226,20 @@ async function resolveAppTokenPosition(
     allowFailure: false,
   })
 
-  const displayProps = getDisplayProps(positionDefinition, resolvedTokens)
+  const displayProps = getDisplayProps(
+    positionDefinition,
+    resolvedTokensByTokenId,
+  )
 
   const position: AppTokenPosition = {
     type: 'app-token',
-    network: positionDefinition.network,
+    networkId: positionDefinition.networkId,
     address: positionDefinition.address,
+    tokenId: getTokenId({
+      networkId: positionDefinition.networkId,
+      isNative: false,
+      address: positionDefinition.address,
+    }),
     appId: positionDefinition.appId,
     appName: appInfo.name,
     symbol: positionTokenInfo.symbol,
@@ -208,7 +248,12 @@ async function resolveAppTokenPosition(
     displayProps,
     tokens: positionDefinition.tokens.map((token, i) =>
       tokenWithUnderlyingBalance(
-        resolvedTokens[token.address],
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId: token.networkId,
+            address: token.address,
+          })
+        ],
         toDecimalNumber(balance, positionTokenInfo.decimals),
         pricePerShare[i],
       ),
@@ -231,13 +276,13 @@ async function resolveContractPosition(
   _address: string,
   positionDefinition: ContractPositionDefinition & { appId: string },
   _tokensByAddress: TokensInfo,
-  resolvedTokens: Record<string, Omit<Token, 'balance'>>,
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
   appInfo: AppInfo,
 ): Promise<ContractPosition> {
   let balances: DecimalNumber[]
   if (typeof positionDefinition.balances === 'function') {
     balances = await positionDefinition.balances({
-      resolvedTokens,
+      resolvedTokensByTokenId,
     })
   } else {
     balances = positionDefinition.balances
@@ -246,7 +291,12 @@ async function resolveContractPosition(
   const tokens = positionDefinition.tokens.map((token, i) =>
     tokenWithUnderlyingBalance(
       {
-        ...resolvedTokens[token.address],
+        ...resolvedTokensByTokenId[
+          getTokenId({
+            networkId: token.networkId,
+            address: token.address,
+          })
+        ],
         ...(token.category && { category: token.category }),
       },
       balances[i],
@@ -257,16 +307,23 @@ async function resolveContractPosition(
   let balanceUsd = new BigNumber(0)
   for (let i = 0; i < positionDefinition.tokens.length; i++) {
     const token = positionDefinition.tokens[i]
-    const tokenInfo = resolvedTokens[token.address]
+    const tokenId = getTokenId({
+      networkId: token.networkId,
+      address: token.address,
+    })
+    const tokenInfo = resolvedTokensByTokenId[tokenId]
     balanceUsd = balanceUsd.plus(balances[i].times(tokenInfo.priceUsd))
   }
 
-  const displayProps = getDisplayProps(positionDefinition, resolvedTokens)
+  const displayProps = getDisplayProps(
+    positionDefinition,
+    resolvedTokensByTokenId,
+  )
 
   const position: ContractPosition = {
     type: 'contract-position',
     address: positionDefinition.address,
-    network: positionDefinition.network,
+    networkId: positionDefinition.networkId,
     appId: positionDefinition.appId,
     appName: appInfo.name,
     label: displayProps.title,
@@ -295,16 +352,17 @@ function addSourceAppId<T>(definition: T, sourceAppId: string) {
 
 // This is the main logic to get positions
 export async function getPositions(
-  network: string,
+  networkId: NetworkId,
   address: string,
   appIds: string[] = [],
+  getTokensInfoUrl: string,
 ) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, hook]) =>
-      hook.getPositionDefinitions(network, address).then(
+      hook.getPositionDefinitions(networkId, address).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },
@@ -323,18 +381,23 @@ export async function getPositions(
   logger.debug({ definitions }, 'positions definitions')
 
   // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo()
+  const baseTokensInfo = await getBaseTokensInfo(getTokensInfoUrl, networkId)
 
   let unlistedBaseTokensInfo: TokensInfo = {}
   let definitionsToResolve: AppPositionDefinition[] = definitions
-  const visitedDefinitions: DefinitionsByAddress = {}
+  const visitedDefinitions: DefinitionsByTokenId = {}
   while (true) {
     // Visit each definition we haven't visited yet
     definitionsToResolve = definitionsToResolve.filter((definition) => {
-      if (visitedDefinitions[definition.address]) {
+      const definitionTokenId = getTokenId({
+        networkId: definition.networkId,
+        address: definition.address,
+      })
+
+      if (visitedDefinitions[definitionTokenId]) {
         return false
       }
-      visitedDefinitions[definition.address] = definition
+      visitedDefinitions[definitionTokenId] = definition
       return true
     })
 
@@ -352,10 +415,17 @@ export async function getPositions(
 
     // Get the tokens definitions for which we don't have the base token info or position definition
     const unresolvedTokenDefinitions = allTokenDefinitions.filter(
-      (tokenDefinition) =>
-        !{ ...baseTokensInfo, ...unlistedBaseTokensInfo }[
-          tokenDefinition.address
-        ] && !visitedDefinitions[tokenDefinition.address],
+      (definition) => {
+        const definitionTokenId = getTokenId({
+          networkId: definition.networkId,
+          address: definition.address,
+        })
+        return (
+          !{ ...baseTokensInfo, ...unlistedBaseTokensInfo }[
+            definitionTokenId
+          ] && !visitedDefinitions[definitionTokenId]
+        )
+      },
     )
 
     logger.debug({ unresolvedTokenDefinitions }, 'unresolvedTokenDefinitions')
@@ -372,7 +442,7 @@ export async function getPositions(
             const hook = hooksByAppId[sourceAppId]
             if (!hook.getAppTokenDefinition) {
               throw new Error(
-                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.network}).`,
+                `Positions hook for app '${sourceAppId}' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for ${tokenDefinition.address} (${tokenDefinition.networkId}).`,
               )
             }
             const appTokenDefinition = await hook
@@ -384,9 +454,9 @@ export async function getPositions(
               // Assume the token is an ERC20 token
               const erc20TokenInfo = await getERC20TokenInfo(
                 tokenDefinition.address as Address,
+                networkId,
               )
-              newUnlistedBaseTokensInfo[tokenDefinition.address] =
-                erc20TokenInfo
+              newUnlistedBaseTokensInfo[erc20TokenInfo.tokenId] = erc20TokenInfo
               return
             }
             throw e
@@ -412,27 +482,34 @@ export async function getPositions(
     visitedPositions: visitedDefinitions,
   })
 
-  const baseTokensByAddress: TokensInfo = {
+  const baseTokensByTokenId: TokensInfo = {
     ...baseTokensInfo,
     ...unlistedBaseTokensInfo,
   }
   const appTokensInfo = await Promise.all(
     Object.values(visitedDefinitions)
       .filter(
-        (position) =>
+        (position): position is AppPositionDefinition =>
           position?.type === 'app-token-definition' &&
-          !baseTokensByAddress[position.address],
+          !baseTokensByTokenId[
+            getTokenId({
+              networkId: position.networkId,
+              address: position.address,
+            })
+          ],
       )
-      .map((definition) => getERC20TokenInfo(definition!.address as Address)),
+      .map((definition) =>
+        getERC20TokenInfo(definition.address as Address, definition.networkId),
+      ),
   )
-  const appTokensByAddress: TokensInfo = {}
+  const appTokensByTokenId: TokensInfo = {}
   for (const tokenInfo of appTokensInfo) {
-    appTokensByAddress[tokenInfo.address] = tokenInfo
+    appTokensByTokenId[tokenInfo.tokenId] = tokenInfo
   }
 
-  const tokensByAddress = {
-    ...baseTokensByAddress,
-    ...appTokensByAddress,
+  const tokensByTokenId: TokensInfo = {
+    ...baseTokensByTokenId,
+    ...appTokensByTokenId,
   }
 
   // We now have all the base tokens info and position definitions
@@ -440,12 +517,12 @@ export async function getPositions(
   // We can now resolve the positions
 
   // Start with the base tokens
-  const resolvedTokens: Record<string, Omit<Token, 'balance'>> = {}
-  for (const token of Object.values(baseTokensByAddress)) {
+  const resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>> = {}
+  for (const token of Object.values(baseTokensByTokenId)) {
     if (!token) {
       continue
     }
-    resolvedTokens[token.address] = {
+    resolvedTokensByTokenId[token.tokenId] = {
       ...token,
       type: 'base-token',
     }
@@ -480,18 +557,18 @@ export async function getPositions(
         position = await resolveAppTokenPosition(
           address,
           positionDefinition,
-          tokensByAddress,
-          resolvedTokens,
+          tokensByTokenId,
+          resolvedTokensByTokenId,
           appInfo,
         )
-        resolvedTokens[positionDefinition.address] = position
+        resolvedTokensByTokenId[position.tokenId] = position
         break
       case 'contract-position-definition':
         position = await resolveContractPosition(
           address,
           positionDefinition,
-          tokensByAddress,
-          resolvedTokens,
+          tokensByTokenId,
+          resolvedTokensByTokenId,
           appInfo,
         )
         break
@@ -500,15 +577,25 @@ export async function getPositions(
         return assertNever
     }
 
-    resolvedPositions[positionDefinition.address] = position
+    resolvedPositions[
+      getTokenId({
+        networkId: positionDefinition.networkId,
+        address: positionDefinition.address,
+      })
+    ] = position
   }
 
   return definitions.map((definition) => {
-    const resolvedPosition = resolvedPositions[definition.address]
+    const definitionTokenId = getTokenId({
+      networkId: definition.networkId,
+      isNative: false,
+      address: definition.address,
+    })
+    const resolvedPosition = resolvedPositions[definitionTokenId]
     // Sanity check
     if (!resolvedPosition) {
       throw new Error(
-        `Could not resolve ${definition.type}: ${definition.address}`,
+        `Could not resolve ${definition.type} with token id ${definitionTokenId}`,
       )
     }
     return resolvedPosition

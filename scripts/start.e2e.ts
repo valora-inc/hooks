@@ -3,7 +3,7 @@ import terminate from 'terminate/promise'
 
 describe('start', () => {
   it('should start the preview server successfully', async () => {
-    const child = $.exec('yarn start', { async: true })
+    const child = $.exec(`yarn start`, { async: true })
 
     // Wait for the server to be ready
     await new Promise<void>((resolve, _reject) => {

@@ -4,15 +4,16 @@ import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/types/positions'
 import { getPositions } from '../src/runtime/getPositions'
+import { NetworkId } from '../src/types/networkId'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
   .options({
-    network: {
+    networkId: {
       alias: 'n',
-      describe: 'Network to get positions for',
-      choices: ['celo', 'celoAlfajores'],
-      default: 'celo',
+      describe: 'Network ID to get positions for',
+      choices: Object.values(NetworkId),
+      default: NetworkId['celo-mainnet'],
     },
     address: {
       alias: 'a',
@@ -29,6 +30,12 @@ const argv = yargs(process.argv.slice(2))
       coerce: (array: string[]) => {
         return array.flatMap((v) => v.split(','))
       },
+    },
+    getTokensInfoUrl: {
+      alias: 'g',
+      describe: 'URL to get token info from',
+      type: 'string',
+      default: 'https://api.mainnet.valora.xyz/getTokensInfo',
     },
   })
   .parseSync()
@@ -48,7 +55,12 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await getPositions(argv.network, argv.address, argv.apps)
+  const positions = await getPositions(
+    argv.networkId,
+    argv.address,
+    argv.apps,
+    argv.getTokensInfoUrl,
+  )
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(
@@ -59,7 +71,7 @@ void (async () => {
           appId: position.appId,
           type: position.type,
           address: position.address,
-          network: position.network,
+          network: position.networkId,
           title: `${position.displayProps.title} (${position.displayProps.description})`,
           priceUsd: new BigNumber(position.priceUsd).toFixed(2),
           balance: balance.toFixed(2),
@@ -72,7 +84,7 @@ void (async () => {
           appId: position.appId,
           type: position.type,
           address: position.address,
-          network: position.network,
+          network: position.networkId,
           title: `${position.displayProps.title} (${position.displayProps.description})`,
           balanceUsd: new BigNumber(position.balanceUsd).toFixed(2),
           breakdown: position.tokens.map(breakdownToken).join(', '),

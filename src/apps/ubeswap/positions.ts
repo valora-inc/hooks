@@ -1,9 +1,9 @@
 import {
-  PositionsHook,
   AppTokenPosition,
   AppTokenPositionDefinition,
   ContractPositionDefinition,
   PositionDefinition,
+  PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
 import got from 'got'
@@ -15,6 +15,8 @@ import { erc20Abi } from '../../abis/erc-20'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
+import { NetworkId } from '../../types/networkId'
+import { getTokenId } from '../../runtime/getTokenId'
 
 const client = createPublicClient({
   chain: celo,
@@ -35,7 +37,7 @@ const PAIRS_QUERY = `
 `
 
 async function getPoolPositionDefinition(
-  network: string,
+  networkId: NetworkId,
   poolAddress: Address,
 ): Promise<AppTokenPositionDefinition> {
   const poolTokenContract = {
@@ -57,15 +59,27 @@ async function getPoolPositionDefinition(
   })
   const position: AppTokenPositionDefinition = {
     type: 'app-token-definition',
-    network,
+    networkId,
     address: poolAddress.toLowerCase(),
     tokens: [token0Address, token1Address].map((token) => ({
       address: token.toLowerCase(),
-      network,
+      networkId,
     })),
-    displayProps: ({ resolvedTokens }) => {
-      const token0 = resolvedTokens[token0Address.toLowerCase()]
-      const token1 = resolvedTokens[token1Address.toLowerCase()]
+    displayProps: ({ resolvedTokensByTokenId }) => {
+      const token0 =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token0Address,
+          })
+        ]
+      const token1 =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token1Address,
+          })
+        ]
       return {
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
@@ -73,7 +87,7 @@ async function getPoolPositionDefinition(
           'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/ubeswap.png',
       }
     },
-    pricePerShare: async ({ tokensByAddress }) => {
+    pricePerShare: async ({ tokensByTokenId }) => {
       const [[reserve0, reserve1], totalSupply] = await client.multicall({
         contracts: [
           {
@@ -87,9 +101,24 @@ async function getPoolPositionDefinition(
         ],
         allowFailure: false,
       })
-      const poolToken = tokensByAddress[poolAddress.toLowerCase()]
-      const token0 = tokensByAddress[token0Address.toLowerCase()]
-      const token1 = tokensByAddress[token1Address.toLowerCase()]
+      const poolToken =
+        tokensByTokenId[
+          getTokenId({ networkId, isNative: false, address: poolAddress })
+        ]
+      const token0 =
+        tokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token0Address,
+          })
+        ]
+      const token1 =
+        tokensByTokenId[
+          getTokenId({
+            networkId,
+            address: token1Address,
+          })
+        ]
       const reserves = [
         toDecimalNumber(reserve0, token0.decimals),
         toDecimalNumber(reserve1, token1.decimals),
@@ -104,7 +133,7 @@ async function getPoolPositionDefinition(
 }
 
 async function getPoolPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
@@ -126,7 +155,7 @@ async function getPoolPositionDefinitions(
   // Get all positions
   const positions = await Promise.all(
     pairs.map(async (pair) => {
-      return getPoolPositionDefinition(network, pair)
+      return getPoolPositionDefinition(networkId, pair)
     }),
   )
 
@@ -134,7 +163,7 @@ async function getPoolPositionDefinitions(
 }
 
 async function getFarmPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
   // Call balanceOf and totalSupply for each farm stakingAddress
@@ -185,19 +214,23 @@ async function getFarmPositionDefinitions(
     userFarms.map(async (farm) => {
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
-        network,
+        networkId,
         address: farm.stakingAddress.toLowerCase(),
         tokens: [
-          { address: farm.lpAddress.toLowerCase(), network },
+          { address: farm.lpAddress.toLowerCase(), networkId },
           {
             address: farm.rewardsTokenAddress.toLowerCase(),
-            network,
+            networkId,
             category: 'claimable',
           },
         ],
-        displayProps: ({ resolvedTokens }) => {
-          const poolToken = resolvedTokens[
-            farm.lpAddress.toLowerCase()
+        displayProps: ({ resolvedTokensByTokenId }) => {
+          const poolToken = resolvedTokensByTokenId[
+            getTokenId({
+              networkId,
+              address: farm.lpAddress,
+              isNative: false,
+            })
           ] as AppTokenPosition
           return {
             title: poolToken.displayProps.title,
@@ -206,8 +239,15 @@ async function getFarmPositionDefinitions(
           }
         },
         availableShortcutIds: ['claim-reward'],
-        balances: async ({ resolvedTokens }) => {
-          const poolToken = resolvedTokens[farm.lpAddress.toLowerCase()]
+        balances: async ({ resolvedTokensByTokenId }) => {
+          const poolToken =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: farm.lpAddress,
+                networkId,
+                isNative: false,
+              })
+            ]
           const share = new BigNumber(farm.balance.toString()).div(
             farm.totalSupply.toString(),
           )
@@ -231,8 +271,11 @@ async function getFarmPositionDefinitions(
             toDecimalNumber(poolBalance, poolToken.decimals),
           ) as DecimalNumber
 
-          const rewardsToken =
-            resolvedTokens[farm.rewardsTokenAddress.toLowerCase()]
+          const rewardsTokenId = getTokenId({
+            address: farm.rewardsTokenAddress,
+            networkId,
+          })
+          const rewardsToken = resolvedTokensByTokenId[rewardsTokenId]
           const rewardsBalance = toDecimalNumber(
             farm.rewardsEarned,
             rewardsToken.decimals,
@@ -257,17 +300,21 @@ const hook: PositionsHook = {
       description: 'Decentralized exchange on Celo',
     }
   },
-  async getPositionDefinitions(network, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (networkId !== NetworkId['celo-mainnet']) {
+      // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
+      return []
+    }
     const [poolDefinitions, farmDefinitions] = await Promise.all([
-      getPoolPositionDefinitions(network, address),
-      getFarmPositionDefinitions(network, address),
+      getPoolPositionDefinitions(networkId, address),
+      getFarmPositionDefinitions(networkId, address),
     ])
 
     return [...poolDefinitions, ...farmDefinitions]
   },
-  getAppTokenDefinition({ network, address }: TokenDefinition) {
+  getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    return getPoolPositionDefinition(network, address as Address)
+    return getPoolPositionDefinition(networkId, address as Address)
   },
 }
 

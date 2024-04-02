@@ -2,3 +2,4 @@
 GOOGLE_CLOUD_PROJECT: celo-mobile-mainnet
 POSITION_IDS: 'curve,gooddollar,halofi,hedgey,locked-celo,moola,ubeswap,uniswap'
 SHORTCUT_IDS: 'gooddollar,hedgey,ubeswap'
+GET_TOKENS_INFO_URL: 'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/tokensInfo'

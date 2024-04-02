@@ -6,9 +6,19 @@ import { getTestServer } from '@google-cloud/functions-framework/testing'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
 import { Position } from '../types/positions'
-import './index'
 import { SerializedDecimalNumber } from '../types/numbers'
+import { NetworkId } from '../types/networkId'
+import { getConfig } from './config'
 
+jest.mock('./config')
+jest.mocked(getConfig).mockReturnValue({
+  POSITION_IDS: [],
+  GET_TOKENS_INFO_URL: 'https://valoraapp.com/mock-endpoint',
+  GOOGLE_CLOUD_PROJECT: 'dev-project',
+  SHORTCUT_IDS: [],
+  NETWORK_ID_TO_RPC_URL: {},
+})
+import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
 jest.mock('../runtime/getPositions')
 jest.mock('../runtime/getShortcuts')
 
@@ -17,7 +27,7 @@ const TEST_POSITIONS: Position[] = [
     type: 'app-token',
     appId: 'ubeswap',
     appName: 'Ubeswap',
-    network: 'celo',
+    networkId: NetworkId['celo-mainnet'],
     address: '0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     symbol: 'ULP',
     decimals: 18,
@@ -27,24 +37,27 @@ const TEST_POSITIONS: Position[] = [
       description: 'Pool',
       imageUrl: '',
     },
+    tokenId: 'celo-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
       {
         type: 'base-token',
-        network: 'celo',
+        networkId: NetworkId['celo-mainnet'],
         address: '0x62b8b11039fcfe5ab0c56e502b1c372a3d2a9c7a',
         symbol: 'G$',
         decimals: 18,
         priceUsd: '0.00015738574843135427' as SerializedDecimalNumber,
         balance: '12445.060074286696111325' as SerializedDecimalNumber,
+        tokenId: 'celo-mainnet:0x62b8b11039fcfe5ab0c56e502b1c372a3d2a9c7a',
       },
       {
         type: 'base-token',
-        network: 'celo',
+        networkId: NetworkId['celo-mainnet'],
         address: '0x765de816845861e75a25fca122bb6898b8b1282a',
         symbol: 'cUSD',
         decimals: 18,
         priceUsd: '1' as SerializedDecimalNumber,
         balance: '2.061316226302041758' as SerializedDecimalNumber,
+        tokenId: 'celo-mainnet:0x765de816845861e75a25fca122bb6898b8b1282a',
       },
     ],
     pricePerShare: [
@@ -66,13 +79,13 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
     id: 'claim-reward',
     name: 'Claim',
     description: 'Claim rewards for staked liquidity',
-    networks: ['celo'],
+    networkIds: [NetworkId['celo-mainnet']],
     category: 'claim',
-    async onTrigger(network, address, positionAddress) {
+    async onTrigger(networkId, address, positionAddress) {
       // Bogus implementation for testing
       return [
         {
-          network,
+          networkId,
           from: address,
           to: positionAddress,
           data: '0xTEST',
@@ -92,7 +105,7 @@ describe('GET /getPositions', () => {
     await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
       })
       .expect(200)
@@ -104,7 +117,7 @@ describe('GET /getPositions', () => {
     const response = await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo',
+        networkId: 'celo-mainnet',
       })
       .expect(400)
     expect(response.body).toMatchInlineSnapshot(`
@@ -145,7 +158,7 @@ describe('POST /triggerShortcut', () => {
     const response = await request(server)
       .post('/triggerShortcut')
       .send({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: TEST_SHORTCUTS[0].id,
@@ -157,7 +170,7 @@ describe('POST /triggerShortcut', () => {
       data: {
         transactions: [
           {
-            network: 'celo',
+            networkId: 'celo-mainnet',
             from: WALLET_ADDRESS.toLowerCase(),
             to: TEST_POSITIONS[0].address,
             data: '0xTEST',
@@ -172,7 +185,7 @@ describe('POST /triggerShortcut', () => {
     const response = await request(server)
       .post('/triggerShortcut')
       .send({
-        network: 'celo',
+        networkId: 'celo-mainnet',
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: 'flarf',

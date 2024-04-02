@@ -1,5 +1,4 @@
-import { Address, createPublicClient, http } from 'viem'
-import { celo } from 'viem/chains'
+import { Address, ContractFunctionParameters } from 'viem'
 import got from 'got'
 import {
   AppTokenPositionDefinition,
@@ -9,11 +8,9 @@ import {
 import { curveTripoolAbi } from './abis/curve-tripool'
 import { curvePoolAbi } from './abis/curve-pool'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
-
-const client = createPublicClient({
-  chain: celo,
-  transport: http(),
-})
+import { NetworkId } from '../../types/networkId'
+import { getClient } from '../../runtime/client'
+import { getTokenId } from '../../runtime/getTokenId'
 
 interface CurveApiResponse {
   success: boolean
@@ -28,14 +25,21 @@ interface CurveApiResponse {
 
 type PoolSize = 2 | 3
 
-const CURVE_BLOCKCHAIN_IDS: Record<string, string> = {
-  celo: 'celo',
+const NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID: Record<NetworkId, string | null> = {
+  [NetworkId['celo-mainnet']]: 'celo',
+  [NetworkId['ethereum-mainnet']]: 'ethereum',
+  [NetworkId['arbitrum-one']]: 'arbitrum',
+  [NetworkId['op-mainnet']]: 'optimism',
+  [NetworkId['ethereum-sepolia']]: null,
+  [NetworkId['arbitrum-sepolia']]: null,
+  [NetworkId['op-sepolia']]: null,
+  [NetworkId['celo-alfajores']]: null,
 }
 
 export async function getAllCurvePools(
-  network: string,
+  networkId: NetworkId,
 ): Promise<{ address: Address; size: PoolSize }[]> {
-  const blockchainId = CURVE_BLOCKCHAIN_IDS[network]
+  const blockchainId = NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID[networkId]
   if (!blockchainId) {
     return []
   }
@@ -50,12 +54,13 @@ export async function getAllCurvePools(
 }
 
 export async function getPoolPositionDefinitions(
-  network: string,
+  networkId: NetworkId,
   address: Address,
 ) {
-  const pools = await getAllCurvePools(network)
+  const pools = await getAllCurvePools(networkId)
 
   // call balanceOf to check if user has balance on a pool
+  const client = getClient(networkId)
   const result = await client.multicall({
     contracts: pools.map(
       (pool) =>
@@ -75,13 +80,13 @@ export async function getPoolPositionDefinitions(
 
   return await Promise.all(
     userPools.map((pool) =>
-      getPoolPositionDefinition(network, pool.address, pool.size),
+      getPoolPositionDefinition(networkId, pool.address, pool.size),
     ),
   )
 }
 
 async function getPoolPositionDefinition(
-  network: string,
+  networkId: NetworkId,
   poolAddress: Address,
   poolSize: PoolSize,
 ) {
@@ -89,7 +94,7 @@ async function getPoolPositionDefinition(
     address: poolAddress,
     abi: poolSize === 3 ? curveTripoolAbi : curvePoolAbi,
   }
-
+  const client = getClient(networkId)
   const tokenAddresses = (await client.multicall({
     contracts: Array.from({ length: poolSize }, (_, index) =>
       BigInt(index),
@@ -101,17 +106,45 @@ async function getPoolPositionDefinition(
     allowFailure: false,
   })) as Address[]
 
+  const balancesFunctionCallParams: ContractFunctionParameters[] = [
+    // get_balances can be used for older pool versions like 0.3.1 (example: https://celoscan.io/address/0xAF7Ee5Ba02dC9879D24cb16597cd854e13f3aDa8#readContract )
+    //   but not in new versions like 0.3.7 (example: https://etherscan.io/address/0x21e27a5e5513d6e65c4f830167390997aa84843a#code )
+    {
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(0)],
+    },
+    {
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(1)],
+    },
+  ]
+  if (poolSize === 3) {
+    balancesFunctionCallParams.push({
+      ...poolTokenContract,
+      functionName: 'balances',
+      args: [BigInt(2)],
+    })
+  }
+
   const position: AppTokenPositionDefinition = {
     type: 'app-token-definition',
-    network,
+    networkId,
     address: poolAddress.toLowerCase(),
     tokens: tokenAddresses.map((token) => ({
       address: token.toLowerCase(),
-      network,
+      networkId,
     })),
-    displayProps: ({ resolvedTokens }) => {
+    displayProps: ({ resolvedTokensByTokenId }) => {
       const tokenSymbols = tokenAddresses.map(
-        (tokenAddress) => resolvedTokens[tokenAddress.toLowerCase()].symbol,
+        (tokenAddress) =>
+          resolvedTokensByTokenId[
+            getTokenId({
+              networkId,
+              address: tokenAddress,
+            })
+          ].symbol,
       )
       return {
         title: tokenSymbols.join(' / '),
@@ -120,17 +153,28 @@ async function getPoolPositionDefinition(
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/curve.png',
       }
     },
-    pricePerShare: async ({ tokensByAddress }) => {
-      const [balances, totalSupply] = await client.multicall({
+    pricePerShare: async ({ tokensByTokenId }) => {
+      const [totalSupply, ...balances] = (await client.multicall({
         contracts: [
-          { ...poolTokenContract, functionName: 'get_balances' },
           { ...poolTokenContract, functionName: 'totalSupply' },
+          ...balancesFunctionCallParams,
         ],
         allowFailure: false,
+      })) as bigint[]
+      const poolTokenId = getTokenId({
+        address: poolAddress,
+        isNative: false,
+        networkId,
       })
-      const poolToken = tokensByAddress[poolAddress.toLowerCase()]
+      const poolToken = tokensByTokenId[poolTokenId]
       const tokens = tokenAddresses.map(
-        (tokenAddress) => tokensByAddress[tokenAddress.toLowerCase()],
+        (tokenAddress) =>
+          tokensByTokenId[
+            getTokenId({
+              address: tokenAddress,
+              networkId,
+            })
+          ],
       )
       const reserves = balances.map((balance, index) =>
         toDecimalNumber(balance, tokens[index].decimals),
@@ -152,15 +196,15 @@ const hook: PositionsHook = {
       description: 'Curve pools',
     }
   },
-  getPositionDefinitions(network, address) {
-    return getPoolPositionDefinitions(network, address as Address)
+  getPositionDefinitions(networkId, address) {
+    return getPoolPositionDefinitions(networkId, address as Address)
   },
-  async getAppTokenDefinition({ network, address }: TokenDefinition) {
+  async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    const pools = await getAllCurvePools(network)
+    const pools = await getAllCurvePools(networkId)
     const poolSize = pools.find((pool) => pool.address === address)?.size
     return await getPoolPositionDefinition(
-      network,
+      networkId,
       address as Address,
       poolSize!,
     )
