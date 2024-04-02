@@ -1,4 +1,4 @@
-import { Chain, createPublicClient, http } from 'viem'
+import { Chain, createPublicClient, http, PublicClient } from 'viem'
 import {
   arbitrum,
   arbitrumSepolia,
@@ -23,7 +23,9 @@ const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['op-sepolia']]: optimismSepolia,
 }
 
-export function getClient(networkId: NetworkId) {
+export function getClient(
+  networkId: NetworkId,
+): PublicClient<ReturnType<typeof http>, Chain> {
   const rpcUrl = getConfig().NETWORK_ID_TO_RPC_URL[networkId]
   return createPublicClient({
     chain: networkIdToViemChain[networkId],
