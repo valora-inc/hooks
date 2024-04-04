@@ -21,10 +21,15 @@ function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
 
-const backwardsCompatibleNetworkSchema = z.union([
-  z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
-  z.object({ networkId: z.nativeEnum(NetworkId) }), // current schema: any member of NetworkId enum passed as 'networkId' field on the request
-])
+function getNetworkIds(args: {network: LegacyNetwork} | {networkIds: NetworkId | NetworkId[]}): NetworkId[] {
+  if ('network' in args) {
+    return [legacyNetworkToNetworkId[args.network]]
+  } else if (Array.isArray(args.networkIds)) {
+    return args.networkIds
+  } else {
+    return [args.networkIds]
+  }
+}
 
 function createApp() {
   const config = getConfig()
@@ -45,7 +50,15 @@ function createApp() {
           .regex(/^0x[a-fA-F0-9]{40}$/)
           .transform((val) => val.toLowerCase()),
       }),
-      backwardsCompatibleNetworkSchema,
+      z.union([
+        z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
+        z.object({
+          networkIds: z
+            .array(z.nativeEnum(NetworkId))
+            .nonempty()
+            .or(z.nativeEnum(NetworkId)), // singleton arrays sometimes serialize as single values
+        }), // current schema: any members of NetworkId enum passed as 'networkIds' field on the request
+      ]),
     ),
   })
 
@@ -54,16 +67,19 @@ function createApp() {
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { address } = parsedRequest.query
-      const networkId =
-        'network' in parsedRequest.query
-          ? legacyNetworkToNetworkId[parsedRequest.query.network]
-          : parsedRequest.query.networkId
-      const positions = await getPositions(
-        networkId,
-        address,
-        config.POSITION_IDS,
-        config.GET_TOKENS_INFO_URL,
-      )
+      const networkIds = getNetworkIds(parsedRequest.query)
+      const positions = (
+        await Promise.all(
+          networkIds.map((networkId) =>
+            getPositions(
+              networkId,
+              address,
+              config.POSITION_IDS,
+              config.GET_TOKENS_INFO_URL,
+            ),
+          ),
+        )
+      ).flat()
       res.send({ message: 'OK', data: positions })
     }),
   )
@@ -85,15 +101,14 @@ function createApp() {
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
       const { address } = parsedRequest.query
-      const networkId =
-        'network' in parsedRequest.query
-          ? legacyNetworkToNetworkId[parsedRequest.query.network]
-          : parsedRequest.query.networkId
-      const shortcuts = await getShortcuts(
-        networkId,
-        address,
-        config.SHORTCUT_IDS,
-      )
+      const networkIds = getNetworkIds(parsedRequest.query)
+      const shortcuts = (
+        await Promise.all(
+          networkIds.map((networkId) =>
+            getShortcuts(networkId, address, config.SHORTCUT_IDS),
+          ),
+        )
+      ).flat()
       res.send({ message: 'OK', data: shortcuts })
     }),
   )
@@ -112,7 +127,10 @@ function createApp() {
           .regex(/^0x[a-fA-F0-9]{40}$/)
           .transform((val) => val.toLowerCase()),
       }),
-      backwardsCompatibleNetworkSchema,
+      z.union([
+        z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
+        z.object({ networkId: z.nativeEnum(NetworkId) }), // current schema: any member of NetworkId enum passed as 'networkId' field on the request
+      ]),
     ),
   })
 
