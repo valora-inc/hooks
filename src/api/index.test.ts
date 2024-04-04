@@ -189,7 +189,7 @@ describe('GET /getPositions', () => {
     const response = await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo', // note: this old schema should still be supported. only the address should be reported as an error.
+        network: 'celo', // note: this old schema should still be supported. only the missing address should be reported as an error.
       })
       .expect(400)
     expect(response.body).toMatchInlineSnapshot(`
