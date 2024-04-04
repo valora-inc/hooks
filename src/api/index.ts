@@ -21,7 +21,9 @@ function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
 
-function getNetworkIds(args: {network: LegacyNetwork} | {networkIds: NetworkId | NetworkId[]}): NetworkId[] {
+function getNetworkIds(
+  args: { network: LegacyNetwork } | { networkIds: NetworkId | NetworkId[] },
+): NetworkId[] {
   if ('network' in args) {
     return [legacyNetworkToNetworkId[args.network]]
   } else if (Array.isArray(args.networkIds)) {
