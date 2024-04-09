@@ -22,7 +22,7 @@ import './index' // NOTE: there are side effects of importing this module-- load
 jest.mock('../runtime/getPositions')
 jest.mock('../runtime/getShortcuts')
 
-const TEST_POSITIONS: Position[] = [
+const TEST_POSITIONS_CELO: Position[] = [
   {
     type: 'app-token',
     appId: 'ubeswap',
@@ -71,7 +71,64 @@ const TEST_POSITIONS: Position[] = [
   },
 ]
 
-jest.mocked(getPositions).mockResolvedValue(TEST_POSITIONS)
+const TEST_POSITIONS_ETHEREUM: Position[] = [
+  {
+    type: 'app-token',
+    appId: 'uniswap',
+    appName: 'Uniswap',
+    networkId: NetworkId['ethereum-mainnet'],
+    address: '0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
+    symbol: 'ULP',
+    decimals: 18,
+    label: 'Pool: UNI / USDC',
+    displayProps: {
+      title: 'UNI / USDC',
+      description: 'Pool',
+      imageUrl: '',
+    },
+    tokenId: 'ethereum-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
+    tokens: [
+      {
+        type: 'base-token',
+        networkId: NetworkId['celo-mainnet'],
+        address: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+        symbol: 'UNI',
+        decimals: 18,
+        priceUsd: '11.17' as SerializedDecimalNumber,
+        balance: '12445.060074286696111325' as SerializedDecimalNumber,
+        tokenId: 'ethereum-mainnet:0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+      },
+      {
+        type: 'base-token',
+        networkId: NetworkId['celo-mainnet'],
+        address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+        symbol: 'USDC',
+        decimals: 18,
+        priceUsd: '1' as SerializedDecimalNumber,
+        balance: '2.061316226302041758' as SerializedDecimalNumber,
+        tokenId: 'ethereum-mainnet:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      },
+    ],
+    pricePerShare: [
+      '1.77845724145984437582' as SerializedDecimalNumber,
+      '2.0128827016512212377' as SerializedDecimalNumber,
+    ],
+    priceUsd: '0.25' as SerializedDecimalNumber,
+    balance: '100.01' as SerializedDecimalNumber,
+    supply: '170.10' as SerializedDecimalNumber,
+    availableShortcutIds: [],
+  },
+]
+
+jest.mocked(getPositions).mockImplementation(async (networkId) => {
+  if (networkId === NetworkId['celo-mainnet']) {
+    return TEST_POSITIONS_CELO
+  } else if (networkId === NetworkId['ethereum-mainnet']) {
+    return TEST_POSITIONS_ETHEREUM
+  } else {
+    return []
+  }
+})
 
 const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
   {
@@ -100,16 +157,31 @@ jest.mocked(getShortcuts).mockResolvedValue(TEST_SHORTCUTS)
 const WALLET_ADDRESS = '0x0000000000000000000000000000000000007E57'
 
 describe('GET /getPositions', () => {
-  it('returns balances', async () => {
+  it('returns balances for celo', async () => {
     const server = getTestServer('hooks-api')
     await request(server)
       .get('/getPositions')
       .query({
-        networkId: 'celo-mainnet',
+        networkIds: [NetworkId['celo-mainnet']],
         address: WALLET_ADDRESS,
       })
       .expect(200)
-      .expect({ message: 'OK', data: TEST_POSITIONS })
+      .expect({ message: 'OK', data: TEST_POSITIONS_CELO })
+  })
+
+  it('returns balances for celo and ethereum', async () => {
+    const server = getTestServer('hooks-api')
+    await request(server)
+      .get('/getPositions')
+      .query({
+        networkIds: [NetworkId['celo-mainnet'], NetworkId['ethereum-mainnet']],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+      .expect({
+        message: 'OK',
+        data: TEST_POSITIONS_CELO.concat(TEST_POSITIONS_ETHEREUM),
+      })
   })
 
   it('returns 400 when address is missing', async () => {
@@ -117,7 +189,7 @@ describe('GET /getPositions', () => {
     const response = await request(server)
       .get('/getPositions')
       .query({
-        networkId: 'celo-mainnet',
+        network: 'celo', // note: this old schema should still be supported. only the missing address should be reported as an error.
       })
       .expect(400)
     expect(response.body).toMatchInlineSnapshot(`
@@ -162,7 +234,7 @@ describe('POST /triggerShortcut', () => {
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: TEST_SHORTCUTS[0].id,
-        positionAddress: TEST_POSITIONS[0].address,
+        positionAddress: TEST_POSITIONS_CELO[0].address,
       })
       .expect(200)
     expect(response.body).toEqual({
@@ -172,7 +244,7 @@ describe('POST /triggerShortcut', () => {
           {
             networkId: 'celo-mainnet',
             from: WALLET_ADDRESS.toLowerCase(),
-            to: TEST_POSITIONS[0].address,
+            to: TEST_POSITIONS_CELO[0].address,
             data: '0xTEST',
           },
         ],
@@ -189,7 +261,7 @@ describe('POST /triggerShortcut', () => {
         address: WALLET_ADDRESS,
         appId: TEST_SHORTCUTS[0].appId,
         shortcutId: 'flarf',
-        positionAddress: TEST_POSITIONS[0].address,
+        positionAddress: TEST_POSITIONS_CELO[0].address,
       })
       .expect(400)
     expect(response.body).toMatchInlineSnapshot(`
