@@ -154,7 +154,7 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
 
 jest.mocked(getShortcuts).mockResolvedValue(TEST_SHORTCUTS)
 
-const WALLET_ADDRESS = '0x0000000000000000000000000000000000007E57'
+const WALLET_ADDRESS = '0x0000000000000000000000000000000000007e57'
 
 describe('GET /getPositions', () => {
   it('returns balances for celo', async () => {

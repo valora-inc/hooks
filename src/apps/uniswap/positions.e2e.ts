@@ -14,7 +14,7 @@ describe('getPositionDefinitions', () => {
   it('should get no definitions for an address with no blockchain interaction', async () => {
     const positions = await hook.getPositionDefinitions(
       NetworkId['celo-mainnet'],
-      '0x0000000000000000000000000000000000007E57',
+      '0x0000000000000000000000000000000000007e57',
     )
     expect(positions.length).toBe(0)
   })
