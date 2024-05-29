@@ -32,6 +32,11 @@ export const userPositionsAbi = [
             type: 'address',
           },
           {
+            internalType: 'uint256',
+            name: 'tokenId',
+            type: 'uint256',
+          },
+          {
             internalType: 'uint96',
             name: 'nonce',
             type: 'uint96',
