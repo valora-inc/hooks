@@ -13,6 +13,7 @@ import {
   Position,
   PositionDefinition,
   Token,
+  UnknownAppTokenError,
 } from '../types/positions'
 import {
   DecimalNumber,
@@ -450,7 +451,7 @@ export async function getPositions(
               .then((definition) => addAppId(definition, sourceAppId))
             return appTokenDefinition
           } catch (e) {
-            if (e instanceof ContractFunctionExecutionError) {
+            if (e instanceof ContractFunctionExecutionError || e instanceof UnknownAppTokenError) {
               // Assume the token is an ERC20 token
               const erc20TokenInfo = await getERC20TokenInfo(
                 tokenDefinition.address as Address,

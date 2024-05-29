@@ -2,7 +2,11 @@ import hook from './positions'
 import { NetworkId } from '../../types/networkId'
 
 describe('getPositionDefinitions', () => {
-  it.each([NetworkId['ethereum-mainnet'], NetworkId['celo-mainnet']])(
+  it.each([
+    NetworkId['ethereum-mainnet'],
+    NetworkId['celo-mainnet'],
+    NetworkId['arbitrum-one'],
+  ])(
     'should get the address definitions successfully for networkId %s',
     async (networkId) => {
       const positions = await hook.getPositionDefinitions(
