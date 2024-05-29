@@ -1,4 +1,4 @@
-import { Address, ContractFunctionParameters } from 'viem'
+import { Address } from 'viem'
 import got from 'got'
 import {
   AppTokenPositionDefinition,
