@@ -25,6 +25,13 @@ export interface TokenDefinition {
   networkId: NetworkId
 }
 
+// To be returned when `getAppTokenDefinition` can't resolve a token
+export class UnknownAppTokenError extends Error {
+  constructor({ networkId, address }: TokenDefinition) {
+    super(`Unknown app token: ${networkId}:${address}`)
+  }
+}
+
 export type TokenCategory = 'claimable' // We could add more categories later
 
 export interface DisplayPropsContext {

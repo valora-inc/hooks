@@ -32,7 +32,7 @@ const handlers = [
     },
   ),
   rest.get(
-    'https://api.curve.fi/v1/getPools/celo/factory',
+    'https://api.curve.fi/v1/getPools/all/celo',
     async (_req, res, ctx) => {
       return res(
         ctx.json({
@@ -247,7 +247,7 @@ const handlers = [
     },
   ),
   rest.get(
-    'https://api.curve.fi/v1/getPools/ethereum/factory',
+    'https://api.curve.fi/v1/getPools/all/ethereum',
     async (_req, res, ctx) => {
       return res(
         ctx.json({
