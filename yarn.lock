@@ -386,10 +386,10 @@
     "@google-cloud/logging" "^11.0.0"
     google-auth-library "^9.0.0"
 
-"@google-cloud/logging@^11.0.0":
-  version "11.0.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-11.0.0.tgz#f5a408d411ccdaac6d2738ef4cb4046cc2bcff86"
-  integrity sha512-uQeReiVICoV5yt9J/cczNxHxqzTkLLG7yGHXCMAk/wQNVZGevT4Bi7CBWpt0aXxm044a76Aj6V08cCAlBj7UZw==
+"@google-cloud/logging@^11.0.0", "@google-cloud/logging@^11.1.0":
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-11.1.0.tgz#79e1f05a27a596d154ab475b167b2d98e29e1457"
+  integrity sha512-S3Zsd+HZxIdZgDZByJ+2GaSQ8rA5OLfdZoZ9Ys1iSZ4HRIhO9ZxlXbmGZgGK9JJ2GaXp7Rux4K4LpkqoYPKnEg==
   dependencies:
     "@google-cloud/common" "^5.0.0"
     "@google-cloud/paginator" "^5.0.0"
@@ -1371,12 +1371,12 @@
   dependencies:
     "@google-cloud/functions-framework" "^3.1.3"
 
-"@valora/logging@^1.3.16":
-  version "1.3.16"
-  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.16.tgz#7359d5c88be7af636ce98b727a45f629800cc6ab"
-  integrity sha512-sqwpDrJ0DN8Spl8psbMyglT9wPvJbDdRD7OkzA0q2fGXbnaMxrLAWjr5oPzO2E/mjskua0idIsrxcyXZVYsOMQ==
+"@valora/logging@^1.3.17":
+  version "1.3.17"
+  resolved "https://registry.yarnpkg.com/@valora/logging/-/logging-1.3.17.tgz#9eebb17374604150c8a0883454849b5d54b7d4be"
+  integrity sha512-VB7rSddiZiScxAuPJWgx5VcC9HHZyofXkd2wLLihFUvKvkT7H+wp3LlHx0cI7cCMslypbCnCjbto6GbJwHot5g==
   dependencies:
-    "@google-cloud/logging" "^11.0.0"
+    "@google-cloud/logging" "^11.1.0"
     "@google-cloud/logging-bunyan" "^5.1.0"
     "@types/bunyan" "^1.8.11"
     "@types/fast-redact" "^3.0.4"
