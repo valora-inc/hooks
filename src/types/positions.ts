@@ -29,7 +29,7 @@ export interface TokenDefinition {
   // For example: Beefy vault depends on Aave, Curve, etc.
   // but we don't yet have all these apps implemented
   // Note: there's also a limitation in the runtime as it can't yet always resolve tokens between apps
-  // This will be added "soon"
+  // This will be fixed "soon"
   fallbackPriceUsd?: SerializedDecimalNumber
 }
 
