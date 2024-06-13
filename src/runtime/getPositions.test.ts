@@ -7,7 +7,7 @@ import {
   PositionsHook,
   UnknownAppTokenError,
 } from '../types/positions'
-import { SerializedDecimalNumber, toDecimalNumber } from '../types/numbers'
+import { toDecimalNumber, toSerializedDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
 import { NetworkId } from '../types/networkId'
 import got from 'got'
@@ -182,7 +182,7 @@ describe(getPositions, () => {
                 address: '0x4456d13Fc6736e8e8330394c0C622103E06ea419',
                 networkId,
                 // Fallback until we can properly decompose the token into base tokens
-                fallbackPriceUsd: '0.5' as SerializedDecimalNumber,
+                fallbackPriceUsd: toSerializedDecimalNumber(0.5),
               },
             ],
             // Meaning that 1 share of the vault is worth 2 underlying token
