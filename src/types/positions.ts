@@ -23,6 +23,14 @@ export interface PositionsHook {
 export interface TokenDefinition {
   address: string
   networkId: NetworkId
+  // Escape hatch for priceUsd in case the token is not in our list of base tokens
+  // and it's difficult to decompose the token into base token
+  // Ideally we should add apps to resolve such tokens
+  // For example: Beefy vault depends on Aave, Curve, etc.
+  // but we don't yet have all these apps implemented
+  // Note: there's also a limitation in the runtime as it can't yet always resolve tokens between apps
+  // This will be added "soon"
+  fallbackPriceUsd?: SerializedDecimalNumber
 }
 
 // To be returned when `getAppTokenDefinition` can't resolve a token
