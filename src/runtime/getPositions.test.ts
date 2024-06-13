@@ -173,7 +173,7 @@ describe(getPositions, () => {
           {
             type: 'app-token-definition',
             networkId,
-            // Beefy crvUSD/​WBTC/​WETH Vault
+            // Beefy crvUSD/WBTC/WETH Vault
             // https://app.beefy.com/vault/curve-op-tricrypto-crvusd
             address: '0xf82160Bad52C235102174aE5E7f36d5099DEEad3',
             tokens: [
