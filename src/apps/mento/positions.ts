@@ -106,35 +106,37 @@ async function getVeMentoPositionDefinition(
   }
 
   const client = getClient(networkId)
-  const [mentoTokenAddress, decimals, locked, balance] = await client.multicall({
-    contracts: [
-      {
-        address: veMentoAddress,
-        abi: lockingAbi,
-        functionName: 'token',
-        args: [],
-      },
-      {
-        address: veMentoAddress,
-        abi: lockingAbi,
-        functionName: 'decimals',
-        args: [],
-      },
-      {
-        address: veMentoAddress,
-        abi: lockingAbi,
-        functionName: 'locked',
-        args: [address],
-      },
-      {
-        address: veMentoAddress,
-        abi: lockingAbi,
-        functionName: 'balanceOf',
-        args: [address],
-      },
-    ],
-    allowFailure: false,
-  })
+  const [mentoTokenAddress, decimals, locked, balance] = await client.multicall(
+    {
+      contracts: [
+        {
+          address: veMentoAddress,
+          abi: lockingAbi,
+          functionName: 'token',
+          args: [],
+        },
+        {
+          address: veMentoAddress,
+          abi: lockingAbi,
+          functionName: 'decimals',
+          args: [],
+        },
+        {
+          address: veMentoAddress,
+          abi: lockingAbi,
+          functionName: 'locked',
+          args: [address],
+        },
+        {
+          address: veMentoAddress,
+          abi: lockingAbi,
+          functionName: 'balanceOf',
+          args: [address],
+        },
+      ],
+      allowFailure: false,
+    },
+  )
 
   if (locked === 0n) {
     return undefined
