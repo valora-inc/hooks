@@ -15,7 +15,12 @@ const AIRDROP_CSV_URL =
   'https://raw.githubusercontent.com/mento-protocol/airgrab-interface/main/src/lib/merkle/list.csv'
 const AIRDROP_ADDRESS = '0x7d8e73deafdbafc98fdbe7974168cfa6d8b9ae0c'
 
-const VE_MENTO_ADDRESS = '0x001bb66636dcd149a1a2ba8c50e408bddd80279c'
+const VE_MENTO_ADDRESS_BY_NETWORK_ID: {
+  [networkId: string]: Address | undefined
+} = {
+  [NetworkId['celo-mainnet']]: '0x001bb66636dcd149a1a2ba8c50e408bddd80279c',
+  [NetworkId['celo-alfajores']]: '0x537cae97c588c6da64a385817f3d3563ddcf0591',
+}
 
 async function getAirdropPositionDefinition(
   networkId: NetworkId,
@@ -27,7 +32,7 @@ async function getAirdropPositionDefinition(
   }
 
   const client = getClient(networkId)
-  const [tokenAddress, claimed] = await client.multicall({
+  const [mentoTokenAddress, claimed] = await client.multicall({
     contracts: [
       {
         address: AIRDROP_ADDRESS,
@@ -68,7 +73,7 @@ async function getAirdropPositionDefinition(
     type: 'contract-position-definition',
     networkId,
     address: AIRDROP_ADDRESS,
-    tokens: [{ address: tokenAddress, networkId }],
+    tokens: [{ address: mentoTokenAddress, networkId }],
     displayProps: {
       title: 'MENTO Airdrop',
       description: 'Claim on https://airdrop.mento.org before August 9th, 2024',
@@ -79,7 +84,7 @@ async function getAirdropPositionDefinition(
       const token =
         resolvedTokensByTokenId[
           getTokenId({
-            address: tokenAddress,
+            address: mentoTokenAddress,
             networkId,
           })
         ]
@@ -95,29 +100,34 @@ async function getVeMentoPositionDefinition(
   networkId: NetworkId,
   address: Address,
 ): Promise<ContractPositionDefinition | undefined> {
+  const veMentoAddress = VE_MENTO_ADDRESS_BY_NETWORK_ID[networkId]
+  if (!veMentoAddress) {
+    return undefined
+  }
+
   const client = getClient(networkId)
-  const [tokenAddress, decimals, locked, balance] = await client.multicall({
+  const [mentoTokenAddress, decimals, locked, balance] = await client.multicall({
     contracts: [
       {
-        address: VE_MENTO_ADDRESS,
+        address: veMentoAddress,
         abi: lockingAbi,
         functionName: 'token',
         args: [],
       },
       {
-        address: VE_MENTO_ADDRESS,
+        address: veMentoAddress,
         abi: lockingAbi,
         functionName: 'decimals',
         args: [],
       },
       {
-        address: VE_MENTO_ADDRESS,
+        address: veMentoAddress,
         abi: lockingAbi,
         functionName: 'locked',
         args: [address],
       },
       {
-        address: VE_MENTO_ADDRESS,
+        address: veMentoAddress,
         abi: lockingAbi,
         functionName: 'balanceOf',
         args: [address],
@@ -133,8 +143,8 @@ async function getVeMentoPositionDefinition(
   const position: ContractPositionDefinition = {
     type: 'contract-position-definition',
     networkId,
-    address: VE_MENTO_ADDRESS,
-    tokens: [{ address: tokenAddress, networkId }],
+    address: veMentoAddress,
+    tokens: [{ address: mentoTokenAddress, networkId }],
     displayProps: {
       title: 'veMENTO',
       description: `Voting power: ${toDecimalNumber(balance, decimals).toFormat(
@@ -147,7 +157,7 @@ async function getVeMentoPositionDefinition(
       const token =
         resolvedTokensByTokenId[
           getTokenId({
-            address: tokenAddress,
+            address: mentoTokenAddress,
             networkId,
           })
         ]
