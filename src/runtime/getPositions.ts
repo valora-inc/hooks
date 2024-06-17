@@ -1,6 +1,6 @@
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import { Address, ContractFunctionExecutionError } from 'viem'
+import { Address, ContractFunctionExecutionError, zeroAddress } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -169,7 +169,7 @@ function getDisplayProps(
 }
 
 async function resolveAppTokenPosition(
-  address: string,
+  address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
   tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -210,14 +210,12 @@ async function resolveAppTokenPosition(
     address: positionDefinition.address as Address,
     abi: erc20Abi,
   } as const
-  const [balance, totalSupply] = await getClient(
-    positionDefinition.networkId,
-  ).multicall({
+  const contractData = await getClient(positionDefinition.networkId).multicall({
     contracts: [
       {
         ...appTokenContract,
         functionName: 'balanceOf',
-        args: [address as Address], // TODO: this is incorrect for intermediary app tokens
+        args: [(address as Address) ?? zeroAddress], // TODO: this is incorrect for intermediary app tokens
       },
       {
         ...appTokenContract,
@@ -226,6 +224,13 @@ async function resolveAppTokenPosition(
     ],
     allowFailure: false,
   })
+
+  let balance = contractData[0]
+  const totalSupply = contractData[1]
+  // If no user address is provided, use 0
+  if (!address) {
+    balance = 0n
+  }
 
   const displayProps = getDisplayProps(
     positionDefinition,
@@ -274,7 +279,7 @@ async function resolveAppTokenPosition(
 }
 
 async function resolveContractPosition(
-  _address: string,
+  _address: string | undefined,
   positionDefinition: ContractPositionDefinition & { appId: string },
   _tokensByAddress: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -354,7 +359,7 @@ function addSourceAppId<T>(definition: T, sourceAppId: string) {
 // This is the main logic to get positions
 export async function getPositions(
   networkId: NetworkId,
-  address: string,
+  address: string | undefined,
   appIds: string[] = [],
   getTokensInfoUrl: string,
 ) {

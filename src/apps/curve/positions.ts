@@ -189,7 +189,10 @@ const hook: PositionsHook = {
       description: 'Curve pools',
     }
   },
-  getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions(networkId, address) {
+    if (!address) {
+      return []
+    }
     return getPoolPositionDefinitions(networkId, address as Address)
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
