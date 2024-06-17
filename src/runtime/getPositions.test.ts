@@ -185,7 +185,7 @@ describe(getPositions, () => {
                 fallbackPriceUsd: toSerializedDecimalNumber(0.5),
               },
             ],
-            // Meaning that 1 share of the vault is worth 2 underlying token
+            // Meaning that 1 share of the vault is worth 2 underlying tokens
             pricePerShare: [toDecimalNumber(2n, 0)],
             displayProps: {
               title: 'Beefy crvUSD/​WBTC/​WETH Vault',
