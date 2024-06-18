@@ -3,7 +3,11 @@ import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
 import { NetworkId } from '../../types/networkId'
 import { toDecimalNumber } from '../../types/numbers'
-import { PositionsHook } from '../../types/positions'
+import {
+  PositionsHook,
+  TokenDefinition,
+  UnknownAppTokenError,
+} from '../../types/positions'
 import { userPositionsAbi } from './abis/user-positions'
 
 const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
@@ -130,6 +134,9 @@ const hook: PositionsHook = {
           },
         }
       })
+  },
+  async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
+    throw new UnknownAppTokenError({ networkId, address })
   },
 }
 
