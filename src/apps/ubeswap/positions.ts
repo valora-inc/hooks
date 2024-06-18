@@ -1,11 +1,3 @@
-import BigNumber from 'bignumber.js'
-import got from 'got'
-import { Address } from 'viem'
-import { erc20Abi } from '../../abis/erc-20'
-import { getClient } from '../../runtime/client'
-import { getTokenId } from '../../runtime/getTokenId'
-import { NetworkId } from '../../types/networkId'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import {
   AppTokenPosition,
   AppTokenPositionDefinition,
@@ -14,9 +6,22 @@ import {
   PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
-import { stakingRewardsAbi } from './abis/staking-rewards'
+import got from 'got'
+import BigNumber from 'bignumber.js'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
+import { Address, createPublicClient, http } from 'viem'
+import { celo } from 'viem/chains'
+import { erc20Abi } from '../../abis/erc-20'
+import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
+import { NetworkId } from '../../types/networkId'
+import { getTokenId } from '../../runtime/getTokenId'
+
+const client = createPublicClient({
+  chain: celo,
+  transport: http(),
+})
 
 const PAIRS_QUERY = `
   query getPairs($address: ID!) {
@@ -31,12 +36,10 @@ const PAIRS_QUERY = `
   }
 `
 
-export async function getUniswapV2PoolPositionDefinition(
+async function getPoolPositionDefinition(
   networkId: NetworkId,
   poolAddress: Address,
 ): Promise<AppTokenPositionDefinition> {
-  const client = getClient(networkId)
-
   const poolTokenContract = {
     address: poolAddress,
     abi: uniswapV2PairAbi,
@@ -152,7 +155,7 @@ async function getPoolPositionDefinitions(
   // Get all positions
   const positions = await Promise.all(
     pairs.map(async (pair) => {
-      return getUniswapV2PoolPositionDefinition(networkId, pair)
+      return getPoolPositionDefinition(networkId, pair)
     }),
   )
 
@@ -163,8 +166,6 @@ async function getFarmPositionDefinitions(
   networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
-  const client = getClient(networkId)
-
   // Call balanceOf and totalSupply for each farm stakingAddress
   const data = await client.multicall({
     contracts: farms.flatMap((farm) => [
@@ -313,7 +314,7 @@ const hook: PositionsHook = {
   },
   getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
-    return getUniswapV2PoolPositionDefinition(networkId, address as Address)
+    return getPoolPositionDefinition(networkId, address as Address)
   },
 }
 
