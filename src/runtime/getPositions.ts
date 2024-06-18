@@ -460,7 +460,14 @@ export async function getPositions(
                 tokenDefinition.address as Address,
                 networkId,
               )
-              newUnlistedBaseTokensInfo[erc20TokenInfo.tokenId] = erc20TokenInfo
+              newUnlistedBaseTokensInfo[erc20TokenInfo.tokenId] = {
+                ...erc20TokenInfo,
+                // TODO: remove the need for this fallback
+                // and implement the apps to resolve the tokens
+                ...(tokenDefinition.fallbackPriceUsd && {
+                  priceUsd: tokenDefinition.fallbackPriceUsd,
+                }),
+              }
               return
             }
             throw e
