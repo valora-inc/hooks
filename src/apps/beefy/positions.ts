@@ -98,7 +98,7 @@ const hook: PositionsHook = {
         ],
         displayProps: () => {
           return {
-            title: vault.name,
+            title: vault.name + (vault.status === 'eol' ? ' (Retired)' : ''),
             description: 'Vault',
             imageUrl:
               'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
