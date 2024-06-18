@@ -1,6 +1,6 @@
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import { Address, ContractFunctionExecutionError } from 'viem'
+import { Address, ContractFunctionExecutionError, zeroAddress } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -13,6 +13,7 @@ import {
   Position,
   PositionDefinition,
   Token,
+  UnknownAppTokenError,
 } from '../types/positions'
 import {
   DecimalNumber,
@@ -168,7 +169,7 @@ function getDisplayProps(
 }
 
 async function resolveAppTokenPosition(
-  address: string,
+  address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
   tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -209,14 +210,12 @@ async function resolveAppTokenPosition(
     address: positionDefinition.address as Address,
     abi: erc20Abi,
   } as const
-  const [balance, totalSupply] = await getClient(
-    positionDefinition.networkId,
-  ).multicall({
+  const contractData = await getClient(positionDefinition.networkId).multicall({
     contracts: [
       {
         ...appTokenContract,
         functionName: 'balanceOf',
-        args: [address as Address], // TODO: this is incorrect for intermediary app tokens
+        args: [(address as Address) ?? zeroAddress], // TODO: this is incorrect for intermediary app tokens
       },
       {
         ...appTokenContract,
@@ -225,6 +224,13 @@ async function resolveAppTokenPosition(
     ],
     allowFailure: false,
   })
+
+  let balance = contractData[0]
+  const totalSupply = contractData[1]
+  // If no user address is provided, use 0
+  if (!address) {
+    balance = 0n
+  }
 
   const displayProps = getDisplayProps(
     positionDefinition,
@@ -273,7 +279,7 @@ async function resolveAppTokenPosition(
 }
 
 async function resolveContractPosition(
-  _address: string,
+  _address: string | undefined,
   positionDefinition: ContractPositionDefinition & { appId: string },
   _tokensByAddress: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -353,7 +359,7 @@ function addSourceAppId<T>(definition: T, sourceAppId: string) {
 // This is the main logic to get positions
 export async function getPositions(
   networkId: NetworkId,
-  address: string,
+  address: string | undefined,
   appIds: string[] = [],
   getTokensInfoUrl: string,
 ) {
@@ -450,13 +456,23 @@ export async function getPositions(
               .then((definition) => addAppId(definition, sourceAppId))
             return appTokenDefinition
           } catch (e) {
-            if (e instanceof ContractFunctionExecutionError) {
+            if (
+              e instanceof ContractFunctionExecutionError ||
+              e instanceof UnknownAppTokenError
+            ) {
               // Assume the token is an ERC20 token
               const erc20TokenInfo = await getERC20TokenInfo(
                 tokenDefinition.address as Address,
                 networkId,
               )
-              newUnlistedBaseTokensInfo[erc20TokenInfo.tokenId] = erc20TokenInfo
+              newUnlistedBaseTokensInfo[erc20TokenInfo.tokenId] = {
+                ...erc20TokenInfo,
+                // TODO: remove the need for this fallback
+                // and implement the apps to resolve the tokens
+                ...(tokenDefinition.fallbackPriceUsd && {
+                  priceUsd: tokenDefinition.fallbackPriceUsd,
+                }),
+              }
               return
             }
             throw e

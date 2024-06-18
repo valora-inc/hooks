@@ -21,7 +21,7 @@ const hook: PositionsHook = {
   },
 
   async getPositionDefinitions(networkId: NetworkId, address: string) {
-    if (networkId !== NetworkId['celo-mainnet']) {
+    if (networkId !== NetworkId['celo-mainnet'] || !address) {
       // hook implementation currently hardcoded to Celo mainnet (nft addresses in particular)
       return []
     }

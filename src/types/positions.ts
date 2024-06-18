@@ -5,10 +5,12 @@ import { NetworkId } from './networkId'
 export interface PositionsHook {
   getInfo(): AppInfo
 
-  // Get position definitions for a given address
+  // Get position definitions
+  // Note: it can be called with or without an address
+  // If called without an address, it should return all positions available for the network
   getPositionDefinitions(
     networkId: NetworkId,
-    address: string,
+    address?: string,
   ): Promise<PositionDefinition[]>
 
   // Get an app token definition from a token definition
@@ -23,6 +25,21 @@ export interface PositionsHook {
 export interface TokenDefinition {
   address: string
   networkId: NetworkId
+  // Escape hatch for priceUsd in case the token is not in our list of base tokens
+  // and it's difficult to decompose the token into base token
+  // Ideally we should add apps to resolve such tokens
+  // For example: Beefy vault depends on Aave, Curve, etc.
+  // but we don't yet have all these apps implemented
+  // Note: there's also a limitation in the runtime as it can't yet always resolve tokens between apps
+  // This will be fixed "soon"
+  fallbackPriceUsd?: SerializedDecimalNumber
+}
+
+// To be returned when `getAppTokenDefinition` can't resolve a token
+export class UnknownAppTokenError extends Error {
+  constructor({ networkId, address }: TokenDefinition) {
+    super(`Unknown app token: ${networkId}:${address}`)
+  }
 }
 
 export type TokenCategory = 'claimable' // We could add more categories later

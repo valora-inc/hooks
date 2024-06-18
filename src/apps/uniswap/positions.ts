@@ -6,8 +6,8 @@ import { toDecimalNumber } from '../../types/numbers'
 import { PositionsHook } from '../../types/positions'
 import { userPositionsAbi } from './abis/user-positions'
 
-const UNI_V3_ADDRESSES: {
-  [networkId: string]:
+const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
+  [networkId in NetworkId]:
     | {
         factory: Address
         nftPositions: Address
@@ -43,6 +43,10 @@ const UNI_V3_ADDRESSES: {
     nftPositions: '0xc36442b4a4522e871399cd717abdd847ab11fe88',
     userPositionsMulticall: '0xd983fe1235a4c9006ef65eceed7c33069ad35ad0',
   },
+  [NetworkId['ethereum-sepolia']]: undefined,
+  [NetworkId['arbitrum-sepolia']]: undefined,
+  [NetworkId['op-sepolia']]: undefined,
+  [NetworkId['celo-alfajores']]: undefined,
 }
 
 const hook: PositionsHook = {
@@ -54,8 +58,8 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    const addresses = UNI_V3_ADDRESSES[networkId]
-    if (!addresses) {
+    const addresses = UNI_V3_ADDRESSES_BY_NETWORK_ID[networkId]
+    if (!addresses || !address) {
       return []
     }
     const { factory, nftPositions, userPositionsMulticall } = addresses
