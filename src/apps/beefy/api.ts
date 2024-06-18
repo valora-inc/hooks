@@ -14,6 +14,7 @@ export interface BeefyVault {
   earnedTokenAddress: Address
   earnContractAddress: Address
   status: string
+  platformId: string
   assets: string[]
   risks: string[]
   strategyTypeId: string
@@ -49,4 +50,11 @@ export async function getAllBeefyVaults(): Promise<BeefyVault[]> {
       v.chain !== null &&
       Object.values(NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID).includes(v.chain),
   )
+}
+
+export async function getBeefyLpsPrices(): Promise<Record<string, number>> {
+  const prices = await got
+    .get(`https://api.beefy.finance/lps`)
+    .json<Record<string, number>>()
+  return prices
 }

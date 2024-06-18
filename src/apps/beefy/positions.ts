@@ -2,20 +2,20 @@ import { Address } from 'viem'
 import { erc20Abi } from '../../abis/erc-20'
 import { getClient } from '../../runtime/client'
 import { NetworkId } from '../../types/networkId'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import { toDecimalNumber, toSerializedDecimalNumber } from '../../types/numbers'
 import {
-  ContractPositionDefinition,
+  AppTokenPositionDefinition,
   PositionsHook,
   TokenDefinition,
   UnknownAppTokenError,
 } from '../../types/positions'
 import { createBatches } from '../../utils/batcher'
-import { getUniswapV2PoolPositionDefinition } from '../ubeswap/positions'
 import { BeefyV2AppMulticallAbi } from './abis/BeefyV2AppMulticallAbi'
 import {
   BeefyVault,
   NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID,
   getAllBeefyVaults,
+  getBeefyLpsPrices,
 } from './api'
 
 // Fetched addresses from https://github.com/beefyfinance/beefy-v2/blob/main/src/config/config.tsx
@@ -76,15 +76,24 @@ const hook: PositionsHook = {
       }
     }
 
+    if (!userVaults.length) {
+      return []
+    }
+
+    const prices = await getBeefyLpsPrices()
+
     return userVaults.map(
-      (vault): ContractPositionDefinition => ({
-        type: 'contract-position-definition',
+      (vault): AppTokenPositionDefinition => ({
+        type: 'app-token-definition',
         networkId,
         address: vault.earnedTokenAddress.toLowerCase(),
         tokens: [
           {
             address: vault.tokenAddress.toLowerCase(),
             networkId,
+            fallbackPriceUsd: prices[vault.id]
+              ? toSerializedDecimalNumber(prices[vault.id])
+              : undefined,
           },
         ],
         displayProps: () => {
@@ -95,35 +104,21 @@ const hook: PositionsHook = {
               'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
           }
         },
-        balances: async () => {
-          const decimals = await client.readContract({
-            address: vault.tokenAddress,
-            abi: erc20Abi,
-            functionName: 'decimals',
-          })
-          return [
-            toDecimalNumber(
-              BigInt(vault.pricePerFullShare),
-              BEEFY_VAULT_DECIMALS,
-            ).times(
-              toDecimalNumber(BigInt(vault.balance), decimals),
-            ) as DecimalNumber,
-          ]
+        pricePerShare: async () => {
+          const decimals = prices[vault.id]
+            ? BEEFY_VAULT_DECIMALS
+            : await client.readContract({
+                address: vault.tokenAddress,
+                abi: erc20Abi,
+                functionName: 'decimals',
+              })
+          return [toDecimalNumber(BigInt(vault.pricePerFullShare), decimals)]
         },
       }),
     )
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
-    const vaults = await getAllBeefyVaults()
-
-    const vault = vaults
-      .filter((v) => v.chain === NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId])
-      .find((v) => v.tokenAddress?.toLowerCase() === address)
-    if (!vault || vault.strategyTypeId !== 'lp') {
-      throw new UnknownAppTokenError({ networkId, address })
-    }
-
-    return getUniswapV2PoolPositionDefinition(networkId, address as Address)
+    throw new UnknownAppTokenError({ networkId, address })
   },
 }
 
