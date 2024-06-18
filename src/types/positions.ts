@@ -5,10 +5,12 @@ import { NetworkId } from './networkId'
 export interface PositionsHook {
   getInfo(): AppInfo
 
-  // Get position definitions for a given address
+  // Get position definitions
+  // Note: it can be called with or without an address
+  // If called without an address, it should return all positions available for the network
   getPositionDefinitions(
     networkId: NetworkId,
-    address: string,
+    address?: string,
   ): Promise<PositionDefinition[]>
 
   // Get an app token definition from a token definition

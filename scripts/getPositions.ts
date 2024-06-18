@@ -17,9 +17,9 @@ const argv = yargs(process.argv.slice(2))
     },
     address: {
       alias: 'a',
-      describe: 'Address to get positions for',
+      describe:
+        'Optional address to get positions for. When not specified it lists all available positions.',
       type: 'string',
-      demandOption: true,
     },
     apps: {
       alias: 'p',
