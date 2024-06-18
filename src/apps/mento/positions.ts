@@ -180,6 +180,10 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
+    if (!address) {
+      return []
+    }
+
     const positions = await Promise.all([
       getAirdropPositionDefinition(networkId, address as Address),
       getVeMentoPositionDefinition(networkId, address as Address),
