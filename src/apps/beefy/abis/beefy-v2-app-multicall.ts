@@ -1,4 +1,4 @@
-export const BeefyV2AppMulticallAbi = [
+export const beefyV2AppMulticallAbi = [
   {
     inputs: [
       {

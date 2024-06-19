@@ -1,6 +1,6 @@
 import { Address } from 'viem'
-import { erc20Abi } from '../../abis/erc-20'
 import { getClient } from '../../runtime/client'
+import { getTokenId } from '../../runtime/getTokenId'
 import { NetworkId } from '../../types/networkId'
 import { toDecimalNumber, toSerializedDecimalNumber } from '../../types/numbers'
 import {
@@ -10,7 +10,7 @@ import {
   UnknownAppTokenError,
 } from '../../types/positions'
 import { createBatches } from '../../utils/batcher'
-import { BeefyV2AppMulticallAbi } from './abis/BeefyV2AppMulticallAbi'
+import { beefyV2AppMulticallAbi } from './abis/beefy-v2-app-multicall'
 import {
   BeefyVault,
   NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID,
@@ -20,7 +20,7 @@ import {
 
 // Fetched addresses from https://github.com/beefyfinance/beefy-v2/blob/main/src/config/config.tsx
 const BEEFY_MULTICALL_ADDRESS: {
-  [networkId: string]: Address | undefined
+  [networkId in NetworkId]: Address | undefined
 } = {
   [NetworkId['ethereum-mainnet']]: '0x00d3e26d17aEA6f5c7d2f442aAc68E679E454517',
   [NetworkId['arbitrum-one']]: '0x47bec05dC291e61cd4360322eA44882cA468dD54',
@@ -29,9 +29,12 @@ const BEEFY_MULTICALL_ADDRESS: {
 
   // polygon: 0x244908D9A21B143911D531cD1D37575D63da4D87
   // base: 0x09C74A4bd3453e1C15D6624F24b3A02059a4dA15
-}
 
-const BEEFY_VAULT_DECIMALS = 18
+  [NetworkId['ethereum-sepolia']]: undefined,
+  [NetworkId['arbitrum-sepolia']]: undefined,
+  [NetworkId['op-sepolia']]: undefined,
+  [NetworkId['celo-alfajores']]: undefined,
+}
 
 const hook: PositionsHook = {
   getInfo() {
@@ -56,25 +59,28 @@ const hook: PositionsHook = {
         (v) => v.chain === NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId],
       ),
     )
-    for (const batch of batches) {
-      if (batch.length === 0) {
-        continue
-      }
-      const balances = await client.readContract({
-        abi: BeefyV2AppMulticallAbi,
-        address: multicallAddress,
-        functionName: 'getTokenBalances',
-        args: [batch.map((vault) => vault.earnedTokenAddress), address],
-      })
-      for (let i = 0; i < balances.length; i++) {
-        if (balances[i] > 0) {
-          userVaults.push({
-            ...batch[i],
-            balance: balances[i],
-          })
+
+    await Promise.all(
+      batches.map(async (batch) => {
+        if (batch.length === 0) {
+          return
         }
-      }
-    }
+        const balances = await client.readContract({
+          abi: beefyV2AppMulticallAbi,
+          address: multicallAddress,
+          functionName: 'getTokenBalances',
+          args: [batch.map((vault) => vault.earnedTokenAddress), address],
+        })
+        for (let i = 0; i < balances.length; i++) {
+          if (balances[i] > 0) {
+            userVaults.push({
+              ...batch[i],
+              balance: balances[i],
+            })
+          }
+        }
+      }),
+    )
 
     if (!userVaults.length) {
       return []
@@ -104,14 +110,12 @@ const hook: PositionsHook = {
               'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
           }
         },
-        pricePerShare: async () => {
-          const decimals = prices[vault.id]
-            ? BEEFY_VAULT_DECIMALS
-            : await client.readContract({
-                address: vault.tokenAddress,
-                abi: erc20Abi,
-                functionName: 'decimals',
-              })
+        pricePerShare: async ({ tokensByTokenId }) => {
+          const tokenId = getTokenId({
+            address: vault.tokenAddress,
+            networkId,
+          })
+          const { decimals } = tokensByTokenId[tokenId]
           return [toDecimalNumber(BigInt(vault.pricePerFullShare), decimals)]
         },
       }),
