@@ -13,8 +13,7 @@ describe.each([NetworkId['arbitrum-one']])(
       expect(positions.length).toBeGreaterThan(0)
     })
 
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip('should get definitions successfully when no address is provided', async () => {
+    it('should get definitions successfully when no address is provided', async () => {
       const positions = await hook.getPositionDefinitions(networkId)
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
