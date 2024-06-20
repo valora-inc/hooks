@@ -8,7 +8,7 @@ import {
 import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
 import { stakeDaoVaultAbi } from './abis/stakeDaoVault'
-import { Address } from 'viem'
+import { Address, zeroAddress } from 'viem'
 import { stakeDaoGaugeAbi } from './abis/stakeDaoGauge'
 import { toDecimalNumber } from '../../types/numbers'
 import { getTokenId } from '../../runtime/getTokenId'
@@ -45,7 +45,7 @@ const SD_VAULT_ADDRESSES_BY_NETWORK_ID: Record<NetworkId, Address[]> = {
 
 async function getVaultPositionDefinitions(
   networkId: NetworkId,
-  address: Address,
+  address: Address | undefined,
 ): Promise<PositionDefinition[]> {
   const client = getClient(networkId)
 
@@ -79,7 +79,7 @@ async function getVaultPositionDefinitions(
         address: vault.sdGaugeAddress,
         abi: stakeDaoGaugeAbi,
         functionName: 'balanceOf',
-        args: [address],
+        args: [address ?? zeroAddress],
       },
       {
         address: vault.sdGaugeAddress,
@@ -95,20 +95,20 @@ async function getVaultPositionDefinitions(
     allowFailure: false,
   })
 
-  const userVaults = vaults
+  const consideredVaults = vaults
     .map((vault, i) => ({
       ...vault,
       sdGauge: {
-        // Technically this is the balance of SD vault token, but there's a 1:1 ratio
-        balance: gaugesData[3 * i] as bigint,
+        // When no address is provided, use 0n (in case zeroAddress has a balance)
+        balance: address ? (gaugesData[3 * i] as bigint) : 0n,
         totalSupply: gaugesData[3 * i + 1] as bigint,
         decimals: gaugesData[3 * i + 2] as bigint,
       },
     }))
-    .filter((vault) => vault.sdGauge.balance > 0)
+    .filter((vault) => (address ? vault.sdGauge.balance > 0 : true))
 
   const positions = await Promise.all(
-    userVaults.map(async (vault) => {
+    consideredVaults.map(async (vault) => {
       const position: ContractPositionDefinition = {
         type: 'contract-position-definition',
         networkId,
@@ -159,10 +159,10 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    if (!address) {
-      return []
-    }
-    return await getVaultPositionDefinitions(networkId, address as Address)
+    return await getVaultPositionDefinitions(
+      networkId,
+      address ? (address as Address) : undefined,
+    )
   },
   async getAppTokenDefinition({ networkId, address }) {
     throw new UnknownAppTokenError({ networkId, address })
