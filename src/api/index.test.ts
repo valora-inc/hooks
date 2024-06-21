@@ -184,30 +184,18 @@ describe('GET /getPositions', () => {
       })
   })
 
-  it('returns 400 when address is missing', async () => {
+  it('returns all positions when address is not provided', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getPositions')
       .query({
-        network: 'celo', // note: this old schema should still be supported. only the missing address should be reported as an error.
+        network: 'celo', // note: this old schema should still be supported.
       })
-      .expect(400)
-    expect(response.body).toMatchInlineSnapshot(`
-      {
-        "details": {
-          "_errors": [],
-          "query": {
-            "_errors": [],
-            "address": {
-              "_errors": [
-                "address is required",
-              ],
-            },
-          },
-        },
-        "message": "Invalid request",
-      }
-    `)
+      .expect(200)
+    expect(response.body).toStrictEqual({
+      message: 'OK',
+      data: TEST_POSITIONS_CELO,
+    })
   })
 })
 
