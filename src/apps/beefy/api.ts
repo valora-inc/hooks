@@ -13,6 +13,7 @@ export interface BeefyVault {
   earnedToken: string
   earnedTokenAddress: Address
   earnContractAddress: Address
+  depositTokenAddresses: string[]
   status: string
   platformId: string
   assets: string[]
@@ -42,7 +43,7 @@ export const NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID: Record<
 
 export async function getAllBeefyVaults(): Promise<BeefyVault[]> {
   const vaults = await got
-    .get(`https://api.beefy.finance/vaults`)
+    .get(`https://api.beefy.finance/harvestable-vaults`)
     .json<BeefyVault[]>()
 
   return vaults.filter(
