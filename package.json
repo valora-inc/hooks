@@ -73,7 +73,7 @@
     "shelljs": "^0.8.5",
     "supertest": "^7.0.0",
     "terminate": "^2.6.1",
-    "ts-jest": "^29.1.4",
+    "ts-jest": "^29.1.5",
     "ts-node": "^10.9.2",
     "tsc-watch": "^6.2.0",
     "typescript": "^5.4.5",
