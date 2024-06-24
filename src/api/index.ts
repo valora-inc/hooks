@@ -48,9 +48,10 @@ function createApp() {
     query: z.intersection(
       z.object({
         address: z
-          .string({ required_error: 'address is required' })
+          .string()
           .regex(/^0x[a-fA-F0-9]{40}$/)
-          .transform((val) => val.toLowerCase()),
+          .transform((val) => val.toLowerCase())
+          .optional(),
       }),
       z.union([
         z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
