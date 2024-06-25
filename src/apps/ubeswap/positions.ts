@@ -17,6 +17,7 @@ import { stakingRewardsAbi } from './abis/staking-rewards'
 import farms from './data/farms.json'
 import { NetworkId } from '../../types/networkId'
 import { getTokenId } from '../../runtime/getTokenId'
+import { getUniswapV3PositionDefinitions } from '../uniswap/positions'
 
 const client = createPublicClient({
   chain: celo,
@@ -292,6 +293,20 @@ async function getFarmPositionDefinitions(
   return positions
 }
 
+const UBESWAP_V3_NFT_MANAGER = '0x897387c7b996485c3aaa85c94272cd6c506f8c8f'
+const UBESWAP_V3_FACTORY = '0x67FEa58D5a5a4162cED847E13c2c81c73bf8aeC4'
+const UNI_V3_MULTICALL = '0xDD1dC48fEA48B3DE667dD3595624d5af4Fb04694'
+
+async function getV3Positions(networkId: NetworkId, address: Address) {
+  return getUniswapV3PositionDefinitions(
+    networkId,
+    address as Address,
+    UNI_V3_MULTICALL,
+    UBESWAP_V3_NFT_MANAGER,
+    UBESWAP_V3_FACTORY,
+  )
+}
+
 const hook: PositionsHook = {
   getInfo() {
     return {
@@ -305,12 +320,15 @@ const hook: PositionsHook = {
       // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }
-    const [poolDefinitions, farmDefinitions] = await Promise.all([
-      getPoolPositionDefinitions(networkId, address),
-      getFarmPositionDefinitions(networkId, address),
-    ])
+    const [poolDefinitions, farmDefinitions, v3Definitions] = await Promise.all(
+      [
+        getPoolPositionDefinitions(networkId, address),
+        getFarmPositionDefinitions(networkId, address),
+        getV3Positions(networkId, address as Address),
+      ],
+    )
 
-    return [...poolDefinitions, ...farmDefinitions]
+    return [...poolDefinitions, ...farmDefinitions, ...v3Definitions]
   },
   getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
