@@ -44,7 +44,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "got": "^11.8.6",
-    "viem": "^2.16.0",
+    "viem": "^2.16.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -53,7 +53,7 @@
     "@types/qrcode-terminal": "^0.12.2",
     "@types/shelljs": "^0.8.15",
     "@types/supertest": "^6.0.2",
-    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@valora/eslint-config-typescript": "^1.0.2",
     "@valora/prettier-config": "^0.0.1",
     "chalk": "^4.1.2",
@@ -61,7 +61,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jest": "^27.9.0",
-    "eslint-plugin-react": "^7.34.2",
+    "eslint-plugin-react": "^7.34.3",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-native": "^4.1.0",
     "internal-ip": "^6.2.0",
