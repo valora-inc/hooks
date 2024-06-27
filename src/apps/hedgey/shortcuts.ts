@@ -11,7 +11,7 @@ const client = createPublicClient({
 })
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(networkId?: NetworkId, address?: string) {
+  async getShortcutDefinitions(networkId: NetworkId, address?: string) {
     if (networkId !== NetworkId['celo-mainnet'] || !address) {
       return []
     }

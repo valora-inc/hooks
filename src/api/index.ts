@@ -87,11 +87,12 @@ function createApp() {
     }),
   )
 
+  // Deprecated route, will be removed in the future
   app.get(
     '/getShortcuts',
     asyncHandler(async (_req, res) => {
       const shortcuts = await getShortcuts(
-        undefined,
+        NetworkId['celo-mainnet'],
         undefined,
         config.SHORTCUT_IDS,
       )
