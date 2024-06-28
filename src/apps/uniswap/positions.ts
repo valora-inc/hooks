@@ -60,6 +60,7 @@ export async function getUniswapV3PositionDefinitions(
   userPositionsMulticall: Address,
   nftPositions: Address,
   factory: Address,
+  imageUrl: string = 'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/uniswap.png',
 ): Promise<ContractPositionDefinition[]> {
   const client = getClient(networkId)
   const userPools = await client.readContract({
@@ -102,8 +103,7 @@ export async function getUniswapV3PositionDefinitions(
             ].symbol
           }`,
           description: 'Pool',
-          imageUrl:
-            'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/uniswap.png',
+          imageUrl,
         }),
         balances: async ({ resolvedTokensByTokenId }) => {
           const token0Decimals =

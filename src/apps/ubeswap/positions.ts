@@ -1,3 +1,11 @@
+import BigNumber from 'bignumber.js'
+import got from 'got'
+import { Address, createPublicClient, http } from 'viem'
+import { celo } from 'viem/chains'
+import { erc20Abi } from '../../abis/erc-20'
+import { getTokenId } from '../../runtime/getTokenId'
+import { NetworkId } from '../../types/networkId'
+import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import {
   AppTokenPosition,
   AppTokenPositionDefinition,
@@ -6,23 +14,18 @@ import {
   PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
-import got from 'got'
-import BigNumber from 'bignumber.js'
-import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
-import { Address, createPublicClient, http } from 'viem'
-import { celo } from 'viem/chains'
-import { erc20Abi } from '../../abis/erc-20'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
-import { stakingRewardsAbi } from './abis/staking-rewards'
-import farms from './data/farms.json'
-import { NetworkId } from '../../types/networkId'
-import { getTokenId } from '../../runtime/getTokenId'
 import { getUniswapV3PositionDefinitions } from '../uniswap/positions'
+import { stakingRewardsAbi } from './abis/staking-rewards'
+import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
+import farms from './data/farms.json'
 
 const client = createPublicClient({
   chain: celo,
   transport: http(),
 })
+
+const UBESWAP_LOGO =
+  'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/ubeswap.png'
 
 const PAIRS_QUERY = `
   query getPairs($address: ID!) {
@@ -84,8 +87,7 @@ async function getPoolPositionDefinition(
       return {
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
-        imageUrl:
-          'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/ubeswap.png',
+        imageUrl: UBESWAP_LOGO,
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
@@ -139,14 +141,17 @@ async function getPoolPositionDefinitions(
 ): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
   const { data } = await got
-    .post('https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap', {
-      json: {
-        query: PAIRS_QUERY,
-        variables: {
-          address: address.toLowerCase(),
+    .post(
+      'https://gateway-arbitrum.network.thegraph.com/api/3f1b45f0fd92b4f414a3158b0381f482/subgraphs/id/JWDRLCwj4H945xEkbB6eocBSZcYnibqcJPJ8h9davFi',
+      {
+        json: {
+          query: PAIRS_QUERY,
+          variables: {
+            address: address.toLowerCase(),
+          },
         },
       },
-    })
+    )
     .json<any>()
 
   const pairs: Address[] = (data.user?.liquidityPositions ?? [])
@@ -304,6 +309,7 @@ async function getV3Positions(networkId: NetworkId, address: Address) {
     UNI_V3_MULTICALL,
     UBESWAP_V3_NFT_MANAGER,
     UBESWAP_V3_FACTORY,
+    UBESWAP_LOGO,
   )
 }
 
