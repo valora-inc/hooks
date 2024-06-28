@@ -47,4 +47,4 @@ export const beefyClmVaultsMulticallAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-]
+] as const

@@ -190,12 +190,12 @@ const hook: PositionsHook = {
     const info =
       clmVaults.length === 0
         ? []
-        : ((await client.readContract({
+        : await client.readContract({
             code: beefyClmVaultsMulticallBytecode,
             abi: beefyClmVaultsMulticallAbi,
             functionName: 'getUserVaults',
             args: [address, clmVaults.map((vault) => vault.earnedTokenAddress)],
-          })) as ClmVaultBalanceInfo[])
+          })
 
     return userVaults
       .map((vault) =>
