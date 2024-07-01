@@ -4,6 +4,7 @@ import { getTokenId } from '../../runtime/getTokenId'
 import { NetworkId } from '../../types/networkId'
 import { toDecimalNumber } from '../../types/numbers'
 import {
+  ContractPositionDefinition,
   PositionsHook,
   TokenDefinition,
   UnknownAppTokenError,
@@ -53,6 +54,81 @@ const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
   [NetworkId['celo-alfajores']]: undefined,
 }
 
+export async function getUniswapV3PositionDefinitions(
+  networkId: NetworkId,
+  address: Address,
+  userPositionsMulticall: Address,
+  nftPositions: Address,
+  factory: Address,
+  imageUrl: string = 'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/uniswap.png',
+): Promise<ContractPositionDefinition[]> {
+  const client = getClient(networkId)
+  const userPools = await client.readContract({
+    abi: userPositionsAbi,
+    address: userPositionsMulticall,
+    functionName: 'getPositions',
+    args: [nftPositions, factory, address as Address],
+  })
+
+  return userPools
+    .map((pool) => ({
+      ...pool,
+      token0: pool.token0.toLowerCase(),
+      token1: pool.token1.toLowerCase(),
+    }))
+    .filter((pool) => pool.liquidity > 0)
+    .map((pool) => {
+      return {
+        type: 'contract-position-definition',
+        networkId,
+        address: pool.poolAddress,
+        tokens: [
+          { address: pool.token0, networkId },
+          { address: pool.token1, networkId },
+        ],
+        displayProps: ({ resolvedTokensByTokenId }) => ({
+          title: `${
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: pool.token0,
+                networkId,
+              })
+            ].symbol
+          } / ${
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: pool.token1,
+                networkId,
+              })
+            ].symbol
+          }`,
+          description: 'Pool',
+          imageUrl,
+        }),
+        balances: async ({ resolvedTokensByTokenId }) => {
+          const token0Decimals =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: pool.token0,
+                networkId,
+              })
+            ].decimals
+          const token1Decimals =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: pool.token1,
+                networkId,
+              })
+            ].decimals
+          return [
+            toDecimalNumber(pool.amount0, token0Decimals),
+            toDecimalNumber(pool.amount1, token1Decimals),
+          ]
+        },
+      }
+    })
+}
+
 const hook: PositionsHook = {
   getInfo() {
     return {
@@ -67,73 +143,13 @@ const hook: PositionsHook = {
       return []
     }
     const { factory, nftPositions, userPositionsMulticall } = addresses
-
-    const client = getClient(networkId)
-    const userPools = await client.readContract({
-      abi: userPositionsAbi,
-      address: userPositionsMulticall,
-      functionName: 'getPositions',
-      args: [nftPositions, factory, address as Address],
-    })
-
-    return userPools
-      .map((pool) => ({
-        ...pool,
-        token0: pool.token0.toLowerCase(),
-        token1: pool.token1.toLowerCase(),
-      }))
-      .filter((pool) => pool.liquidity > 0)
-      .map((pool) => {
-        return {
-          type: 'contract-position-definition',
-          networkId,
-          address: pool.poolAddress,
-          tokens: [
-            { address: pool.token0, networkId },
-            { address: pool.token1, networkId },
-          ],
-          displayProps: ({ resolvedTokensByTokenId }) => ({
-            title: `${
-              resolvedTokensByTokenId[
-                getTokenId({
-                  address: pool.token0,
-                  networkId,
-                })
-              ].symbol
-            } / ${
-              resolvedTokensByTokenId[
-                getTokenId({
-                  address: pool.token1,
-                  networkId,
-                })
-              ].symbol
-            }`,
-            description: 'Pool',
-            imageUrl:
-              'https://raw.githubusercontent.com/valora-inc/dapp-list/ab12ab234b4a6e01eff599c6bd0b7d5b44d6f39d/assets/uniswap.png',
-          }),
-          balances: async ({ resolvedTokensByTokenId }) => {
-            const token0Decimals =
-              resolvedTokensByTokenId[
-                getTokenId({
-                  address: pool.token0,
-                  networkId,
-                })
-              ].decimals
-            const token1Decimals =
-              resolvedTokensByTokenId[
-                getTokenId({
-                  address: pool.token1,
-                  networkId,
-                })
-              ].decimals
-            return [
-              toDecimalNumber(pool.amount0, token0Decimals),
-              toDecimalNumber(pool.amount1, token1Decimals),
-            ]
-          },
-        }
-      })
+    return getUniswapV3PositionDefinitions(
+      networkId,
+      address as Address,
+      userPositionsMulticall,
+      nftPositions,
+      factory,
+    )
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     throw new UnknownAppTokenError({ networkId, address })
