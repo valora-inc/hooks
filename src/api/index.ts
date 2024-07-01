@@ -36,7 +36,7 @@ function getNetworkIds(
 function serializeShortcuts(
   shortcuts: Awaited<ReturnType<typeof getShortcuts>>,
 ) {
-  // TODO: consider using JSON schema for triggerInputShape
+  // TODO: consider returning JSON schema for triggerInputShape
   return shortcuts.map(({ onTrigger, triggerInputShape, ...shortcut }) => ({
     ...shortcut,
   }))
