@@ -2,7 +2,7 @@ import { getHooks } from './getHooks'
 import { NetworkId } from '../types/networkId'
 
 export async function getShortcuts(
-  networkId?: NetworkId,
+  networkId: NetworkId,
   address?: string,
   appIds: string[] = [],
 ) {
