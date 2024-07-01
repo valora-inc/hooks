@@ -5,11 +5,16 @@ import { NetworkId } from '../../types/networkId'
 import { toDecimalNumber, toSerializedDecimalNumber } from '../../types/numbers'
 import {
   AppTokenPositionDefinition,
+  ContractPositionDefinition,
   PositionsHook,
   TokenDefinition,
   UnknownAppTokenError,
 } from '../../types/positions'
 import { createBatches } from '../../utils/batcher'
+import {
+  beefyClmVaultsMulticallAbi,
+  beefyClmVaultsMulticallBytecode,
+} from './abis/beefy-clm-vaults-multicall'
 import { beefyV2AppMulticallAbi } from './abis/beefy-v2-app-multicall'
 import {
   BeefyVault,
@@ -34,6 +39,97 @@ const BEEFY_MULTICALL_ADDRESS: {
   [NetworkId['arbitrum-sepolia']]: undefined,
   [NetworkId['op-sepolia']]: undefined,
   [NetworkId['celo-alfajores']]: undefined,
+}
+
+const beefyAppTokenDefinition = (
+  networkId: NetworkId,
+  vault: BeefyVault,
+  prices: Record<string, number>,
+): AppTokenPositionDefinition => ({
+  type: 'app-token-definition',
+  networkId,
+  address: vault.earnedTokenAddress.toLowerCase(),
+  tokens: [
+    {
+      address: vault.tokenAddress.toLowerCase(),
+      networkId,
+      fallbackPriceUsd: prices[vault.id]
+        ? toSerializedDecimalNumber(prices[vault.id])
+        : undefined,
+    },
+  ],
+  displayProps: () => {
+    return {
+      title: vault.name + (vault.status === 'eol' ? ' (Retired)' : ''),
+      description: 'Vault',
+      imageUrl:
+        'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+    }
+  },
+  pricePerShare: async ({ tokensByTokenId }) => {
+    const tokenId = getTokenId({
+      address: vault.tokenAddress,
+      networkId,
+    })
+    const { decimals } = tokensByTokenId[tokenId]
+    return [toDecimalNumber(BigInt(vault.pricePerFullShare), decimals)]
+  },
+})
+
+// CLM = Cowcentrated Liquidity Manager: https://docs.beefy.finance/beefy-products/clm
+interface ClmVaultBalanceInfo {
+  token0: Address
+  token1: Address
+  amount0: bigint
+  amount1: bigint
+}
+
+const beefyConcentratedContractDefinition = (
+  networkId: NetworkId,
+  vault: BeefyVault,
+  balanceInfo: ClmVaultBalanceInfo | undefined,
+): ContractPositionDefinition | null => {
+  if (!balanceInfo) {
+    return null
+  }
+
+  return {
+    type: 'contract-position-definition',
+    networkId,
+    address: vault.earnedTokenAddress.toLowerCase(),
+    tokens: vault.depositTokenAddresses.map((address) => ({
+      address: address.toLowerCase(),
+      networkId,
+    })),
+    displayProps: () => {
+      return {
+        title: vault.name + (vault.status === 'eol' ? ' (Retired)' : ''),
+        description: 'Vault',
+        imageUrl:
+          'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+      }
+    },
+    balances: async ({ resolvedTokensByTokenId }) => {
+      const token0Decimals =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: balanceInfo.token0,
+          })
+        ].decimals
+      const token1Decimals =
+        resolvedTokensByTokenId[
+          getTokenId({
+            networkId,
+            address: balanceInfo.token1,
+          })
+        ].decimals
+      return [
+        toDecimalNumber(balanceInfo.amount0, token0Decimals),
+        toDecimalNumber(balanceInfo.amount1, token1Decimals),
+      ]
+    },
+  }
 }
 
 const hook: PositionsHook = {
@@ -88,38 +184,34 @@ const hook: PositionsHook = {
 
     const prices = await getBeefyLpsPrices()
 
-    return userVaults.map(
-      (vault): AppTokenPositionDefinition => ({
-        type: 'app-token-definition',
-        networkId,
-        address: vault.earnedTokenAddress.toLowerCase(),
-        tokens: [
-          {
-            address: vault.tokenAddress.toLowerCase(),
-            networkId,
-            fallbackPriceUsd: prices[vault.id]
-              ? toSerializedDecimalNumber(prices[vault.id])
-              : undefined,
-          },
-        ],
-        displayProps: () => {
-          return {
-            title: vault.name + (vault.status === 'eol' ? ' (Retired)' : ''),
-            description: 'Vault',
-            imageUrl:
-              'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
-          }
-        },
-        pricePerShare: async ({ tokensByTokenId }) => {
-          const tokenId = getTokenId({
-            address: vault.tokenAddress,
-            networkId,
-          })
-          const { decimals } = tokensByTokenId[tokenId]
-          return [toDecimalNumber(BigInt(vault.pricePerFullShare), decimals)]
-        },
-      }),
+    const clmVaults = userVaults.filter(
+      (vault) => vault.strategyTypeId === 'cowcentrated',
     )
+    const info =
+      clmVaults.length === 0
+        ? []
+        : await client.readContract({
+            code: beefyClmVaultsMulticallBytecode,
+            abi: beefyClmVaultsMulticallAbi,
+            functionName: 'getUserVaults',
+            args: [address, clmVaults.map((vault) => vault.earnedTokenAddress)],
+          })
+
+    return userVaults
+      .map((vault) =>
+        vault.strategyTypeId === 'cowcentrated'
+          ? beefyConcentratedContractDefinition(
+              networkId,
+              vault,
+              info.find(
+                (i) =>
+                  i.token0 === vault.depositTokenAddresses[0] &&
+                  i.token1 === vault.depositTokenAddresses[1],
+              ),
+            )
+          : beefyAppTokenDefinition(networkId, vault, prices),
+      )
+      .filter((position): position is ContractPositionDefinition => !!position)
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     throw new UnknownAppTokenError({ networkId, address })
