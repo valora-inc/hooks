@@ -11,7 +11,7 @@ import { getClient } from '../../runtime/client'
 import { poolV3Abi } from './abis/pool-v3'
 
 // From https://github.com/bgd-labs/aave-address-book/tree/4d208edf7271e0fff0eceed55de535e32dc055d4/src/ts
-const AAVE_POOL_V3_ADDRESSES_BY_NETWORK_ID: {
+const AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID: {
   [networkId in NetworkId]: Address | undefined
 } = {
   [NetworkId['celo-mainnet']]: undefined,
@@ -29,7 +29,7 @@ const GAS = 1_000_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
-    const poolContractAddress = AAVE_POOL_V3_ADDRESSES_BY_NETWORK_ID[networkId]
+    const poolContractAddress = AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID[networkId]
     if (!poolContractAddress) {
       return []
     }
