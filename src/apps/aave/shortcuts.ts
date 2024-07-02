@@ -43,7 +43,7 @@ const hook: ShortcutsHook = {
         // category: 'deposit',
         triggerInputShape: {
           depositToken: z.object({
-            // TODO: consider requiring only tokenId,
+            // TODO: consider requiring only tokenId and (decimal) amount
             // Right now it would mean more changes in hooks
             address: ZodAddressLowerCased,
             decimals: z.coerce.number(),
