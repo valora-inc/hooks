@@ -19,6 +19,7 @@ jest.mocked(getConfig).mockReturnValue({
   NETWORK_ID_TO_RPC_URL: {},
 })
 import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
+import { ZodAddressLowerCased } from '../types/address'
 jest.mock('../runtime/getPositions')
 jest.mock('../runtime/getShortcuts')
 
@@ -138,7 +139,10 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
     description: 'Claim rewards for staked liquidity',
     networkIds: [NetworkId['celo-mainnet']],
     category: 'claim',
-    async onTrigger(networkId, address, positionAddress) {
+    triggerInputShape: {
+      positionAddress: ZodAddressLowerCased,
+    },
+    async onTrigger({ networkId, address, positionAddress }) {
       // Bogus implementation for testing
       return [
         {
@@ -205,9 +209,11 @@ describe('GET /getShortcuts', () => {
     const response = await request(server).get('/getShortcuts').expect(200)
     expect(response.body).toEqual({
       message: 'OK',
-      data: TEST_SHORTCUTS.map(({ onTrigger, ...shortcut }) => ({
-        ...shortcut,
-      })),
+      data: TEST_SHORTCUTS.map(
+        ({ onTrigger, triggerInputShape, ...shortcut }) => ({
+          ...shortcut,
+        }),
+      ),
     })
   })
 })
@@ -257,5 +263,31 @@ describe('POST /triggerShortcut', () => {
         "message": "No shortcut found with id 'flarf' for app 'ubeswap', available shortcuts: claim-reward",
       }
     `)
+  })
+
+  it("returns 400 when the shortcut trigger inputs don't match the schema", async () => {
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .post('/triggerShortcut')
+      .send({
+        networkId: 'celo-mainnet',
+        address: WALLET_ADDRESS,
+        appId: TEST_SHORTCUTS[0].appId,
+        shortcutId: TEST_SHORTCUTS[0].id,
+        positionAddress: 'barf',
+      })
+      .expect(400)
+    expect(response.body).toStrictEqual({
+      details: {
+        _errors: [],
+        body: {
+          _errors: [],
+          positionAddress: {
+            _errors: ['Invalid Address barf'],
+          },
+        },
+      },
+      message: 'Invalid request',
+    })
   })
 })
