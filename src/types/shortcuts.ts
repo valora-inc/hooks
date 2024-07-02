@@ -28,6 +28,9 @@ export type Transaction = {
   from: string
   to: string
   data: string
+  // These are needed when returning more than one transaction
+  gas?: BigInt // in wei
+  estimatedGasUse?: BigInt // in wei
 }
 
 // This is to help TS infer the type of the triggerInputShape
