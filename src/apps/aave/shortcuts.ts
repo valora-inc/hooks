@@ -16,7 +16,7 @@ const AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID: {
 } = {
   [NetworkId['celo-mainnet']]: undefined,
   [NetworkId['celo-alfajores']]: undefined,
-  [NetworkId['ethereum-mainnet']]: '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
+  [NetworkId['ethereum-mainnet']]: '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2',
   [NetworkId['ethereum-sepolia']]: '0x6ae43d3271ff6888e7fc43fd7321a503ff738951',
   [NetworkId['arbitrum-one']]: '0x794a61358d6845594f94dc1db02a252b5b4814ad',
   [NetworkId['arbitrum-sepolia']]: '0xbfc91d59fdaa134a4ed45f7b584caf96d7792eff',
