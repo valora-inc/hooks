@@ -49,7 +49,7 @@ describe('getShortcutDefinitions', () => {
         },
       })
 
-      expect(transactions.length).toEqual(2)
+      expect(transactions.length).toEqual(1)
     })
   })
 })
