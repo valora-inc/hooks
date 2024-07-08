@@ -9,18 +9,18 @@ describe('getShortcutDefinitions', () => {
     expect(shortcuts.length).toBeGreaterThan(0)
   })
 
-  describe('.onTrigger', () => {
+  describe('deposit.onTrigger', () => {
     it('should return transactions', async () => {
       const shortcuts = await hook.getShortcutDefinitions(
         NetworkId['arbitrum-one'],
-        '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       )
-      const shortcut = shortcuts[0]
+      const shortcut = shortcuts.find((shortcut) => shortcut.id === 'deposit')
+      expect(shortcut).toBeDefined()
 
-      const transactions = await shortcut.onTrigger({
+      const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-        depositToken: {
+        token: {
           address: '0x724dc807b04555b71ed48a6896b6f41593b8c637', // USDC
           amount: '10',
           decimals: 6,

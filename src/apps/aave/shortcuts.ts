@@ -42,7 +42,7 @@ const hook: ShortcutsHook = {
         networkIds: [networkId],
         // category: 'deposit',
         triggerInputShape: {
-          depositToken: z.object({
+          token: z.object({
             // TODO: consider requiring only tokenId and (decimal) amount
             // Right now it would mean more changes in hooks
             address: ZodAddressLowerCased,
@@ -50,20 +50,17 @@ const hook: ShortcutsHook = {
             amount: z.string(), // in decimal string
           }),
         },
-        async onTrigger({ networkId, address, depositToken }) {
+        async onTrigger({ networkId, address, token }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToSupply = parseUnits(
-            depositToken.amount,
-            depositToken.decimals,
-          )
+          const amountToSupply = parseUnits(token.amount, token.decimals)
 
           const client = getClient(networkId)
 
           const approvedAllowanceForSpender = await client.readContract({
-            address: depositToken.address,
+            address: token.address,
             abi: erc20Abi,
             functionName: 'allowance',
             args: [walletAddress, poolContractAddress],
@@ -79,7 +76,7 @@ const hook: ShortcutsHook = {
             const approveTx: Transaction = {
               networkId,
               from: walletAddress,
-              to: depositToken.address,
+              to: token.address,
               data,
             }
             transactions.push(approveTx)
@@ -92,7 +89,7 @@ const hook: ShortcutsHook = {
             data: encodeFunctionData({
               abi: poolV3Abi,
               functionName: 'supply',
-              args: [depositToken.address, amountToSupply, walletAddress, 0],
+              args: [token.address, amountToSupply, walletAddress, 0],
             }),
             // TODO: consider moving this concern to the runtime
             // which would simulate the transaction(s) to get these
