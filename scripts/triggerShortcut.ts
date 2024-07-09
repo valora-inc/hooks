@@ -6,12 +6,16 @@ import { mnemonicToAccount } from 'viem/accounts'
 import { celo } from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
 import { NetworkId } from '../src/types/networkId'
+import { z } from 'zod'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 
 const argv = yargs(process.argv.slice(2))
+  .parserConfiguration({
+    'parse-numbers': false, // prevents 0x{string} from being parsed as a number
+  })
   .usage(
-    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> --positionAddress <positionAddress>',
+    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> [<triggerInput>...]',
   )
   .env('')
   .options({
@@ -39,11 +43,6 @@ const argv = yargs(process.argv.slice(2))
       type: 'string',
       demandOption: true,
     },
-    positionAddress: {
-      describe: 'Position address to trigger the shortcut on',
-      type: 'string',
-      demandOption: true,
-    },
     mnemonic: {
       describe: 'Mnemonic to use to sign the shortcut transaction(s)',
       type: 'string',
@@ -68,19 +67,22 @@ void (async () => {
     )
   }
 
+  // TODO: consider showing a user friendly prompt to fill in the trigger input
+  // or at least a list of the expected fields
+  // This just throws a Zod error if the input is not valid
+  const triggerInput = z.object(shortcut.triggerInputShape).parse(argv)
+
+  const triggerArgs = {
+    networkId: argv.networkId,
+    address: argv.address,
+    ...triggerInput,
+  }
+
   console.log(
     `Triggering shortcut '${shortcut.id}' for app '${shortcut.appId}'`,
-    {
-      network: argv.network,
-      address: argv.address,
-      positionAddress: argv.positionAddress,
-    },
+    triggerArgs,
   )
-  const result = await shortcut.onTrigger(
-    argv.networkId,
-    argv.address,
-    argv.positionAddress,
-  )
+  const result = await shortcut.onTrigger(triggerArgs)
 
   console.log('Transaction(s) to send:', result)
 

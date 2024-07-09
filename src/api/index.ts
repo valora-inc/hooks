@@ -16,6 +16,7 @@ import {
   legacyNetworkToNetworkId,
   NetworkId,
 } from '../types/networkId'
+import { Transaction } from '../types/shortcuts'
 
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
@@ -31,6 +32,25 @@ function getNetworkIds(
   } else {
     return [args.networkIds]
   }
+}
+
+function serializeShortcuts(
+  shortcuts: Awaited<ReturnType<typeof getShortcuts>>,
+) {
+  // TODO: consider returning JSON schema for triggerInputShape
+  return shortcuts.map(({ onTrigger, triggerInputShape, ...shortcut }) => ({
+    ...shortcut,
+  }))
+}
+
+function serializeTransactions(transactions: Transaction[]) {
+  return transactions.map((tx) => ({
+    ...tx,
+    ...(tx.gas !== undefined ? { gas: tx.gas.toString() } : {}),
+    ...(tx.estimatedGasUse !== undefined
+      ? { estimatedGasUse: tx.estimatedGasUse.toString() }
+      : {}),
+  }))
 }
 
 function createApp() {
@@ -96,7 +116,7 @@ function createApp() {
         undefined,
         config.SHORTCUT_IDS,
       )
-      res.send({ message: 'OK', data: shortcuts })
+      res.send({ message: 'OK', data: serializeShortcuts(shortcuts) })
     }),
   )
 
@@ -113,7 +133,7 @@ function createApp() {
           ),
         )
       ).flat()
-      res.send({ message: 'OK', data: shortcuts })
+      res.send({ message: 'OK', data: serializeShortcuts(shortcuts) })
     }),
   )
 
@@ -126,10 +146,6 @@ function createApp() {
           .transform((val) => val.toLowerCase()),
         appId: z.string({ required_error: 'appId is required' }),
         shortcutId: z.string({ required_error: 'shortcutId is required' }),
-        positionAddress: z
-          .string({ required_error: 'positionAddress is required' })
-          .regex(/^0x[a-fA-F0-9]{40}$/)
-          .transform((val) => val.toLowerCase()),
       }),
       z.union([
         z.object({ network: z.nativeEnum(LegacyNetwork) }), // legacy schema: 'celo' or 'celoAlfajores' passed as 'network' field on the request
@@ -146,7 +162,7 @@ function createApp() {
         triggerShortcutRequestSchema,
       )
 
-      const { address, appId, shortcutId, positionAddress } = parsedRequest.body
+      const { address, appId, shortcutId } = parsedRequest.body
 
       const networkId =
         'network' in parsedRequest.body
@@ -165,12 +181,23 @@ function createApp() {
         )
       }
 
-      const transactions = await shortcut.onTrigger(
+      // Now check the trigger input
+      const parsedTriggerInput = await parseRequest(
+        req,
+        z.object({
+          body: z.object(shortcut.triggerInputShape),
+        }),
+      )
+
+      const transactions = await shortcut.onTrigger({
         networkId,
         address,
-        positionAddress,
-      )
-      res.send({ message: 'OK', data: { transactions } })
+        ...parsedTriggerInput.body,
+      })
+      res.send({
+        message: 'OK',
+        data: { transactions: serializeTransactions(transactions) },
+      })
     }),
   )
 
