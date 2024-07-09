@@ -145,8 +145,7 @@ const hook: PositionsHook = {
                 title: `${tokenDescription.symbol} ${type}`,
                 description: `${baseTokenDescription.symbol} Market`,
                 imageUrl:
-                  // TODO: Update the image url once PR is merged.
-                  'https://raw.githubusercontent.com/valora-inc/dapp-list/27afcdc8779d2e9eb6897372e18c88e41b2e6df1/assets/compound.png',
+                  'https://raw.githubusercontent.com/valora-inc/hooks/main/src/apps/compound/assets/compound.png',
               }
             },
             balances: async ({ resolvedTokensByTokenId }) => {
