@@ -24,7 +24,7 @@ describe('getPositionDefinitions', () => {
     )
     expect(collateralPosition?.tokens.length).toBeGreaterThan(0)
 
-    // TODO: Add debt position (requires access to the testing private keys).
+    // TODO: Add debt position (requires access to the test account's private keys).
     // const debtPosition = positions.find((p) =>
     //   p.displayProps.title.endsWith(' Debt'),
     // )
