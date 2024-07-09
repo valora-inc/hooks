@@ -72,19 +72,15 @@ const hook: PositionsHook = {
 
     const client = getClient(networkId)
 
-    const results = await Promise.all(
-      markets.map((market) =>
-        client.readContract({
-          code: compoundMulticallBytecode,
-          abi: compoundMulticallAbi,
-          functionName: 'getUserPositions',
-          args: [address, market.address],
-        }),
-      ),
-    )
+    const results = await client.readContract({
+      code: compoundMulticallBytecode,
+      abi: compoundMulticallAbi,
+      functionName: 'getUserPositions',
+      args: [address, markets.map((m) => m.address)],
+    })
 
     return results.flatMap(
-      ([baseToken, baseTokenBalance, borrowBalance, collaterals], index) => {
+      ({ baseToken, baseTokenBalance, borrowBalance, collaterals }, index) => {
         const balances: {
           token: Address
           market: Address
