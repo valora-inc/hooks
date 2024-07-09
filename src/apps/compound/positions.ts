@@ -86,24 +86,21 @@ const hook: PositionsHook = {
           market: Address
           balance: bigint
           type: string
-        }[] = []
-
-        if (baseTokenBalance > 0n) {
-          balances.push({
+        }[] = [
+          {
             token: baseToken,
             market: markets[index].address,
             balance: baseTokenBalance,
             type: 'Supply',
-          })
-        }
-        if (borrowBalance > 0n) {
-          balances.push({
+          },
+          {
             token: baseToken,
             market: markets[index].address,
             balance: -borrowBalance,
             type: 'Debt',
-          })
-        }
+          },
+        ]
+
         for (const collateral of collaterals) {
           balances.push({
             token: collateral.asset,
