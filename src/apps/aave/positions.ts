@@ -133,6 +133,7 @@ const hook: PositionsHook = {
             networkId,
             address: reserveData.aTokenAddress.toLowerCase(),
             tokens: [{ address: reserveData.underlyingAsset, networkId }],
+            availableShortcutIds: ['deposit', 'withdraw'],
             displayProps: {
               title: reserveData.symbol,
               description: `Supplied (APY: ${supplyApy.toFixed(2)}%)`,
