@@ -6,13 +6,15 @@ import { toDecimalNumber } from '../../types/numbers'
 import {
   ContractPositionDefinition,
   PositionsHook,
-  TokenDefinition,
   UnknownAppTokenError,
 } from '../../types/positions'
+import { uniV3NftManagerAbi } from './abis/nftManager'
 import { userPositionsAbi } from './abis/user-positions'
 
-const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
-  [networkId in NetworkId]:
+export const UINT128_MAX_VALUE = 340282366920938463463374607431768211455n
+
+export const UNI_V3_ADDRESSES: {
+  [networkId: string]:
     | {
         factory: Address
         nftPositions: Address
@@ -26,7 +28,7 @@ const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
   // [NetworkId.polygon]: {
   //   factory: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
   //   nftPositions: '0xc36442b4a4522e871399cd717abdd847ab11fe88',
-  //   userPositionsMulticall: '',
+  //   userPositionsMulticall: '0x78e7F5dF660a445332BdBACC639fAf3C71dBb662',
   // },
   [NetworkId['celo-mainnet']]: {
     factory: '0xAfE208a311B21f13EF87E33A90049fC17A7acDEc',
@@ -48,10 +50,6 @@ const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
     nftPositions: '0xc36442b4a4522e871399cd717abdd847ab11fe88',
     userPositionsMulticall: '0xd983fe1235a4c9006ef65eceed7c33069ad35ad0',
   },
-  [NetworkId['ethereum-sepolia']]: undefined,
-  [NetworkId['arbitrum-sepolia']]: undefined,
-  [NetworkId['op-sepolia']]: undefined,
-  [NetworkId['celo-alfajores']]: undefined,
 }
 
 export async function getUniswapV3PositionDefinitions(
@@ -70,22 +68,50 @@ export async function getUniswapV3PositionDefinitions(
     args: [nftPositions, factory, address as Address],
   })
 
+  // TODO: Try to find a way to do this using multicall instead of N requests.
+  // It can't be done from the user positions multicall contract because it requires the user to call it.
+  // Standard multicall doesn't work because it's a `simlateContract` call.
+  const tokensOwed = (
+    await Promise.all(
+      userPools.map((pool) =>
+        client.simulateContract({
+          abi: uniV3NftManagerAbi,
+          address: nftPositions,
+          functionName: 'collect',
+          args: [
+            {
+              tokenId: pool.tokenId,
+              recipient: address,
+              amount0Max: UINT128_MAX_VALUE,
+              amount1Max: UINT128_MAX_VALUE,
+            },
+          ],
+        }),
+      ),
+    )
+  ).map(({ result }) => result as [bigint, bigint])
+
   return userPools
-    .map((pool) => ({
+    .map((pool, index) => ({
       ...pool,
       token0: pool.token0.toLowerCase(),
       token1: pool.token1.toLowerCase(),
+      tokensOwed0: tokensOwed[index][0],
+      tokensOwed1: tokensOwed[index][1],
     }))
     .filter((pool) => pool.liquidity > 0)
     .map((pool) => {
       return {
         type: 'contract-position-definition',
         networkId,
-        address: pool.poolAddress,
+        address: `${pool.poolAddress}-${pool.tokenId}`,
         tokens: [
           { address: pool.token0, networkId },
           { address: pool.token1, networkId },
+          { address: pool.token0, networkId, category: 'claimable' },
+          { address: pool.token1, networkId, category: 'claimable' },
         ],
+        availableShortcutIds: ['uniswapv3-claim-fees'],
         displayProps: ({ resolvedTokensByTokenId }) => ({
           title: `${
             resolvedTokensByTokenId[
@@ -123,6 +149,8 @@ export async function getUniswapV3PositionDefinitions(
           return [
             toDecimalNumber(pool.amount0, token0Decimals),
             toDecimalNumber(pool.amount1, token1Decimals),
+            toDecimalNumber(pool.tokensOwed0, token0Decimals),
+            toDecimalNumber(pool.tokensOwed1, token1Decimals),
           ]
         },
       }
@@ -138,8 +166,8 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    const addresses = UNI_V3_ADDRESSES_BY_NETWORK_ID[networkId]
-    if (!addresses || !address) {
+    const addresses = UNI_V3_ADDRESSES[networkId]
+    if (!addresses) {
       return []
     }
     const { factory, nftPositions, userPositionsMulticall } = addresses
@@ -151,7 +179,7 @@ const hook: PositionsHook = {
       factory,
     )
   },
-  async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
+  async getAppTokenDefinition({ networkId, address }) {
     throw new UnknownAppTokenError({ networkId, address })
   },
 }
