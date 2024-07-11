@@ -185,7 +185,7 @@ const hook: PositionsHook = {
     const prices = await getBeefyLpsPrices()
 
     const clmVaults = userVaults.filter(
-      (vault) => vault.strategyTypeId === 'cowcentrated',
+      (vault) => vault.type === 'cowcentrated',
     )
     const info =
       clmVaults.length === 0
@@ -199,7 +199,7 @@ const hook: PositionsHook = {
 
     return userVaults
       .map((vault) =>
-        vault.strategyTypeId === 'cowcentrated'
+        vault.type === 'cowcentrated'
           ? beefyConcentratedContractDefinition(
               networkId,
               vault,
