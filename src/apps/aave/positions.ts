@@ -54,10 +54,16 @@ const AAVE_LOGO =
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 
-// Get APY from APR, between 0 and 100
+// Get APY from APR, both in percentage (0-100)
 function getApy(apr: number) {
   // Note: not using BigNumber here as it takes too long to calculate
-  return ((1 + apr / COMPOUND_PERIOD) ** COMPOUND_PERIOD - 1) * 100
+  return ((1 + apr / 100 / COMPOUND_PERIOD) ** COMPOUND_PERIOD - 1) * 100
+}
+
+// The chain data is in RAY units (1e27) and non compounded
+// https://docs.aave.com/developers/guides/rates-guide#formatting-rates
+function getApyFromRayApr(apr: bigint) {
+  return getApy(new BigNumber(apr.toString()).div(1e27).times(100).toNumber())
 }
 
 const hook: PositionsHook = {
@@ -93,28 +99,11 @@ const hook: PositionsHook = {
       : undefined
 
     return reservesData.flatMap((reserveData, i) => {
-      // The chain data is in RAY units (1e27) and non compounded
-      // https://docs.aave.com/developers/guides/rates-guide#formatting-rates
-      const supplyApr = new BigNumber(reserveData.liquidityRate.toString())
-        .div(1e27)
-        .toNumber()
-      // Note: not using BigNumber here as it takes too long to calculate
-      const supplyApy = getApy(supplyApr)
-
-      const variableBorrowApr = new BigNumber(
-        reserveData.variableBorrowRate.toString(),
+      const supplyApy = getApyFromRayApr(reserveData.liquidityRate)
+      const variableBorrowApy = getApyFromRayApr(reserveData.variableBorrowRate)
+      const stableBorrowApy = getApyFromRayApr(
+        userReserveData?.[i].stableBorrowRate || reserveData.stableBorrowRate,
       )
-        .div(1e27)
-        .toNumber()
-      const variableBorrowApy = getApy(variableBorrowApr)
-
-      const stableBorrowApr = new BigNumber(
-        userReserveData?.[i].stableBorrowRate.toString() ||
-          reserveData.stableBorrowRate.toString(),
-      )
-        .div(1e27)
-        .toNumber()
-      const stableBorrowApy = getApy(stableBorrowApr)
 
       // Include a token if the user has a balance
       // or if no user data is available (when querying all positions)
