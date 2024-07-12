@@ -83,7 +83,7 @@ export interface BalancesContext {
 export interface ContractPositionDefinition extends AbstractPositionDefinition {
   type: 'contract-position-definition'
   // Needed in some cases to differentiate between different positions of the same contract
-  // for instance uniswap v3 positions at different ranges
+  // for instance Uniswap V3 positions on a given liquidity pool but at different ranges
   extraId?: string
   balances:
     | ((context: BalancesContext) => Promise<DecimalNumber[]>)
