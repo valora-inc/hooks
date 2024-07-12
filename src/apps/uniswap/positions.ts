@@ -82,6 +82,7 @@ export async function getUniswapV3PositionDefinitions(
         type: 'contract-position-definition',
         networkId,
         address: pool.poolAddress,
+        extraId: pool.tokenId.toString(),
         tokens: [
           { address: pool.token0, networkId },
           { address: pool.token1, networkId },
