@@ -9,6 +9,7 @@ import {
   AppTokenPositionDefinition,
   ContractPosition,
   ContractPositionDefinition,
+  DataProps,
   DisplayProps,
   Position,
   PositionDefinition,
@@ -187,6 +188,17 @@ function getDisplayProps(
   }
 }
 
+function getDataProps(
+  positionDefinition: PositionDefinition,
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
+): DataProps | undefined {
+  if (typeof positionDefinition.dataProps === 'function') {
+    return positionDefinition.dataProps({ resolvedTokensByTokenId })
+  } else {
+    return positionDefinition.dataProps
+  }
+}
+
 async function resolveAppTokenPosition(
   address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
@@ -255,6 +267,7 @@ async function resolveAppTokenPosition(
     positionDefinition,
     resolvedTokensByTokenId,
   )
+  const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
 
   const position: AppTokenPosition = {
     type: 'app-token',
@@ -272,6 +285,7 @@ async function resolveAppTokenPosition(
     decimals: positionTokenInfo.decimals,
     label: displayProps.title,
     displayProps,
+    dataProps,
     tokens: positionDefinition.tokens.map((token, i) =>
       tokenWithUnderlyingBalance(
         resolvedTokensByTokenId[
@@ -345,6 +359,7 @@ async function resolveContractPosition(
     positionDefinition,
     resolvedTokensByTokenId,
   )
+  const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
 
   const position: ContractPosition = {
     type: 'contract-position',
@@ -355,6 +370,7 @@ async function resolveContractPosition(
     appName: appInfo.name,
     label: displayProps.title,
     displayProps,
+    dataProps,
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
