@@ -80,6 +80,7 @@ const hook: PositionsHook = {
           type: 'contract-position-definition',
           networkId,
           address: planNft.contractAddress,
+          extraId: planNft.tokenId,
           tokens: [{ address: tokenAddress, networkId, category: 'claimable' }],
           availableShortcutIds: [
             `${planNft.contractAddress}:${planNft.tokenId}`,
