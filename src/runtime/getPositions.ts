@@ -166,9 +166,10 @@ function getPositionId(positionDefinition: PositionDefinition): string {
     case 'app-token-definition':
       return tokenId
     case 'contract-position-definition':
-      return tokenId + positionDefinition.extraId
-        ? `:${positionDefinition.extraId}`
-        : ''
+      return (
+        tokenId +
+        (positionDefinition.extraId ? `:${positionDefinition.extraId}` : '')
+      )
     default:
       const assertNever: never = positionDefinition
       return assertNever
