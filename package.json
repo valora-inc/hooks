@@ -37,7 +37,7 @@
     "deploy:production:http": "yarn deploy:production --trigger-http --allow-unauthenticated"
   },
   "dependencies": {
-    "@google-cloud/functions-framework": "^3.4.0",
+    "@google-cloud/functions-framework": "^3.4.1",
     "@valora/http-handler": "^0.0.1",
     "@valora/logging": "^1.3.17",
     "bignumber.js": "^9.1.2",
