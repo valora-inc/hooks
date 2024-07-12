@@ -286,13 +286,15 @@ describe(getPositions, () => {
       'test-hook2': {
         ...lockedCeloTestHook,
         async getPositionDefinitions(networkId, _address) {
-          return lockedCeloTestHook.getPositionDefinitions(networkId, _address).then((positions) =>
-            positions.map((p) => ({
-              ...p,
-              extraId: 'unique-id',
-            })),
-          )
-        }
+          return lockedCeloTestHook
+            .getPositionDefinitions(networkId, _address)
+            .then((positions) =>
+              positions.map((p) => ({
+                ...p,
+                extraId: 'unique-id',
+              })),
+            )
+        },
       },
     })
     getSpy.mockReturnValue({
