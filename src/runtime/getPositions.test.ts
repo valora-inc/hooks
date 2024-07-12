@@ -70,6 +70,7 @@ const failingTestHook: PositionsHook = {
 }
 
 const loggerErrorSpy = jest.spyOn(logger, 'error')
+const loggerWarnSpy = jest.spyOn(logger, 'warn')
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -238,5 +239,72 @@ describe(getPositions, () => {
     expect(beefyPosition.balance).toBe('30')
     expect(beefyPosition.priceUsd).toBe('1')
     expect(beefyPosition.supply).toBe('1000')
+  })
+
+  it('should warn and omit positions with the same address and networkId', async () => {
+    mockMulticall.mockResolvedValueOnce([
+      'CELO', // Symbol for 0x471ece3750da237f93b8e339c536989b8978a438
+      18, // Decimals
+    ])
+    // testHook and testHook2 both return positions with the same address
+    // this should result in a warning and only one position being returned
+    getHooksSpy.mockResolvedValue({
+      'test-hook': lockedCeloTestHook,
+      'test-hook2': lockedCeloTestHook,
+    })
+    getSpy.mockReturnValue({
+      json: jest.fn().mockResolvedValue(mockTokensInfo),
+    } as any)
+    const positions = await getPositions(
+      NetworkId['celo-mainnet'],
+      '0x0000000000000000000000000000000000007e57',
+      [],
+      'mock-token-info-url',
+    )
+    expect(positions.length).toBe(1)
+    expect(loggerWarnSpy).toHaveBeenCalledTimes(1)
+    expect(loggerWarnSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        duplicateDefinition: expect.objectContaining({
+          appId: 'test-hook2',
+        }),
+        initialDefinition: expect.objectContaining({
+          appId: 'test-hook',
+        }),
+      }),
+      'Duplicate position definition detected in app test-hook2 for 0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e (celo-mainnet). test-hook already defined it. Skipping it. If this is unexpected and the position is a contract-position-definition, please specify a unique extraId.',
+    )
+  })
+
+  it('should not warn about duplicates if the positions specify different extraIds', async () => {
+    mockMulticall.mockResolvedValueOnce([
+      'CELO', // Symbol for 0x471ece3750da237f93b8e339c536989b8978a438
+      18, // Decimals
+    ])
+    getHooksSpy.mockResolvedValue({
+      'test-hook': lockedCeloTestHook,
+      'test-hook2': {
+        ...lockedCeloTestHook,
+        async getPositionDefinitions(networkId, _address) {
+          return lockedCeloTestHook.getPositionDefinitions(networkId, _address).then((positions) =>
+            positions.map((p) => ({
+              ...p,
+              extraId: 'unique-id',
+            })),
+          )
+        }
+      },
+    })
+    getSpy.mockReturnValue({
+      json: jest.fn().mockResolvedValue(mockTokensInfo),
+    } as any)
+    const positions = await getPositions(
+      NetworkId['celo-mainnet'],
+      '0x0000000000000000000000000000000000007e57',
+      [],
+      'mock-token-info-url',
+    )
+    expect(positions.length).toBe(2)
+    expect(loggerWarnSpy).toHaveBeenCalledTimes(0)
   })
 })

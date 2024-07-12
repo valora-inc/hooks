@@ -82,6 +82,9 @@ export interface BalancesContext {
 
 export interface ContractPositionDefinition extends AbstractPositionDefinition {
   type: 'contract-position-definition'
+  // Needed in some cases to differentiate between different positions of the same contract
+  // for instance uniswap v3 positions at different ranges
+  extraId?: string
   balances:
     | ((context: BalancesContext) => Promise<DecimalNumber[]>)
     | DecimalNumber[]
@@ -100,6 +103,9 @@ export interface AppInfo {
 }
 
 export interface AbstractPosition {
+  // Should be unique across all positions
+  // And treated as an opaque identifier by consumers
+  positionId: string // Example: celo-mainnet:0x...
   address: string // Example: 0x...
   networkId: NetworkId // Example: celo-mainnet
   appId: string // Example: ubeswap
