@@ -45,7 +45,7 @@ interface TokenInfo extends Omit<AbstractToken, 'balance'> {
 
 type TokensInfo = Record<string, TokenInfo>
 
-type DefinitionsByTokenId = Record<string, AppPositionDefinition | undefined>
+type DefinitionsByPositionId = Record<string, AppPositionDefinition | undefined>
 
 type AppPositionDefinition = PositionDefinition & {
   appId: string
@@ -157,6 +157,25 @@ function tokenWithUnderlyingBalance<T extends Token>(
   } as T
 }
 
+function getPositionId(positionDefinition: PositionDefinition): string {
+  const tokenId = getTokenId({
+    networkId: positionDefinition.networkId,
+    address: positionDefinition.address,
+  })
+  switch (positionDefinition.type) {
+    case 'app-token-definition':
+      return tokenId
+    case 'contract-position-definition':
+      return (
+        tokenId +
+        (positionDefinition.extraId ? `:${positionDefinition.extraId}` : '')
+      )
+    default:
+      const assertNever: never = positionDefinition
+      return assertNever
+  }
+}
+
 function getDisplayProps(
   positionDefinition: PositionDefinition,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -246,6 +265,7 @@ async function resolveAppTokenPosition(
       isNative: false,
       address: positionDefinition.address,
     }),
+    positionId: getPositionId(positionDefinition),
     appId: positionDefinition.appId,
     appName: appInfo.name,
     symbol: positionTokenInfo.symbol,
@@ -330,6 +350,7 @@ async function resolveContractPosition(
     type: 'contract-position',
     address: positionDefinition.address,
     networkId: positionDefinition.networkId,
+    positionId: getPositionId(positionDefinition),
     appId: positionDefinition.appId,
     appName: appInfo.name,
     label: displayProps.title,
@@ -391,19 +412,16 @@ export async function getPositions(
 
   let unlistedBaseTokensInfo: TokensInfo = {}
   let definitionsToResolve: AppPositionDefinition[] = definitions
-  const visitedDefinitions: DefinitionsByTokenId = {}
+  const visitedDefinitions: DefinitionsByPositionId = {}
   while (true) {
     // Visit each definition we haven't visited yet
     definitionsToResolve = definitionsToResolve.filter((definition) => {
-      const definitionTokenId = getTokenId({
-        networkId: definition.networkId,
-        address: definition.address,
-      })
+      const definitionPositionId = getPositionId(definition)
 
-      if (visitedDefinitions[definitionTokenId]) {
+      if (visitedDefinitions[definitionPositionId]) {
         return false
       }
-      visitedDefinitions[definitionTokenId] = definition
+      visitedDefinitions[definitionPositionId] = definition
       return true
     })
 
@@ -429,7 +447,10 @@ export async function getPositions(
         return (
           !{ ...baseTokensInfo, ...unlistedBaseTokensInfo }[
             definitionTokenId
-          ] && !visitedDefinitions[definitionTokenId]
+          ] &&
+          (!visitedDefinitions[definitionTokenId] ||
+            visitedDefinitions[definitionTokenId]?.type !==
+              'app-token-definition')
         )
       },
     )
@@ -593,27 +614,32 @@ export async function getPositions(
         return assertNever
     }
 
-    resolvedPositions[
-      getTokenId({
-        networkId: positionDefinition.networkId,
-        address: positionDefinition.address,
-      })
-    ] = position
+    resolvedPositions[getPositionId(positionDefinition)] = position
   }
 
-  return definitions.map((definition) => {
-    const definitionTokenId = getTokenId({
-      networkId: definition.networkId,
-      isNative: false,
-      address: definition.address,
+  const returnedPositionIds = new Set()
+  return definitions
+    .map((definition) => {
+      const positionId = getPositionId(definition)
+      const resolvedPosition = resolvedPositions[positionId]
+      // Sanity check
+      if (!resolvedPosition) {
+        throw new Error(
+          `Could not resolve ${definition.type} with position id ${positionId}`,
+        )
+      }
+      if (returnedPositionIds.has(positionId)) {
+        logger.warn(
+          {
+            duplicateDefinition: definition,
+            initialDefinition: visitedDefinitions[positionId],
+          },
+          `Duplicate position definition detected in app ${definition.appId} for ${definition.address} (${definition.networkId}). ${resolvedPosition.appId} already defined it. Skipping it. If this is unexpected and the position is a contract-position-definition, please specify a unique extraId.`,
+        )
+        return undefined
+      }
+      returnedPositionIds.add(positionId)
+      return resolvedPosition
     })
-    const resolvedPosition = resolvedPositions[definitionTokenId]
-    // Sanity check
-    if (!resolvedPosition) {
-      throw new Error(
-        `Could not resolve ${definition.type} with token id ${definitionTokenId}`,
-      )
-    }
-    return resolvedPosition
-  })
+    .filter((p) => p !== undefined)
 }
