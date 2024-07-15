@@ -107,6 +107,46 @@ function createApp() {
     }),
   )
 
+  // Positions for the Earn feature
+  // For now limited to specific positions
+  app.get(
+    '/getEarnPositions',
+    asyncHandler(async (req, res) => {
+      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
+      const networkIds = getNetworkIds(parsedRequest.query).filter(
+        (network) =>
+          // For now limit to Arbitrum
+          network === NetworkId['arbitrum-one'] ||
+          network === NetworkId['arbitrum-sepolia'],
+      )
+
+      const positions = (
+        await Promise.all(
+          networkIds.map((networkId) =>
+            getPositions(
+              networkId,
+              undefined,
+              // For now limit to Aave
+              ['aave'],
+              config.GET_TOKENS_INFO_URL,
+            ),
+          ),
+        )
+      )
+        .flat()
+        .filter(
+          // For now limit to specific positions
+          (position) =>
+            position.positionId ===
+              `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637` ||
+            position.positionId ===
+              `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
+        )
+
+      res.send({ message: 'OK', data: positions })
+    }),
+  )
+
   // Deprecated route, will be removed in the future
   app.get(
     '/getShortcuts',

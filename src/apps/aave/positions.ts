@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
 import { uiPoolDataProviderV3Abi } from './abis/ui-pool-data-provider-v3'
+import { getTokenId } from '../../runtime/getTokenId'
 
 // See https://github.com/bgd-labs/aave-address-book/tree/fbb590953db44d62a756d4639cb77ea58afb299c/src/ts
 // and https://docs.aave.com/developers/deployed-contracts/v3-mainnet
@@ -121,7 +122,9 @@ const hook: PositionsHook = {
             type: 'app-token-definition',
             networkId,
             address: reserveData.aTokenAddress.toLowerCase(),
-            tokens: [{ address: reserveData.underlyingAsset, networkId }],
+            tokens: [
+              { address: reserveData.underlyingAsset.toLowerCase(), networkId },
+            ],
             availableShortcutIds: ['deposit', 'withdraw'],
             displayProps: {
               title: reserveData.symbol,
@@ -130,6 +133,14 @@ const hook: PositionsHook = {
             },
             dataProps: {
               apy: supplyApy,
+              depositTokenId: getTokenId({
+                networkId,
+                address: reserveData.underlyingAsset.toLowerCase(),
+              }),
+              withdrawTokenId: getTokenId({
+                networkId,
+                address: reserveData.aTokenAddress.toLowerCase(),
+              }),
             },
             pricePerShare: [new BigNumber(1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
