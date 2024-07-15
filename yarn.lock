@@ -5635,10 +5635,10 @@ teeny-request@^9.0.0:
     stream-events "^1.0.5"
     uuid "^9.0.0"
 
-terminate@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/terminate/-/terminate-2.6.1.tgz#99a4eb1647011b95f47401f6beb9f23e0362fbc0"
-  integrity sha512-0kdr49oam98yvjkVY+gfUaT3SMaJI6Sc+yijJjU+qhat+0NQKQn60OsIZZeKyVgTO0/33nRa3HowRbpw3A7u9A==
+terminate@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/terminate/-/terminate-2.8.0.tgz#12f0315ba2e383f1b7a062a300417151819f458e"
+  integrity sha512-bcbjJEg0wY5nuJXvGxxHfmoEPkyHLCctUKO6suwtxy7jVSgGcgPeGwpbLDLELFhIaxCGRr3dPvyNg1yuz2V0eg==
   dependencies:
     ps-tree "^1.2.0"
 
