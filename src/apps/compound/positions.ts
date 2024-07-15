@@ -119,7 +119,8 @@ const hook: PositionsHook = {
           positions.push({
             type: 'contract-position-definition',
             networkId,
-            address: `${market.toLowerCase()}-${token.toLowerCase()}-${type}`,
+            address: market.toLowerCase(),
+            extraId: `${token.toLowerCase()}-${type.toLowerCase()}`,
             tokens: [
               {
                 address: token.toLowerCase(),
