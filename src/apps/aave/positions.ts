@@ -128,6 +128,9 @@ const hook: PositionsHook = {
               description: `Supplied (APY: ${supplyApy.toFixed(2)}%)`,
               imageUrl: AAVE_LOGO,
             },
+            dataProps: {
+              apy: supplyApy,
+            },
             pricePerShare: [new BigNumber(1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
         // Variable debt token

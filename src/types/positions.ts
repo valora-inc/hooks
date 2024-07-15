@@ -54,10 +54,24 @@ export interface DisplayProps {
   imageUrl: string // Example: https://...
 }
 
+export interface DataPropsContext {
+  resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>
+}
+
+// For now list all the data props we need
+// But in the future we could parameterize this
+export type DataProps = EarnDataProps
+
+export interface EarnDataProps {
+  apy: number
+  // We'll add more fields here as needed
+}
+
 export interface AbstractPositionDefinition {
   networkId: NetworkId
   address: string
   displayProps: ((context: DisplayPropsContext) => DisplayProps) | DisplayProps
+  dataProps?: ((context: DataPropsContext) => DataProps) | DataProps
   tokens: (TokenDefinition & {
     category?: TokenCategory
   })[]
@@ -115,6 +129,7 @@ export interface AbstractPosition {
    */
   label: string // Example: Pool
   displayProps: DisplayProps
+  dataProps?: DataProps
   tokens: (Token & { category?: TokenCategory })[]
   availableShortcutIds: string[] // Allows to apply shortcuts to positions
 }
