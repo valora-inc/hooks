@@ -107,11 +107,23 @@ function createApp() {
     }),
   )
 
+  const getEarnPositionsRequestSchema = z.object({
+    query: z.object({
+      networkIds: z
+        .array(z.nativeEnum(NetworkId))
+        .nonempty()
+        .or(z.nativeEnum(NetworkId)), // singleton arrays sometimes serialize as single values
+    }),
+  })
+
   // Positions for the Earn feature
   app.get(
     '/getEarnPositions',
     asyncHandler(async (req, res) => {
-      const parsedRequest = await parseRequest(req, getHooksRequestSchema)
+      const parsedRequest = await parseRequest(
+        req,
+        getEarnPositionsRequestSchema,
+      )
       const networkIds = getNetworkIds(parsedRequest.query).filter(
         (network) =>
           // For now limit to Arbitrum
