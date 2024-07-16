@@ -108,7 +108,6 @@ function createApp() {
   )
 
   // Positions for the Earn feature
-  // For now limited to specific positions
   app.get(
     '/getEarnPositions',
     asyncHandler(async (req, res) => {
@@ -125,6 +124,7 @@ function createApp() {
           networkIds.map((networkId) =>
             getPositions(
               networkId,
+              // Earn positions are not user-specific
               undefined,
               // For now limit to Aave
               ['aave'],
