@@ -41,29 +41,30 @@ export function getConfig(): Config {
       .transform(networkIdToRpcUrlTransform),
   })
 
-  const productionSchema = z.intersection(
-    sharedSchema,
-    z.object({
-      GOOGLE_CLOUD_PROJECT: z.string().min(1),
-      POSITION_IDS: z.string().transform((val) => val.split(',')),
-      SHORTCUT_IDS: z.string().transform((val) => val.split(',')),
-    }),
-  )
+  const productionSchema = sharedSchema.extend({
+    GOOGLE_CLOUD_PROJECT: z.string().min(1),
+    POSITION_IDS: z.string().transform((val) => val.split(',')),
+    SHORTCUT_IDS: z.string().transform((val) => val.split(',')),
+  })
 
-  const developmentSchema = z.intersection(
-    sharedSchema,
-    z.object({
-      GOOGLE_CLOUD_PROJECT: z.string().default('dev-project'),
-      POSITION_IDS: z
-        .string()
-        .default('')
-        .transform((val) => (val === '' ? [] : val.split(','))),
-      SHORTCUT_IDS: z
-        .string()
-        .default('')
-        .transform((val) => (val === '' ? [] : val.split(','))),
-    }),
-  )
+  // Provide defaults in development
+  // TODO: consider providing a default .env.development file instead
+  const developmentSchema = sharedSchema.extend({
+    GET_TOKENS_INFO_URL: z
+      .string()
+      .default(
+        'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/tokensInfo',
+      ),
+    GOOGLE_CLOUD_PROJECT: z.string().default('dev-project'),
+    POSITION_IDS: z
+      .string()
+      .default('')
+      .transform((val) => (val === '' ? [] : val.split(','))),
+    SHORTCUT_IDS: z
+      .string()
+      .default('')
+      .transform((val) => (val === '' ? [] : val.split(','))),
+  })
 
   return process.env.NODE_ENV === 'production'
     ? productionSchema.parse(process.env)

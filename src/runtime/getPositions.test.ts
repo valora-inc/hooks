@@ -89,7 +89,6 @@ describe(getPositions, () => {
       NetworkId['celo-mainnet'],
       '0x0000000000000000000000000000000000007e57',
       [],
-      'mock-token-info-url',
     )
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
@@ -148,7 +147,6 @@ describe(getPositions, () => {
         NetworkId['celo-mainnet'],
         '0x0000000000000000000000000000000000007e57',
         [],
-        'mock-get-tokens-info-url',
       ),
     ).rejects.toThrow(
       "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo-mainnet)",
@@ -225,7 +223,6 @@ describe(getPositions, () => {
       NetworkId['op-mainnet'],
       '0x0000000000000000000000000000000000007e57',
       [],
-      'mock-token-info-url',
     )
     expect(positions.length).toBe(1)
     const beefyPosition = positions[0] as AppTokenPosition
@@ -259,7 +256,6 @@ describe(getPositions, () => {
       NetworkId['celo-mainnet'],
       '0x0000000000000000000000000000000000007e57',
       [],
-      'mock-token-info-url',
     )
     expect(positions.length).toBe(1)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(1)
@@ -304,7 +300,6 @@ describe(getPositions, () => {
       NetworkId['celo-mainnet'],
       '0x0000000000000000000000000000000000007e57',
       [],
-      'mock-token-info-url',
     )
     expect(positions.length).toBe(2)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(0)

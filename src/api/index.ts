@@ -6,7 +6,7 @@ import {
 } from '@valora/http-handler'
 import express from 'express'
 import { z } from 'zod'
-import { getConfig } from './config'
+import { getConfig } from '../config'
 import { logger } from '../log'
 import { parseRequest } from './parseRequest'
 import { getPositions } from '../runtime/getPositions'
@@ -94,12 +94,7 @@ function createApp() {
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
-            getPositions(
-              networkId,
-              address,
-              config.POSITION_IDS,
-              config.GET_TOKENS_INFO_URL,
-            ),
+            getPositions(networkId, address, config.POSITION_IDS),
           ),
         )
       ).flat()
