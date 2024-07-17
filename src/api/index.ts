@@ -18,6 +18,16 @@ import {
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
 
+const EARN_SUPPORTED_NETWORK_IDS = new Set([
+  NetworkId['arbitrum-one'],
+  NetworkId['arbitrum-sepolia'],
+])
+const EARN_SUPPORTED_APP_IDS = ['aave']
+const EARN_SUPPORTED_POSITION_IDS = new Set([
+  `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
+  `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
+])
+
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
@@ -120,10 +130,7 @@ function createApp() {
         getEarnPositionsRequestSchema,
       )
       const networkIds = getNetworkIds(parsedRequest.query).filter(
-        (network) =>
-          // For now limit to Arbitrum
-          network === NetworkId['arbitrum-one'] ||
-          network === NetworkId['arbitrum-sepolia'],
+        (networkId) => EARN_SUPPORTED_NETWORK_IDS.has(networkId),
       )
 
       const positions = (
@@ -133,9 +140,7 @@ function createApp() {
               networkId,
               // Earn positions are not user-specific
               undefined,
-              // For now limit to Aave
-              ['aave'],
-              config.GET_TOKENS_INFO_URL,
+              EARN_SUPPORTED_APP_IDS,
             ),
           ),
         )
@@ -143,11 +148,7 @@ function createApp() {
         .flat()
         .filter(
           // For now limit to specific positions
-          (position) =>
-            position.positionId ===
-              `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637` ||
-            position.positionId ===
-              `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
+          (position) => EARN_SUPPORTED_POSITION_IDS.has(position.positionId),
         )
 
       res.send({ message: 'OK', data: positions })
