@@ -10,7 +10,7 @@ import {
   sepolia,
 } from 'viem/chains'
 import { NetworkId } from '../types/networkId'
-import { getConfig } from '../api/config'
+import { getConfig } from '../config'
 
 const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['celo-mainnet']]: celo,
