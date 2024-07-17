@@ -64,6 +64,8 @@ export type DataProps = EarnDataProps
 
 export interface EarnDataProps {
   apy: number
+  depositTokenId: string
+  withdrawTokenId: string
   // We'll add more fields here as needed
 }
 

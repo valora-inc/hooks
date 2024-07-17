@@ -18,6 +18,16 @@ import {
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
 
+const EARN_SUPPORTED_NETWORK_IDS = new Set([
+  NetworkId['arbitrum-one'],
+  NetworkId['arbitrum-sepolia'],
+])
+const EARN_SUPPORTED_APP_IDS = ['aave']
+const EARN_SUPPORTED_POSITION_IDS = new Set([
+  `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
+  `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
+])
+
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
@@ -98,6 +108,49 @@ function createApp() {
           ),
         )
       ).flat()
+      res.send({ message: 'OK', data: positions })
+    }),
+  )
+
+  const getEarnPositionsRequestSchema = z.object({
+    query: z.object({
+      networkIds: z
+        .array(z.nativeEnum(NetworkId))
+        .nonempty()
+        .or(z.nativeEnum(NetworkId)), // singleton arrays sometimes serialize as single values
+    }),
+  })
+
+  // Positions for the Earn feature
+  app.get(
+    '/getEarnPositions',
+    asyncHandler(async (req, res) => {
+      const parsedRequest = await parseRequest(
+        req,
+        getEarnPositionsRequestSchema,
+      )
+      const networkIds = getNetworkIds(parsedRequest.query).filter(
+        (networkId) => EARN_SUPPORTED_NETWORK_IDS.has(networkId),
+      )
+
+      const positions = (
+        await Promise.all(
+          networkIds.map((networkId) =>
+            getPositions(
+              networkId,
+              // Earn positions are not user-specific
+              undefined,
+              EARN_SUPPORTED_APP_IDS,
+            ),
+          ),
+        )
+      )
+        .flat()
+        .filter(
+          // For now limit to specific positions
+          (position) => EARN_SUPPORTED_POSITION_IDS.has(position.positionId),
+        )
+
       res.send({ message: 'OK', data: positions })
     }),
   )

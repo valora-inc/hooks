@@ -123,11 +123,57 @@ const TEST_POSITIONS_ETHEREUM: Position[] = [
   },
 ]
 
+const TEST_POSITIONS_ARBITRUM: Position[] = [
+  {
+    type: 'app-token',
+    networkId: NetworkId['arbitrum-one'],
+    address: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+    tokenId: 'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
+    positionId: 'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
+    appId: 'aave',
+    appName: 'Aave',
+    symbol: 'aArbUSDCn',
+    decimals: 6,
+    label: 'USDC',
+    displayProps: {
+      title: 'USDC',
+      description: 'Supplied (APY: 7.42%)',
+      imageUrl:
+        'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png',
+    },
+    dataProps: {
+      apy: 7.419092396389471,
+      depositTokenId: 'arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+      withdrawTokenId:
+        'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
+    },
+    tokens: [
+      {
+        address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+        decimals: 6,
+        symbol: 'USDC',
+        networkId: NetworkId['arbitrum-one'],
+        tokenId: 'arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+        priceUsd: '1' as SerializedDecimalNumber,
+        type: 'base-token',
+        balance: '0' as SerializedDecimalNumber,
+      },
+    ],
+    pricePerShare: ['1' as SerializedDecimalNumber],
+    priceUsd: '1' as SerializedDecimalNumber,
+    balance: '0' as SerializedDecimalNumber,
+    supply: '239859963.713137' as SerializedDecimalNumber,
+    availableShortcutIds: ['deposit', 'withdraw'],
+  },
+]
+
 jest.mocked(getPositions).mockImplementation(async (networkId) => {
   if (networkId === NetworkId['celo-mainnet']) {
     return TEST_POSITIONS_CELO
   } else if (networkId === NetworkId['ethereum-mainnet']) {
     return TEST_POSITIONS_ETHEREUM
+  } else if (networkId === NetworkId['arbitrum-one']) {
+    return TEST_POSITIONS_ARBITRUM
   } else {
     return []
   }
@@ -201,6 +247,23 @@ describe('GET /getPositions', () => {
     expect(response.body).toStrictEqual({
       message: 'OK',
       data: TEST_POSITIONS_CELO,
+    })
+  })
+})
+
+describe('GET /getEarnPositions', () => {
+  it('returns earn positions', async () => {
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .get('/getEarnPositions')
+      .query({
+        networkIds: [NetworkId['arbitrum-one']],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+    expect(response.body).toEqual({
+      message: 'OK',
+      data: TEST_POSITIONS_ARBITRUM,
     })
   })
 })
