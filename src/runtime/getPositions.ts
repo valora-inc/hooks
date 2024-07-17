@@ -27,6 +27,7 @@ import { NetworkId } from '../types/networkId'
 import { getClient } from './client'
 import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'
+import { getConfig } from '../config'
 
 interface RawTokenInfo {
   address?: string
@@ -398,7 +399,6 @@ export async function getPositions(
   networkId: NetworkId,
   address: string | undefined,
   appIds: string[] = [],
-  getTokensInfoUrl: string,
 ) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
@@ -424,7 +424,10 @@ export async function getPositions(
   logger.debug({ definitions }, 'positions definitions')
 
   // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo(getTokensInfoUrl, networkId)
+  const baseTokensInfo = await getBaseTokensInfo(
+    getConfig().GET_TOKENS_INFO_URL,
+    networkId,
+  )
 
   let unlistedBaseTokensInfo: TokensInfo = {}
   let definitionsToResolve: AppPositionDefinition[] = definitions

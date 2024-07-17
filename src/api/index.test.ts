@@ -8,9 +8,9 @@ import { getShortcuts } from '../runtime/getShortcuts'
 import { Position } from '../types/positions'
 import { SerializedDecimalNumber } from '../types/numbers'
 import { NetworkId } from '../types/networkId'
-import { getConfig } from './config'
+import { getConfig } from '../config'
 
-jest.mock('./config')
+jest.mock('../config')
 jest.mocked(getConfig).mockReturnValue({
   POSITION_IDS: [],
   GET_TOKENS_INFO_URL: 'https://valoraapp.com/mock-endpoint',

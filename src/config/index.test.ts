@@ -1,4 +1,4 @@
-import { networkIdToRpcUrlTransform } from './config'
+import { networkIdToRpcUrlTransform } from '.'
 
 describe('config', () => {
   describe('networkIdToRpcUrlTransform', () => {
