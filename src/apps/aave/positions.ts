@@ -3,65 +3,16 @@ import {
   AppTokenPositionDefinition,
   UnknownAppTokenError,
   TokenDefinition,
+  ContractPositionDefinition,
 } from '../../types/positions'
 import { Address } from 'viem'
-import { DecimalNumber } from '../../types/numbers'
+import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
-import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
 import { uiPoolDataProviderV3Abi } from './abis/ui-pool-data-provider-v3'
 import { getTokenId } from '../../runtime/getTokenId'
-
-// See https://github.com/bgd-labs/aave-address-book/tree/fbb590953db44d62a756d4639cb77ea58afb299c/src/ts
-// and https://docs.aave.com/developers/deployed-contracts/v3-mainnet
-const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
-  NetworkId,
-  | {
-      poolAddressesProvider: Address
-      uiPoolDataProvider: Address
-    }
-  | undefined
-> = {
-  [NetworkId['celo-mainnet']]: undefined,
-  [NetworkId['celo-alfajores']]: undefined,
-  [NetworkId['ethereum-mainnet']]: {
-    poolAddressesProvider: '0x2f39d218133afab8f2b819b1066c7e434ad94e9e',
-    uiPoolDataProvider: '0x91c0ea31b49b69ea18607702c5d9ac360bf3de7d',
-  },
-  [NetworkId['ethereum-sepolia']]: {
-    poolAddressesProvider: '0x012bac54348c0e635dcac9d5fb99f06f24136c9a',
-    uiPoolDataProvider: '0x69529987fa4a075d0c00b0128fa848dc9ebbe9ce',
-  },
-  [NetworkId['arbitrum-one']]: {
-    poolAddressesProvider: '0xa97684ead0e402dc232d5a977953df7ecbab3cdb',
-    uiPoolDataProvider: '0x145de30c929a065582da84cf96f88460db9745a7',
-  },
-  [NetworkId['arbitrum-sepolia']]: {
-    poolAddressesProvider: '0xb25a5d144626a0d488e52ae717a051a2e9997076',
-    uiPoolDataProvider: '0x97cf44bf6a9a3d2b4f32b05c480dbedc018f72a9',
-  },
-  [NetworkId['op-mainnet']]: {
-    poolAddressesProvider: '0xa97684ead0e402dc232d5a977953df7ecbab3cdb',
-    uiPoolDataProvider: '0xbd83ddbe37fc91923d59c8c1e0bde0cccca332d5',
-  },
-  [NetworkId['op-sepolia']]: {
-    poolAddressesProvider: '0x36616cf17557639614c1cddb356b1b83fc0b2132',
-    uiPoolDataProvider: '0x86e2938dae289763d4e09a7e42c5ccca62cf9809',
-  },
-  [NetworkId['polygon-pos-mainnet']]: {
-    poolAddressesProvider: '0xa97684ead0e402dc232d5a977953df7ecbab3cdb',
-    uiPoolDataProvider: '0xc69728f11e9e6127733751c8410432913123acf1',
-  },
-  [NetworkId['polygon-pos-amoy']]: undefined,
-  [NetworkId['base-mainnet']]: {
-    poolAddressesProvider: '0xe20fcbdbffc4dd138ce8b2e6fbb6cb49777ad64d',
-    uiPoolDataProvider: '0x174446a6741300cd2e7c1b1a636fee99c8f83502',
-  },
-  [NetworkId['base-sepolia']]: {
-    poolAddressesProvider: '0xd449fed49d9c443688d6816fe6872f21402e41de',
-    uiPoolDataProvider: '0x884702e4b1d0a2900369e83d5765d537f469cac9',
-  },
-}
+import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
+import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 
 const AAVE_LOGO =
   'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png'
@@ -103,14 +54,25 @@ const hook: PositionsHook = {
       args: [aaveAddresses.poolAddressesProvider],
     })
 
-    const userReserveData = address
-      ? await client.readContract({
-          address: aaveAddresses.uiPoolDataProvider,
-          abi: uiPoolDataProviderV3Abi,
-          functionName: 'getUserReservesData',
-          args: [aaveAddresses.poolAddressesProvider, address as Address],
+    const [userReserveData, userIncentivesData] = address
+      ? await client.multicall({
+          contracts: [
+            {
+              address: aaveAddresses.uiPoolDataProvider,
+              abi: uiPoolDataProviderV3Abi,
+              functionName: 'getUserReservesData',
+              args: [aaveAddresses.poolAddressesProvider, address as Address],
+            },
+            {
+              address: aaveAddresses.uiIncentiveDataProvider,
+              abi: uiIncentiveDataProviderV3Abi,
+              functionName: 'getUserReservesIncentivesData',
+              args: [aaveAddresses.poolAddressesProvider, address as Address],
+            },
+          ],
+          allowFailure: false,
         })
-      : undefined
+      : [undefined, undefined]
 
     return reservesData.flatMap((reserveData, i) => {
       const supplyApy = getApyFromRayApr(reserveData.liquidityRate)
@@ -127,6 +89,20 @@ const hook: PositionsHook = {
         !userReserveData || userReserveData[i].scaledVariableDebt > 0n
       const useStableDebt =
         !userReserveData || userReserveData[i].principalStableDebt > 0n
+
+      const userIncentives = userIncentivesData?.[i]
+      const aTokenRewardsInfo =
+        userIncentives?.aTokenIncentivesUserData.userRewardsInformation.filter(
+          (info) => info.userUnclaimedRewards > 0n,
+        )
+      const variableDebtRewardsInfo =
+        userIncentives?.vTokenIncentivesUserData.userRewardsInformation.filter(
+          (info) => info.userUnclaimedRewards > 0n,
+        )
+      const stableDebtRewardsInfo =
+        userIncentives?.sTokenIncentivesUserData.userRewardsInformation.filter(
+          (info) => info.userUnclaimedRewards > 0n,
+        )
 
       return [
         // AToken
@@ -157,6 +133,31 @@ const hook: PositionsHook = {
             },
             pricePerShare: [new BigNumber(1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
+        // ATokens incentives
+        aTokenRewardsInfo?.length &&
+          ({
+            type: 'contract-position-definition',
+            networkId,
+            address: reserveData.aTokenAddress.toLowerCase(),
+            extraId: 'supply-incentives',
+            tokens: aTokenRewardsInfo.map((info) => ({
+              address: info.rewardTokenAddress.toLowerCase(),
+              networkId,
+              category: 'claimable',
+            })),
+            availableShortcutIds: ['claim-rewards'],
+            balances: aTokenRewardsInfo.map((info) =>
+              toDecimalNumber(
+                info.userUnclaimedRewards,
+                info.rewardTokenDecimals,
+              ),
+            ),
+            displayProps: {
+              title: `${reserveData.symbol} supply incentives`,
+              description: 'Rewards for supplying',
+              imageUrl: AAVE_LOGO,
+            },
+          } satisfies ContractPositionDefinition),
         // Variable debt token
         useVariableDebt &&
           ({
@@ -175,6 +176,31 @@ const hook: PositionsHook = {
             // instead of using a negative pricePerShare
             pricePerShare: [new BigNumber(-1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
+        // Variable debt incentives
+        variableDebtRewardsInfo?.length &&
+          ({
+            type: 'contract-position-definition',
+            networkId,
+            address: reserveData.variableDebtTokenAddress.toLowerCase(),
+            extraId: 'variable-debt-incentives',
+            tokens: variableDebtRewardsInfo.map((info) => ({
+              address: info.rewardTokenAddress.toLowerCase(),
+              networkId,
+              category: 'claimable',
+            })),
+            availableShortcutIds: ['claim-rewards'],
+            balances: variableDebtRewardsInfo.map((info) =>
+              toDecimalNumber(
+                info.userUnclaimedRewards,
+                info.rewardTokenDecimals,
+              ),
+            ),
+            displayProps: {
+              title: `${reserveData.symbol} variable debt incentives`,
+              description: 'Rewards for borrowing',
+              imageUrl: AAVE_LOGO,
+            },
+          } satisfies ContractPositionDefinition),
         // Stable debt token
         useStableDebt &&
           ({
@@ -192,6 +218,31 @@ const hook: PositionsHook = {
             // TODO: similar as comment above for variable debt
             pricePerShare: [new BigNumber(-1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
+        // Stable debt incentives
+        stableDebtRewardsInfo?.length &&
+          ({
+            type: 'contract-position-definition',
+            networkId,
+            address: reserveData.stableDebtTokenAddress.toLowerCase(),
+            extraId: 'stable-debt-incentives',
+            tokens: stableDebtRewardsInfo.map((info) => ({
+              address: info.rewardTokenAddress.toLowerCase(),
+              networkId,
+              category: 'claimable',
+            })),
+            availableShortcutIds: ['claim-rewards'],
+            balances: stableDebtRewardsInfo.map((info) =>
+              toDecimalNumber(
+                info.userUnclaimedRewards,
+                info.rewardTokenDecimals,
+              ),
+            ),
+            displayProps: {
+              title: `${reserveData.symbol} stable debt incentives`,
+              description: 'Rewards for borrowing',
+              imageUrl: AAVE_LOGO,
+            },
+          } satisfies ContractPositionDefinition),
       ].filter((x) => !!x)
     })
   },
