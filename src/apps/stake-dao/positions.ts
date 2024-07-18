@@ -41,6 +41,10 @@ const SD_VAULT_ADDRESSES_BY_NETWORK_ID: Record<NetworkId, Address[]> = {
   [NetworkId['arbitrum-sepolia']]: [],
   [NetworkId['op-mainnet']]: [],
   [NetworkId['op-sepolia']]: [],
+  [NetworkId['polygon-pos-mainnet']]: [],
+  [NetworkId['polygon-pos-amoy']]: [],
+  [NetworkId['base-mainnet']]: [],
+  [NetworkId['base-sepolia']]: [],
 }
 
 async function getVaultPositionDefinitions(

@@ -8,6 +8,10 @@ import {
   optimism,
   optimismSepolia,
   sepolia,
+  polygon,
+  polygonAmoy,
+  base,
+  baseSepolia,
 } from 'viem/chains'
 import { NetworkId } from '../types/networkId'
 import { getConfig } from '../config'
@@ -21,6 +25,10 @@ const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['ethereum-sepolia']]: sepolia,
   [NetworkId['arbitrum-sepolia']]: arbitrumSepolia,
   [NetworkId['op-sepolia']]: optimismSepolia,
+  [NetworkId['polygon-pos-mainnet']]: polygon,
+  [NetworkId['polygon-pos-amoy']]: polygonAmoy,
+  [NetworkId['base-mainnet']]: base,
+  [NetworkId['base-sepolia']]: baseSepolia,
 }
 
 export function getClient(
