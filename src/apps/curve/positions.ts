@@ -47,10 +47,14 @@ const NETWORK_ID_TO_CURVE_BLOCKCHAIN_ID: Record<NetworkId, string | null> = {
   [NetworkId['ethereum-mainnet']]: 'ethereum',
   [NetworkId['arbitrum-one']]: 'arbitrum',
   [NetworkId['op-mainnet']]: 'optimism',
+  [NetworkId['polygon-pos-mainnet']]: 'polygon',
+  [NetworkId['base-mainnet']]: 'base',
+  [NetworkId['celo-alfajores']]: null,
   [NetworkId['ethereum-sepolia']]: null,
   [NetworkId['arbitrum-sepolia']]: null,
   [NetworkId['op-sepolia']]: null,
-  [NetworkId['celo-alfajores']]: null,
+  [NetworkId['polygon-pos-amoy']]: null,
+  [NetworkId['base-sepolia']]: null,
 }
 
 export async function getAllCurvePools(

@@ -31,14 +31,15 @@ const BEEFY_MULTICALL_ADDRESS: {
   [NetworkId['arbitrum-one']]: '0x47bec05dC291e61cd4360322eA44882cA468dD54',
   [NetworkId['op-mainnet']]: '0xB089f6c9C99238FC6df256cc66d53Aed198584D9',
   [NetworkId['celo-mainnet']]: '0x0bF5F48d8F761efAe0f187eCce60784e5d3E87E6',
-
-  // polygon: 0x244908D9A21B143911D531cD1D37575D63da4D87
-  // base: 0x09C74A4bd3453e1C15D6624F24b3A02059a4dA15
-
+  [NetworkId['polygon-pos-mainnet']]:
+    '0x244908D9A21B143911D531cD1D37575D63da4D87',
+  [NetworkId['base-mainnet']]: '0x09C74A4bd3453e1C15D6624F24b3A02059a4dA15',
   [NetworkId['ethereum-sepolia']]: undefined,
   [NetworkId['arbitrum-sepolia']]: undefined,
   [NetworkId['op-sepolia']]: undefined,
   [NetworkId['celo-alfajores']]: undefined,
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-sepolia']]: undefined,
 }
 
 const beefyAppTokenDefinition = (

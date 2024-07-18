@@ -23,6 +23,11 @@ const AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID: {
   [NetworkId['arbitrum-sepolia']]: '0xbfc91d59fdaa134a4ed45f7b584caf96d7792eff',
   [NetworkId['op-mainnet']]: '0x794a61358d6845594f94dc1db02a252b5b4814ad',
   [NetworkId['op-sepolia']]: '0xb50201558b00496a145fe76f7424749556e326d8',
+  [NetworkId['polygon-pos-mainnet']]:
+    '0x794a61358d6845594f94dc1db02a252b5b4814ad',
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-mainnet']]: '0xa238dd80c259a72e81d7e4664a9801593f98d1c5',
+  [NetworkId['base-sepolia']]: '0x07ea79f68b2b3df564d0a34f8e19d9b1e339814b',
 }
 
 // Hardcoding for now

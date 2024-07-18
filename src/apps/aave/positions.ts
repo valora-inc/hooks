@@ -48,6 +48,19 @@ const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
     poolAddressesProvider: '0x36616cf17557639614c1cddb356b1b83fc0b2132',
     uiPoolDataProvider: '0x86e2938dae289763d4e09a7e42c5ccca62cf9809',
   },
+  [NetworkId['polygon-pos-mainnet']]: {
+    poolAddressesProvider: '0xa97684ead0e402dc232d5a977953df7ecbab3cdb',
+    uiPoolDataProvider: '0xc69728f11e9e6127733751c8410432913123acf1',
+  },
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-mainnet']]: {
+    poolAddressesProvider: '0xe20fcbdbffc4dd138ce8b2e6fbb6cb49777ad64d',
+    uiPoolDataProvider: '0x174446a6741300cd2e7c1b1a636fee99c8f83502',
+  },
+  [NetworkId['base-sepolia']]: {
+    poolAddressesProvider: '0xd449fed49d9c443688d6816fe6872f21402e41de',
+    uiPoolDataProvider: '0x884702e4b1d0a2900369e83d5765d537f469cac9',
+  },
 }
 
 const AAVE_LOGO =
