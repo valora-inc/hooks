@@ -58,7 +58,9 @@ describe('getShortcutDefinitions', () => {
       const shortcuts = await hook.getShortcutDefinitions(
         NetworkId['arbitrum-one'],
       )
-      const shortcut = shortcuts.find((shortcut) => shortcut.id === 'claim-rewards')
+      const shortcut = shortcuts.find(
+        (shortcut) => shortcut.id === 'claim-rewards',
+      )
       expect(shortcut).toBeDefined()
 
       const transactions = await shortcut!.onTrigger({
@@ -68,5 +70,6 @@ describe('getShortcutDefinitions', () => {
       })
 
       expect(transactions.length).toEqual(1)
+    })
   })
 })
