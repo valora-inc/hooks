@@ -10,35 +10,21 @@ import { z } from 'zod'
 import { getClient } from '../../runtime/client'
 import { poolV3Abi } from './abis/pool-v3'
 import { aTokenAbi } from './abis/atoken'
-
-// From https://github.com/bgd-labs/aave-address-book/tree/4d208edf7271e0fff0eceed55de535e32dc055d4/src/ts
-const AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID: {
-  [networkId in NetworkId]: Address | undefined
-} = {
-  [NetworkId['celo-mainnet']]: undefined,
-  [NetworkId['celo-alfajores']]: undefined,
-  [NetworkId['ethereum-mainnet']]: '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2',
-  [NetworkId['ethereum-sepolia']]: '0x6ae43d3271ff6888e7fc43fd7321a503ff738951',
-  [NetworkId['arbitrum-one']]: '0x794a61358d6845594f94dc1db02a252b5b4814ad',
-  [NetworkId['arbitrum-sepolia']]: '0xbfc91d59fdaa134a4ed45f7b584caf96d7792eff',
-  [NetworkId['op-mainnet']]: '0x794a61358d6845594f94dc1db02a252b5b4814ad',
-  [NetworkId['op-sepolia']]: '0xb50201558b00496a145fe76f7424749556e326d8',
-  [NetworkId['polygon-pos-mainnet']]:
-    '0x794a61358d6845594f94dc1db02a252b5b4814ad',
-  [NetworkId['polygon-pos-amoy']]: undefined,
-  [NetworkId['base-mainnet']]: '0xa238dd80c259a72e81d7e4664a9801593f98d1c5',
-  [NetworkId['base-sepolia']]: '0x07ea79f68b2b3df564d0a34f8e19d9b1e339814b',
-}
+import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
+import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 
 // Hardcoding for now
 const GAS = 1_000_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
-    const poolContractAddress = AAVE_POOL_V3_ADDRESS_BY_NETWORK_ID[networkId]
-    if (!poolContractAddress) {
+    const aaveAddresses = AAVE_V3_ADDRESSES_BY_NETWORK_ID[networkId]
+    if (!aaveAddresses) {
       return []
     }
+
+    const poolContractAddress = aaveAddresses.pool
+    const incentivesContractAddress = aaveAddresses.incentivesController
 
     return [
       createShortcut({
@@ -153,6 +139,32 @@ const hook: ShortcutsHook = {
           transactions.push(withdrawTx)
 
           return transactions
+        },
+      }),
+      createShortcut({
+        id: 'claim-rewards',
+        name: 'Claim',
+        description: 'Claim rewards',
+        networkIds: [networkId],
+        category: 'claim',
+        triggerInputShape: {
+          positionAddress: ZodAddressLowerCased,
+        },
+        async onTrigger({ networkId, address, positionAddress }) {
+          const walletAddress = address as Address
+
+          return [
+            {
+              networkId,
+              from: walletAddress,
+              to: incentivesContractAddress,
+              data: encodeFunctionData({
+                abi: incentivesControllerV3Abi,
+                functionName: 'claimAllRewardsToSelf',
+                args: [[positionAddress]], // positionAddress is the a/v/sToken address
+              }),
+            },
+          ]
         },
       }),
     ]
