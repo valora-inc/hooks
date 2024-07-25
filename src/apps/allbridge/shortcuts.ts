@@ -72,7 +72,7 @@ const hook: ShortcutsHook = {
             data: encodeFunctionData({
               abi: poolAbi,
               functionName: 'deposit',
-              args: [token.address, amountToSupply, walletAddress, 0],
+              args: [amountToSupply],
             }),
             // TODO: consider moving this concern to the runtime
             // which would simulate the transaction(s) to get these
