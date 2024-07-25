@@ -14,7 +14,7 @@ import { poolAbi } from './abis/pool'
 const GAS = 1_000_000n
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
+  async getShortcutDefinitions(networkId: NetworkId) {
     return [
       createShortcut({
         id: 'deposit',
