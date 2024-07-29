@@ -1,7 +1,7 @@
 import hook from './positions'
 import { NetworkId } from '../../types/networkId'
 
-describe.each([NetworkId['arbitrum-one']])(
+describe.each([NetworkId['celo-mainnet']])(
   'getPositionDefinitions for networkId %s',
   (networkId) => {
     it('should get the address definitions successfully', async () => {

@@ -28,25 +28,38 @@ const hook: PositionsHook = {
     const allbridgeTokenInfo = (await getAllBridgeTokenInfo({ networkId }))
       .tokens
 
-    return allbridgeTokenInfo.flatMap(async (tokenInfo) => {
-      const apr = new BigNumber(tokenInfo.apr7d).toNumber()
+    const client = getClient(networkId)
 
-      const client = getClient(networkId)
-      const balanceOf = await client.readContract({
-        address: tokenInfo.poolAddress,
-        abi: poolAbi,
-        functionName: 'balanceOf',
-        args: [address as Address],
-      })
-      const pendingReward = await client.readContract({
-        address: tokenInfo.poolAddress,
-        abi: poolAbi,
-        functionName: 'pendingReward',
-        args: [address as Address],
-      })
+    const balances = await Promise.all(
+      allbridgeTokenInfo.map(async (tokenInfo) => {
+        return address ? client.readContract({
+          address: tokenInfo.poolAddress,
+          abi: poolAbi,
+          functionName: 'balanceOf',
+          args: [address as Address],
+        }) : undefined
+      }),
+    )
 
-      const useAToken = balanceOf > 0 || !balanceOf
-      const showReward = pendingReward > 0
+    const rewards = await Promise.all(
+      allbridgeTokenInfo.map(async (tokenInfo) => {
+        return address ? client.readContract({
+          address: tokenInfo.poolAddress,
+          abi: poolAbi,
+          functionName: 'pendingReward',
+          args: [address as Address],
+        }) : undefined
+      }),
+    )
+
+    return allbridgeTokenInfo.flatMap((tokenInfo, i) => {
+      const apr = new BigNumber(tokenInfo.apr7d).toNumber() * 100
+
+      const balanceOf = balances[i]
+      const pendingReward = rewards[i]
+
+      const useAToken = !balanceOf || balanceOf > 0
+      const showReward = !!pendingReward && pendingReward > 0
       return [
         useAToken &&
           ({
@@ -96,7 +109,7 @@ const hook: PositionsHook = {
               imageUrl: ALLBRIDGE_LOGO,
             },
           } satisfies ContractPositionDefinition),
-      ]
+      ].filter((x) => !!x)
     })
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
