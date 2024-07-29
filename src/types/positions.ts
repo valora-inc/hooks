@@ -63,7 +63,8 @@ export interface DataPropsContext {
 export type DataProps = EarnDataProps
 
 export interface EarnDataProps {
-  apy: number
+  apy?: number
+  apr?: number
   depositTokenId: string
   withdrawTokenId: string
   // We'll add more fields here as needed

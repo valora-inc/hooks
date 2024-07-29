@@ -10,7 +10,7 @@ import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
-import { getAllBridgeTokenInfo } from './api'
+import { getAllbridgeTokenInfo } from './api'
 import { poolAbi } from './abis/pool'
 
 const ALLBRIDGE_LOGO =
@@ -25,21 +25,19 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(networkId, address) {
-    const allbridgeTokenInfo = (await getAllBridgeTokenInfo({ networkId }))
+    const allbridgeTokenInfo = (await getAllbridgeTokenInfo({ networkId }))
       .tokens
 
     const client = getClient(networkId)
 
     const balances = await Promise.all(
       allbridgeTokenInfo.map(async (tokenInfo) => {
-        return address
-          ? client.readContract({
+        return address ? client.readContract({
               address: tokenInfo.poolAddress,
               abi: poolAbi,
               functionName: 'balanceOf',
               args: [address as Address],
-            })
-          : undefined
+            }) : undefined
       }),
     )
 
@@ -62,7 +60,7 @@ const hook: PositionsHook = {
       const balanceOf = balances[i]
       const pendingReward = rewards[i]
 
-      const useAToken = !balanceOf || balanceOf > 0
+      const useAToken = !address || (!!balanceOf && balanceOf > 0)
       const showReward = !!pendingReward && pendingReward > 0
       return [
         useAToken &&
@@ -80,7 +78,7 @@ const hook: PositionsHook = {
               imageUrl: ALLBRIDGE_LOGO,
             },
             dataProps: {
-              apy: apr,
+              apr,
               depositTokenId: getTokenId({
                 networkId,
                 address: tokenInfo.tokenAddress.toLowerCase(),

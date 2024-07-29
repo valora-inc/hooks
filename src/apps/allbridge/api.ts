@@ -2,7 +2,7 @@ import got from 'got'
 import { NetworkId } from '../../types/networkId'
 import { Address } from 'viem'
 
-type SupportedAllBridgeChainSymbols =
+type SupportedAllbridgeChainSymbols =
   | 'ETH'
   | 'CEL'
   | 'POL'
@@ -11,7 +11,7 @@ type SupportedAllBridgeChainSymbols =
   | 'BAS'
 
 const ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID: Record<
-  SupportedAllBridgeChainSymbols,
+  SupportedAllbridgeChainSymbols,
   NetworkId
 > = {
   ETH: NetworkId['ethereum-mainnet'],
@@ -22,8 +22,8 @@ const ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID: Record<
   BAS: NetworkId['base-mainnet'],
 }
 
-type AllBridgeApiResponse = {
-  [key in SupportedAllBridgeChainSymbols]: NetworkInfo
+type AllbridgeApiResponse = {
+  [key in SupportedAllbridgeChainSymbols]: NetworkInfo
 }
 
 interface TokenInfo {
@@ -67,29 +67,34 @@ interface NetworkInfo {
   chainId: number
   bridgeAddress: Address
   swapAddress: Address
-  transferTime: Record<SupportedAllBridgeChainSymbols, TransferTime>
+  transferTime: Record<SupportedAllbridgeChainSymbols, TransferTime>
   confirmations: number
   txCostAmount: TxCostAmount
 }
 
-export async function getAllBridgeTokenInfo({
+export async function getAllbridgeTokenInfo({
   networkId,
 }: {
   networkId: NetworkId
 }): Promise<NetworkInfo> {
   const tokenObj: Record<string, NetworkInfo> = {}
-  const tokenInfo: AllBridgeApiResponse = await got
+  const networkInfo: AllbridgeApiResponse = await got
     .get('https://core.api.allbridgecoreapi.net/token-info')
     .json()
 
-  for (const key of Object.keys(
-    tokenInfo,
-  ) as SupportedAllBridgeChainSymbols[]) {
-    if (!ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[key]) continue
-    tokenObj[ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[key]] = tokenInfo[
-      key
-    ] as NetworkInfo
-  }
+  Object.entries(networkInfo).forEach(([allbridgeChain, chainNetworkInfo]) => {
+    if (
+      ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[
+        allbridgeChain as SupportedAllbridgeChainSymbols
+      ]
+    ) {
+      tokenObj[
+        ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[
+          allbridgeChain as SupportedAllbridgeChainSymbols
+        ]
+      ] = chainNetworkInfo
+    }
+  })
 
   return tokenObj[networkId]
 }
