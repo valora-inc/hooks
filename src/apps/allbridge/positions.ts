@@ -52,7 +52,7 @@ const hook: PositionsHook = {
           ({
             type: 'app-token-definition',
             networkId,
-            address: ''.toLowerCase(), // TODO: Add LP token address here
+            address: tokenInfo.poolAddress.toLowerCase(),
             tokens: [
               { address: tokenInfo.tokenAddress.toLowerCase(), networkId },
             ],
@@ -70,7 +70,7 @@ const hook: PositionsHook = {
               }),
               withdrawTokenId: getTokenId({
                 networkId,
-                address: ''.toLowerCase(), // TODO: Add LP token address here
+                address: tokenInfo.poolAddress.toLowerCase(),
               }),
             },
             pricePerShare: [new BigNumber(1) as DecimalNumber],
@@ -79,7 +79,7 @@ const hook: PositionsHook = {
           ({
             type: 'contract-position-definition',
             networkId,
-            address: ''.toLowerCase(), // TODO: Add LP token address here
+            address: tokenInfo.poolAddress.toLowerCase(),
             extraId: 'supply-incentives',
             tokens: [
               {
