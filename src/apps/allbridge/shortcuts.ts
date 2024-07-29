@@ -9,18 +9,12 @@ import {
   Transaction,
 } from '../../types/shortcuts'
 import { poolAbi } from './abis/pool'
-import { getAllBridgeTokenInfo } from './api'
 
 // Hardcoding for now
 const GAS = 1_000_000n
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
-    const tokenInfo = await getAllBridgeTokenInfo({ networkId })
-
-    // TODO(tomm): How should we loop through allBridgeAddresses?
-    const poolContractAddress = tokenInfo.tokens[0].poolAddress
-
+  async getShortcutDefinitions(networkId: NetworkId) {
     return [
       createShortcut({
         id: 'deposit',
@@ -36,8 +30,10 @@ const hook: ShortcutsHook = {
             decimals: z.coerce.number(),
             amount: z.string(), // in decimal string
           }),
+          positionAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ networkId, address, token }) {
+
+        async onTrigger({ networkId, address, token, positionAddress }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
@@ -50,14 +46,14 @@ const hook: ShortcutsHook = {
             address: token.address,
             abi: erc20Abi,
             functionName: 'allowance',
-            args: [walletAddress, poolContractAddress],
+            args: [walletAddress, positionAddress],
           })
 
           if (approvedAllowanceForSpender < amountToSupply) {
             const data = encodeFunctionData({
               abi: erc20Abi,
               functionName: 'approve',
-              args: [poolContractAddress, amountToSupply],
+              args: [positionAddress, amountToSupply],
             })
 
             const approveTx: Transaction = {
@@ -72,11 +68,11 @@ const hook: ShortcutsHook = {
           const supplyTx: Transaction = {
             networkId,
             from: walletAddress,
-            to: poolContractAddress,
+            to: positionAddress,
             data: encodeFunctionData({
               abi: poolAbi,
               functionName: 'deposit',
-              args: [token.address, amountToSupply, walletAddress, 0],
+              args: [amountToSupply],
             }),
             // TODO: consider moving this concern to the runtime
             // which would simulate the transaction(s) to get these
