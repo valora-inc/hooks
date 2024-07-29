@@ -7,6 +7,7 @@ describe('getShortcutDefinitions', () => {
       NetworkId['arbitrum-one'],
     )
     expect(shortcuts.length).toBeGreaterThan(0)
+    expect(shortcuts[0].id).toBe('deposit')
   })
 
   describe('deposit.onTrigger', () => {
