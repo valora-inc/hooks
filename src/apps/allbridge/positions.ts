@@ -32,12 +32,14 @@ const hook: PositionsHook = {
 
     const balances = await Promise.all(
       allbridgeTokenInfo.map(async (tokenInfo) => {
-        return address ? client.readContract({
+        return address
+          ? client.readContract({
               address: tokenInfo.poolAddress,
               abi: poolAbi,
               functionName: 'balanceOf',
               args: [address as Address],
-            }) : undefined
+            })
+          : undefined
       }),
     )
 
