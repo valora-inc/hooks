@@ -13,7 +13,8 @@ import { getTokenId } from '../../runtime/getTokenId'
 import { getAllBridgeTokenInfo } from './api'
 import { poolAbi } from './abis/pool'
 
-const ALLBRIDGE_LOGO = '???'  // TODO: Add actual logo link
+const ALLBRIDGE_LOGO =
+  'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/allbridgecore.png'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -80,11 +81,13 @@ const hook: PositionsHook = {
             networkId,
             address: ''.toLowerCase(), // TODO: Add LP token address here
             extraId: 'supply-incentives',
-            tokens: [{
-              address: tokenInfo.tokenAddress.toLowerCase(),
-              networkId,
-              category: 'claimable',
-            }],
+            tokens: [
+              {
+                address: tokenInfo.tokenAddress.toLowerCase(),
+                networkId,
+                category: 'claimable',
+              },
+            ],
             availableShortcutIds: ['claim-rewards'],
             balances: [toDecimalNumber(pendingReward, tokenInfo.decimals)],
             displayProps: {
