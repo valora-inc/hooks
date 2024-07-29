@@ -552,4 +552,4 @@ export const poolAbi = [
     type: 'function',
   },
   { stateMutability: 'payable', type: 'receive' },
-]
+] as const
