@@ -30,20 +30,20 @@ import { poolAbi } from './abis/pool'
         const apr = (new BigNumber(tokenInfo.apr7d)).toNumber()
 
         const client = getClient(networkId)
-        const [balanceOf] = await client.readContract({
+        const balanceOf = await client.readContract({
             address: tokenInfo.poolAddress,
             abi: poolAbi,
             functionName: 'balanceOf',
             args: [address as Address],
         })
-        const [pendingReward] = await client.readContract({
+        const pendingReward = await client.readContract({
             address: tokenInfo.poolAddress,
             abi: poolAbi,
             functionName: 'pendingReward',
             args: [address as Address],
         })
 
-        const useAToken = balanceOf.toNumber() > 0 || !balanceOf
+        const useAToken = balanceOf > 0 || !balanceOf
       })
     },
     async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
