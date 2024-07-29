@@ -32,23 +32,27 @@ const hook: PositionsHook = {
 
     const balances = await Promise.all(
       allbridgeTokenInfo.map(async (tokenInfo) => {
-        return address ? client.readContract({
-          address: tokenInfo.poolAddress,
-          abi: poolAbi,
-          functionName: 'balanceOf',
-          args: [address as Address],
-        }) : undefined
+        return address
+          ? client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'balanceOf',
+              args: [address as Address],
+            })
+          : undefined
       }),
     )
 
     const rewards = await Promise.all(
       allbridgeTokenInfo.map(async (tokenInfo) => {
-        return address ? client.readContract({
-          address: tokenInfo.poolAddress,
-          abi: poolAbi,
-          functionName: 'pendingReward',
-          args: [address as Address],
-        }) : undefined
+        return address
+          ? client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'pendingReward',
+              args: [address as Address],
+            })
+          : undefined
       }),
     )
 
