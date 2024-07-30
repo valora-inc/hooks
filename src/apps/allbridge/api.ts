@@ -78,11 +78,11 @@ export async function getAllbridgeTokenInfo({
   networkId: NetworkId
 }): Promise<NetworkInfo> {
   const tokenObj: Record<string, NetworkInfo> = {}
-  const networkInfo: AllbridgeApiResponse = await got
+  const allbridgeTokensInfoResponse: AllbridgeApiResponse = await got
     .get('https://core.api.allbridgecoreapi.net/token-info')
     .json()
 
-  Object.entries(networkInfo).forEach(([allbridgeChain, chainNetworkInfo]) => {
+  Object.entries(allbridgeTokensInfoResponse).forEach(([allbridgeChain, chainNetworkInfo]) => {
     if (
       ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[
         allbridgeChain as SupportedAllbridgeChainSymbols
