@@ -45,6 +45,10 @@ describe('getShortcutDefinitions', () => {
       const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+        token: {
+          amount: '1',
+          decimals: 3,
+        },
         positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       })
 
