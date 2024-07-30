@@ -86,6 +86,40 @@ const hook: ShortcutsHook = {
         },
       }),
       createShortcut({
+        id: 'withdraw',
+        name: 'Withdraw',
+        description: 'Withdraw your assets',
+        networkIds: [networkId],
+        triggerInputShape: {
+          token: z.object({
+            decimals: z.coerce.number(),
+            amount: z.string(),
+          }),
+          positionAddress: ZodAddressLowerCased,
+        },
+        async onTrigger({ networkId, address, token, positionAddress }) {
+          const walletAddress = address as Address
+          const transactions: Transaction[] = []
+
+          const amountToWithdraw = parseUnits(token.amount, token.decimals)
+
+          const withdrawTx: Transaction = {
+            networkId,
+            from: walletAddress,
+            to: positionAddress,
+            data: encodeFunctionData({
+              abi: poolAbi,
+              functionName: 'withdraw',
+              args: [amountToWithdraw],
+            }),
+          }
+
+          transactions.push(withdrawTx)
+
+          return transactions
+        },
+      }),
+      createShortcut({
         id: 'claim-rewards',
         name: 'Claim',
         description: 'Claim rewards',
