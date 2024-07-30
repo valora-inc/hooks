@@ -85,6 +85,32 @@ const hook: ShortcutsHook = {
           return transactions
         },
       }),
+      createShortcut({
+        id: 'claim-rewards',
+        name: 'Claim',
+        description: 'Claim rewards',
+        networkIds: [networkId],
+        category: 'claim',
+        triggerInputShape: {
+          positionAddress: ZodAddressLowerCased,
+        },
+        async onTrigger({ networkId, address, positionAddress }) {
+          const walletAddress = address as Address
+
+          const claimTx: Transaction = {
+            networkId,
+            from: walletAddress,
+            to: positionAddress,
+            data: encodeFunctionData({
+              abi: poolAbi,
+              functionName: 'claimRewards',
+              args: [],
+            }),
+          }
+
+          return [claimTx]
+        },
+      }),
     ]
   },
 }
