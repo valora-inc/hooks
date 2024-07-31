@@ -125,7 +125,7 @@ const hook: PositionsHook = {
               yieldRates: [
                 {
                   yieldRatePercentage: supplyApy,
-                  label: 'Earnings APY', // TODO: replace with translation key
+                  label: 'earnFlow.yieldRateLabels.earningsApy',
                   tokenId: getTokenId({
                     networkId,
                     address: reserveData.underlyingAsset.toLowerCase(),
@@ -138,7 +138,7 @@ const hook: PositionsHook = {
                       info.userUnclaimedRewards,
                       info.rewardTokenDecimals,
                     ),
-                    label: 'Rewards', // TODO: replace with translation key
+                    label: 'earnFlow.earningItemLabels.rewards',
                     tokenId: getTokenId({
                       networkId,
                       address: info.rewardTokenAddress.toLowerCase(),
