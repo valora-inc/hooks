@@ -62,10 +62,10 @@ const hook: PositionsHook = {
       const balanceOf = balances[i]
       const pendingReward = rewards[i]
 
-      const useAToken = !address || (!!balanceOf && balanceOf > 0)
+      const showLpToken = !address || (!!balanceOf && balanceOf > 0)
       const showReward = !!pendingReward && pendingReward > 0
       return [
-        useAToken &&
+        showLpToken &&
           ({
             type: 'app-token-definition',
             networkId,
