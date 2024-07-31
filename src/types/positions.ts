@@ -62,8 +62,24 @@ export interface DataPropsContext {
 // But in the future we could parameterize this
 export type DataProps = EarnDataProps
 
+export interface YieldRate {
+  yieldRatePercentage: number
+  label: string
+  tokenId: string
+}
+
+export interface EarningItem {
+  amount: DecimalNumber
+  label: string
+  tokenId: string
+  subtractFromDeposit?: boolean
+}
+
 export interface EarnDataProps {
-  apy: number
+  contractCreatedAt?: Date
+  manageUrl?: string
+  yieldRates: YieldRate[]
+  earningItems: EarningItem[]
   depositTokenId: string
   withdrawTokenId: string
   // We'll add more fields here as needed
