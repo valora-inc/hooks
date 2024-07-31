@@ -121,7 +121,7 @@ const hook: PositionsHook = {
               imageUrl: AAVE_LOGO,
             },
             dataProps: {
-              // TODO: Add manageUrl and contractCreatedAt
+              // TODO(ACT-1328): Add manageUrl and contractCreatedAt
               yieldRates: [
                 {
                   yieldRatePercentage: supplyApy,
