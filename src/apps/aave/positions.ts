@@ -121,7 +121,30 @@ const hook: PositionsHook = {
               imageUrl: AAVE_LOGO,
             },
             dataProps: {
-              apy: supplyApy,
+              // TODO(ACT-1328): Add manageUrl and contractCreatedAt
+              yieldRates: [
+                {
+                  yieldRatePercentage: supplyApy,
+                  label: 'earnFlow.yieldRateLabels.earningsApy',
+                  tokenId: getTokenId({
+                    networkId,
+                    address: reserveData.underlyingAsset.toLowerCase(),
+                  }),
+                },
+              ],
+              earningItems: aTokenRewardsInfo?.length
+                ? aTokenRewardsInfo.map((info) => ({
+                    amount: toDecimalNumber(
+                      info.userUnclaimedRewards,
+                      info.rewardTokenDecimals,
+                    ),
+                    label: 'earnFlow.earningItemLabels.rewards',
+                    tokenId: getTokenId({
+                      networkId,
+                      address: info.rewardTokenAddress.toLowerCase(),
+                    }),
+                  }))
+                : [],
               depositTokenId: getTokenId({
                 networkId,
                 address: reserveData.underlyingAsset.toLowerCase(),
