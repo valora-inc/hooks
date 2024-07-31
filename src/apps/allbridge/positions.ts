@@ -80,7 +80,32 @@ const hook: PositionsHook = {
               imageUrl: ALLBRIDGE_LOGO,
             },
             dataProps: {
-              apr,
+              // TODO(ACT-1328): Add manageUrl and contractCreatedAt
+              yieldRates: [
+                {
+                  yieldRatePercentage: apr,
+                  label: 'earnFlow.yieldRateLabels.earningsApr',
+                  tokenId: getTokenId({
+                    networkId,
+                    address: tokenInfo.tokenAddress.toLowerCase(),
+                  }),
+                },
+              ],
+              earningItems: pendingReward
+                ? [
+                    {
+                      amount: toDecimalNumber(
+                        pendingReward,
+                        tokenInfo.decimals,
+                      ),
+                      label: 'earnFlow.earningItemLabels.earnings',
+                      tokenId: getTokenId({
+                        networkId,
+                        address: tokenInfo.tokenAddress.toLowerCase(),
+                      }),
+                    },
+                  ]
+                : [],
               depositTokenId: getTokenId({
                 networkId,
                 address: tokenInfo.tokenAddress.toLowerCase(),
