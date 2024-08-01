@@ -144,7 +144,7 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
     dataProps: {
       yieldRates: [
         {
-          yieldRatePercentage: 7.419092396389471,
+          percentage: 7.419092396389471,
           label: 'earnFlow.yieldRateLabels.earningsApy',
           tokenId: 'arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831',
         },

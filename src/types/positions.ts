@@ -63,7 +63,7 @@ export interface DataPropsContext {
 export type DataProps = EarnDataProps
 
 export interface YieldRate {
-  yieldRatePercentage: number
+  percentage: number
   label: string
   tokenId: string
 }
