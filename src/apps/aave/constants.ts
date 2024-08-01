@@ -18,7 +18,7 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   [NetworkId['celo-alfajores']]: undefined,
   [NetworkId['ethereum-mainnet']]: {
     poolAddressesProvider: '0x2f39d218133afab8f2b819b1066c7e434ad94e9e',
-    uiPoolDataProvider: '0x91c0ea31b49b69ea18607702c5d9ac360bf3de7d',
+    uiPoolDataProvider: '0x5c5228ac8bc1528482514af3e27e692495148717',
     uiIncentiveDataProvider: '0x162a7ac02f547ad796ca549f757e2b8d1d9b10a6',
     incentivesController: '0x8164cc65827dcfe994ab23944cbc90e0aa80bfcb',
     pool: '0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2',
