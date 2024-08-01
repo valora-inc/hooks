@@ -124,7 +124,7 @@ const hook: PositionsHook = {
               // TODO(ACT-1328): Add manageUrl and contractCreatedAt
               yieldRates: [
                 {
-                  yieldRatePercentage: supplyApy,
+                  percentage: supplyApy,
                   label: 'earnFlow.yieldRateLabels.earningsApy',
                   tokenId: getTokenId({
                     networkId,
