@@ -54,7 +54,7 @@ const hook: PositionsHook = {
               })
             : undefined
         }),
-      )
+      ),
     ])
 
     return allbridgeTokenInfo.flatMap((tokenInfo, i) => {
