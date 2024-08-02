@@ -16,11 +16,11 @@ import * as mockTokensInfo from './mockTokensInfo.json'
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
   createPublicClient: () => ({
-    multicall: (...args: any) => mockMulticall(...args),
+    readContract: (...args: any) => mockReadContract(...args),
   }),
 }))
 
-const mockMulticall = jest.fn()
+const mockReadContract = jest.fn()
 
 const getHooksSpy = jest.spyOn(hooks, 'getHooks')
 const getSpy = jest.spyOn(got, 'get')
@@ -134,11 +134,6 @@ describe(getPositions, () => {
         return [position]
       },
     }
-
-    mockMulticall.mockResolvedValue([
-      'ULP', // Symbol for 0xda7f463c27ec862cfbf2369f3f74c364d050d93f
-      18, // Decimals
-    ])
     getHooksSpy.mockResolvedValue({
       'test-hook': testHook,
     })
@@ -200,19 +195,27 @@ describe(getPositions, () => {
       },
     }
 
-    mockMulticall
-      .mockResolvedValueOnce([
-        '3c-crvUSD', // Symbol for 0x4456d13Fc6736e8e8330394c0C622103E06ea419
-        18, // Decimals
-      ])
-      .mockResolvedValueOnce([
-        'mooCurveTriCrypto-crvUSD', // Symbol for 0xf82160Bad52C235102174aE5E7f36d5099DEEad3
-        18, // Decimals
-      ])
-      .mockResolvedValueOnce([
-        30n * 10n ** 18n, // balanceOf 0xf82160Bad52C235102174aE5E7f36d5099DEEad3
-        1000n * 10n ** 18n, // totalSupply
-      ])
+    mockReadContract.mockImplementation(async ({ address, functionName }) => {
+      switch (functionName) {
+        case 'symbol':
+          switch (address) {
+            case '0x4456d13Fc6736e8e8330394c0C622103E06ea419':
+              return '3c-crvUSD'
+            case '0xf82160Bad52C235102174aE5E7f36d5099DEEad3':
+              return 'mooCurveTriCrypto-crvUSD'
+            default:
+              throw new Error(`Unexpected token address: ${address}`)
+          }
+        case 'decimals':
+          return 18
+        case 'totalSupply':
+          return 1000n * 10n ** 18n
+        case 'balanceOf':
+          return 30n * 10n ** 18n
+        default:
+          throw new Error(`Unexpected functionName called: ${functionName}`)
+      }
+    })
     getHooksSpy.mockResolvedValue({
       'beefy-price-escape': testHook,
     })
@@ -238,11 +241,85 @@ describe(getPositions, () => {
     expect(beefyPosition.supply).toBe('1000')
   })
 
+  it('should get tokens info for unlisted tokens once per unique token address and networkId', async () => {
+    const testHook: PositionsHook = {
+      getInfo() {
+        return {
+          id: 'test-hook',
+          name: 'Test Hook',
+          description: '',
+        }
+      },
+      async getPositionDefinitions(networkId, _address) {
+        const position: ContractPositionDefinition = {
+          type: 'contract-position-definition',
+          networkId,
+          address: '0x0000000000000000000000000000000000000001',
+          tokens: [
+            {
+              address: '0x000000000000000000000000000000000000000a',
+              networkId,
+            },
+          ],
+          displayProps: {
+            title: 'Test position',
+            description: '',
+            imageUrl: '',
+          },
+          balances: async () => {
+            return [toDecimalNumber(10n, 18)]
+          },
+        }
+
+        return [
+          position,
+          {
+            ...position,
+            address: '0x0000000000000000000000000000000000000002',
+            tokens: [
+              {
+                // Same as the first position but with uppercase address
+                address: '0x000000000000000000000000000000000000000A',
+                networkId,
+              },
+            ],
+          },
+        ]
+      },
+      async getAppTokenDefinition(tokenDefinition) {
+        throw new UnknownAppTokenError(tokenDefinition)
+      },
+    }
+
+    mockReadContract.mockImplementation(async ({ functionName }) => {
+      switch (functionName) {
+        case 'symbol':
+          return 'T1'
+        case 'decimals':
+          return 18
+        case 'totalSupply':
+          return 1000n * 10n ** 18n
+        default:
+          throw new Error(`Unexpected functionName called: ${functionName}`)
+      }
+    })
+    getHooksSpy.mockResolvedValue({
+      'test-hook': testHook,
+    })
+    getSpy.mockReturnValue({
+      json: jest.fn().mockResolvedValue(mockTokensInfo),
+    } as any)
+    const positions = await getPositions(
+      NetworkId['celo-mainnet'],
+      '0x0000000000000000000000000000000000007e57',
+      [],
+    )
+    // Just 3 calls to readContract, one for each unique token address and networkId
+    expect(mockReadContract).toHaveBeenCalledTimes(3)
+    expect(positions.length).toBe(2)
+  })
+
   it('should warn and omit positions with the same address and networkId', async () => {
-    mockMulticall.mockResolvedValueOnce([
-      'CELO', // Symbol for 0x471ece3750da237f93b8e339c536989b8978a438
-      18, // Decimals
-    ])
     // testHook and testHook2 both return positions with the same address
     // this should result in a warning and only one position being returned
     getHooksSpy.mockResolvedValue({
@@ -273,10 +350,6 @@ describe(getPositions, () => {
   })
 
   it('should not warn about duplicates if the positions specify different extraIds', async () => {
-    mockMulticall.mockResolvedValueOnce([
-      'CELO', // Symbol for 0x471ece3750da237f93b8e339c536989b8978a438
-      18, // Decimals
-    ])
     getHooksSpy.mockResolvedValue({
       'test-hook': lockedCeloTestHook,
       'test-hook2': {
