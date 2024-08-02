@@ -142,7 +142,14 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
         'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png',
     },
     dataProps: {
-      apy: 7.419092396389471,
+      yieldRates: [
+        {
+          percentage: 7.419092396389471,
+          label: 'Earnings APY',
+          tokenId: 'arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831',
+        },
+      ],
+      earningItems: [],
       depositTokenId: 'arbitrum-one:0xaf88d065e77c8cc2239327c5edb3a432268e5831',
       withdrawTokenId:
         'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
