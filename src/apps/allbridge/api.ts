@@ -12,20 +12,20 @@ type SupportedAllbridgeChainSymbols =
 
 const NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL: Record<
   NetworkId,
-  SupportedAllbridgeChainSymbols
+  SupportedAllbridgeChainSymbols | undefined
 > = {
   [NetworkId['ethereum-mainnet']]: 'ETH',
-  [NetworkId['ethereum-sepolia']]: 'ETH',
+  [NetworkId['ethereum-sepolia']]: undefined,
   [NetworkId['celo-mainnet']]: 'CEL',
-  [NetworkId['celo-alfajores']]: 'CEL',
+  [NetworkId['celo-alfajores']]: undefined,
   [NetworkId['polygon-pos-mainnet']]: 'POL',
-  [NetworkId['polygon-pos-amoy']]: 'POL',
+  [NetworkId['polygon-pos-amoy']]: undefined,
   [NetworkId['arbitrum-one']]: 'ARB',
-  [NetworkId['arbitrum-sepolia']]: 'ARB',
+  [NetworkId['arbitrum-sepolia']]: undefined,
   [NetworkId['op-mainnet']]: 'OPT',
-  [NetworkId['op-sepolia']]: 'OPT',
+  [NetworkId['op-sepolia']]: undefined,
   [NetworkId['base-mainnet']]: 'BAS',
-  [NetworkId['base-sepolia']]: 'BAS',
+  [NetworkId['base-sepolia']]: undefined,
 }
 
 type AllbridgeApiResponse = {
@@ -82,12 +82,10 @@ export async function getAllbridgeTokenInfo({
   networkId,
 }: {
   networkId: NetworkId
-}): Promise<NetworkInfo> {
+}): Promise<NetworkInfo | undefined> {
   const allbridgeTokensInfoResponse: AllbridgeApiResponse = await got
     .get('https://core.api.allbridgecoreapi.net/token-info')
     .json()
-
-  return allbridgeTokensInfoResponse[
-    NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
-  ]
+  const allbridgeBlockchain = NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
+  return allbridgeBlockchain ? allbridgeTokensInfoResponse[allbridgeBlockchain] : undefined
 }
