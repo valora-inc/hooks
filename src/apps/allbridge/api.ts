@@ -86,6 +86,9 @@ export async function getAllbridgeTokenInfo({
   const allbridgeTokensInfoResponse: AllbridgeApiResponse = await got
     .get('https://core.api.allbridgecoreapi.net/token-info')
     .json()
-  const allbridgeBlockchain = NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
-  return allbridgeBlockchain ? allbridgeTokensInfoResponse[allbridgeBlockchain] : undefined
+  const allbridgeBlockchain =
+    NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
+  return allbridgeBlockchain
+    ? allbridgeTokensInfoResponse[allbridgeBlockchain]
+    : undefined
 }
