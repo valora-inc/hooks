@@ -10,18 +10,6 @@ type SupportedAllbridgeChainSymbols =
   | 'OPT'
   | 'BAS'
 
-const ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID: Record<
-  SupportedAllbridgeChainSymbols,
-  NetworkId
-> = {
-  ETH: NetworkId['ethereum-mainnet'],
-  CEL: NetworkId['celo-mainnet'],
-  POL: NetworkId['polygon-pos-mainnet'],
-  ARB: NetworkId['arbitrum-one'],
-  OPT: NetworkId['op-mainnet'],
-  BAS: NetworkId['base-mainnet'],
-}
-
 const NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL: Record<
   NetworkId,
   SupportedAllbridgeChainSymbols
