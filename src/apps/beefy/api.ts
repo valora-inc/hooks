@@ -2,18 +2,16 @@ import got from 'got'
 import { Address } from 'viem'
 import { NetworkId } from '../../types/networkId'
 
-export interface BeefyVault {
+export type BeefyVault = {
   id: string
   name: string
-  type: string
+  type: string // cowcentrated, gov
   token: string
   tokenAddress: Address
   tokenDecimals: number
   tokenProviderId: string
   earnedToken: string
-  earnedTokenAddress: Address
   earnContractAddress: Address
-  depositTokenAddresses: string[]
   status: string
   platformId: string
   assets: string[]
@@ -23,8 +21,21 @@ export interface BeefyVault {
   chain: string
   zaps: any[]
   isGovVault: boolean
+  oracle: string
+  oracleId: string
+}
+
+export type BaseBeefyVault = BeefyVault & {
+  earnedTokenAddress: Address
+  depositTokenAddresses: string[]
   strategy: Address
   pricePerFullShare: string
+}
+
+export type GovVault = BeefyVault & {
+  type: 'gov'
+  isGovVault: true
+  earnedTokenAddress: Address[]
 }
 
 export const NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID: Record<
@@ -35,22 +46,36 @@ export const NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID: Record<
   [NetworkId['ethereum-mainnet']]: 'ethereum',
   [NetworkId['arbitrum-one']]: 'arbitrum',
   [NetworkId['op-mainnet']]: 'optimism',
+  [NetworkId['polygon-pos-mainnet']]: 'polygon',
+  [NetworkId['base-mainnet']]: 'base',
+  [NetworkId['celo-alfajores']]: null,
   [NetworkId['ethereum-sepolia']]: null,
   [NetworkId['arbitrum-sepolia']]: null,
   [NetworkId['op-sepolia']]: null,
-  [NetworkId['celo-alfajores']]: null,
+  [NetworkId['polygon-pos-amoy']]: null,
+  [NetworkId['base-sepolia']]: null,
 }
 
-export async function getAllBeefyVaults(): Promise<BeefyVault[]> {
-  const vaults = await got
-    .get(`https://api.beefy.finance/harvestable-vaults`)
-    .json<BeefyVault[]>()
+export async function getBeefyVaults(
+  networkId: NetworkId,
+): Promise<{ vaults: BaseBeefyVault[]; govVaults: GovVault[] }> {
+  const [vaults, govVaults] = await Promise.all([
+    got
+      .get(
+        `https://api.beefy.finance/harvestable-vaults/${NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId]}`,
+      )
+      .json<BaseBeefyVault[]>(),
+    got
+      .get(
+        `https://api.beefy.finance/gov-vaults/${NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId]}`,
+      )
+      .json<GovVault[]>(),
+  ])
 
-  return vaults.filter(
-    (v) =>
-      v.chain !== null &&
-      Object.values(NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID).includes(v.chain),
-  )
+  return {
+    vaults,
+    govVaults,
+  }
 }
 
 export async function getBeefyLpsPrices(): Promise<Record<string, number>> {

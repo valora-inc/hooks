@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version-file: 'package.json'
           check-latest: true
       - run: yarn
       - run: yarn typecheck
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version-file: 'package.json'
           check-latest: true
       - run: yarn
       - run: yarn test:ci
@@ -71,7 +71,7 @@ jobs:
           install_components: 'beta'
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version-file: 'package.json'
           check-latest: true
       - run: yarn
       - run: yarn deploy:staging:http hooks-api
@@ -94,7 +94,7 @@ jobs:
           install_components: 'beta'
       - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version-file: 'package.json'
           check-latest: true
       - run: yarn
       - run: yarn deploy:production:http hooks-api

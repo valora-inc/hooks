@@ -1,31 +1,20 @@
-import { Address, encodeFunctionData, parseUnits, erc20Abi } from 'viem'
+import { Address, encodeFunctionData, erc20Abi, parseUnits } from 'viem'
+import { z } from 'zod'
+import { getClient } from '../../runtime/client'
+import { ZodAddressLowerCased } from '../../types/address'
+import { NetworkId } from '../../types/networkId'
 import {
   createShortcut,
   ShortcutsHook,
   Transaction,
 } from '../../types/shortcuts'
-import { NetworkId } from '../../types/networkId'
-import { ZodAddressLowerCased } from '../../types/address'
-import { z } from 'zod'
-import { getClient } from '../../runtime/client'
-import { poolV3Abi } from './abis/pool-v3'
-import { aTokenAbi } from './abis/atoken'
-import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
-import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
+import { poolAbi } from './abis/pool'
 
 // Hardcoding for now
 const GAS = 1_000_000n
 
 const hook: ShortcutsHook = {
-  async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
-    const aaveAddresses = AAVE_V3_ADDRESSES_BY_NETWORK_ID[networkId]
-    if (!aaveAddresses) {
-      return []
-    }
-
-    const poolContractAddress = aaveAddresses.pool
-    const incentivesContractAddress = aaveAddresses.incentivesController
-
+  async getShortcutDefinitions(networkId: NetworkId) {
     return [
       createShortcut({
         id: 'deposit',
@@ -41,8 +30,10 @@ const hook: ShortcutsHook = {
             decimals: z.coerce.number(),
             amount: z.string(), // in decimal string
           }),
+          positionAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ networkId, address, token }) {
+
+        async onTrigger({ networkId, address, token, positionAddress }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
@@ -55,14 +46,14 @@ const hook: ShortcutsHook = {
             address: token.address,
             abi: erc20Abi,
             functionName: 'allowance',
-            args: [walletAddress, poolContractAddress],
+            args: [walletAddress, positionAddress],
           })
 
           if (approvedAllowanceForSpender < amountToSupply) {
             const data = encodeFunctionData({
               abi: erc20Abi,
               functionName: 'approve',
-              args: [poolContractAddress, amountToSupply],
+              args: [positionAddress, amountToSupply],
             })
 
             const approveTx: Transaction = {
@@ -77,11 +68,11 @@ const hook: ShortcutsHook = {
           const supplyTx: Transaction = {
             networkId,
             from: walletAddress,
-            to: poolContractAddress,
+            to: positionAddress,
             data: encodeFunctionData({
-              abi: poolV3Abi,
-              functionName: 'supply',
-              args: [token.address, amountToSupply, walletAddress, 0],
+              abi: poolAbi,
+              functionName: 'deposit',
+              args: [amountToSupply],
             }),
             // TODO: consider moving this concern to the runtime
             // which would simulate the transaction(s) to get these
@@ -99,40 +90,27 @@ const hook: ShortcutsHook = {
         name: 'Withdraw',
         description: 'Withdraw your assets',
         networkIds: [networkId],
-        // category: 'withdraw',
         triggerInputShape: {
-          // This is the A token
           token: z.object({
-            // TODO: consider requiring only tokenId and (decimal) amount
-            // Right now it would mean more changes in hooks
-            address: ZodAddressLowerCased,
             decimals: z.coerce.number(),
-            amount: z.string(), // in decimal string
+            amount: z.string(),
           }),
+          positionAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ networkId, address, token }) {
+        async onTrigger({ networkId, address, token, positionAddress }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
-          // amount in smallest unit
           const amountToWithdraw = parseUnits(token.amount, token.decimals)
-
-          const client = getClient(networkId)
-
-          const underlyingAssetAddress = await client.readContract({
-            address: token.address,
-            abi: aTokenAbi,
-            functionName: 'UNDERLYING_ASSET_ADDRESS',
-          })
 
           const withdrawTx: Transaction = {
             networkId,
             from: walletAddress,
-            to: poolContractAddress,
+            to: positionAddress,
             data: encodeFunctionData({
-              abi: poolV3Abi,
+              abi: poolAbi,
               functionName: 'withdraw',
-              args: [underlyingAssetAddress, amountToWithdraw, walletAddress],
+              args: [amountToWithdraw],
             }),
           }
 
@@ -153,18 +131,18 @@ const hook: ShortcutsHook = {
         async onTrigger({ networkId, address, positionAddress }) {
           const walletAddress = address as Address
 
-          return [
-            {
-              networkId,
-              from: walletAddress,
-              to: incentivesContractAddress,
-              data: encodeFunctionData({
-                abi: incentivesControllerV3Abi,
-                functionName: 'claimAllRewardsToSelf',
-                args: [[positionAddress]], // positionAddress is the a/v/sToken address
-              }),
-            },
-          ]
+          const claimTx: Transaction = {
+            networkId,
+            from: walletAddress,
+            to: positionAddress,
+            data: encodeFunctionData({
+              abi: poolAbi,
+              functionName: 'claimRewards',
+              args: [],
+            }),
+          }
+
+          return [claimTx]
         },
       }),
     ]

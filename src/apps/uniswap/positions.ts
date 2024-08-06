@@ -48,10 +48,15 @@ const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
     nftPositions: '0xc36442b4a4522e871399cd717abdd847ab11fe88',
     userPositionsMulticall: '0xd983fe1235a4c9006ef65eceed7c33069ad35ad0',
   },
+  [NetworkId['polygon-pos-mainnet']]: undefined, // TODO: ask Gonza to deploy the multicall
+  [NetworkId['base-mainnet']]: undefined, // TODO: ask Gonza to deploy the multicall
+
   [NetworkId['ethereum-sepolia']]: undefined,
   [NetworkId['arbitrum-sepolia']]: undefined,
   [NetworkId['op-sepolia']]: undefined,
   [NetworkId['celo-alfajores']]: undefined,
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-sepolia']]: undefined,
 }
 
 export async function getUniswapV3PositionDefinitions(

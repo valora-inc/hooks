@@ -7,6 +7,7 @@ describe('getShortcutDefinitions', () => {
       NetworkId['arbitrum-one'],
     )
     expect(shortcuts.length).toBeGreaterThan(0)
+    expect(shortcuts[0].id).toBe('deposit')
   })
 
   describe('deposit.onTrigger', () => {
@@ -25,6 +26,7 @@ describe('getShortcutDefinitions', () => {
           amount: '10',
           decimals: 6,
         },
+        positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       })
 
       expect(transactions.length).toEqual(2)
@@ -38,15 +40,16 @@ describe('getShortcutDefinitions', () => {
       )
       const shortcut = shortcuts.find((shortcut) => shortcut.id === 'withdraw')
       expect(shortcut).toBeDefined()
+      expect(shortcuts[1].id).toBe('withdraw')
 
       const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         token: {
-          address: '0x724dc807b04555b71ed48a6896b6f41593b8c637', // aArbUSDCn
-          amount: '10',
-          decimals: 6,
+          amount: '1',
+          decimals: 3,
         },
+        positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       })
 
       expect(transactions.length).toEqual(1)
@@ -62,6 +65,7 @@ describe('getShortcutDefinitions', () => {
         (shortcut) => shortcut.id === 'claim-rewards',
       )
       expect(shortcut).toBeDefined()
+      expect(shortcuts[2].id).toBe('claim-rewards')
 
       const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],

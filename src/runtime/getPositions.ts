@@ -1,6 +1,6 @@
 import got from 'got'
 import BigNumber from 'bignumber.js'
-import { Address, ContractFunctionExecutionError, zeroAddress } from 'viem'
+import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
   AbstractToken,
@@ -43,6 +43,8 @@ interface RawTokenInfo {
 
 interface TokenInfo extends Omit<AbstractToken, 'balance'> {
   imageUrl: string
+  balance: DecimalNumber
+  totalSupply: DecimalNumber
 }
 
 type TokensInfo = Record<string, TokenInfo>
@@ -71,19 +73,23 @@ async function getBaseTokensInfo(
     tokensInfo[tokenId] = {
       ...tokenInfo,
       priceUsd: toSerializedDecimalNumber(tokenInfo.priceUsd ?? 0),
+      // We don't have this info here but it's not yet needed for base tokens anyway
+      balance: toDecimalNumber(0n, 0),
+      totalSupply: toDecimalNumber(0n, 0),
     }
   }
   return tokensInfo
 }
 
 async function getERC20TokenInfo(
-  address: Address,
+  contractAddress: Address,
   networkId: NetworkId,
+  address?: Address,
 ): Promise<TokenInfo> {
   const imageUrl = ''
   const priceUsd = toSerializedDecimalNumber(0)
 
-  if (isNative({ address, networkId })) {
+  if (isNative({ address: contractAddress, networkId })) {
     return {
       address: undefined,
       networkId,
@@ -96,35 +102,56 @@ async function getERC20TokenInfo(
         isNative: true,
         address: undefined, // address isn't used for native assets' token id at this time, but even if it was, we would probably not use 0xeee... because it is misleading and bug prone (no actual smart contract with that address exists) and not universal
       }),
+      // TODO: get real values if we actually need them, but for now it's not needed
+      balance: toDecimalNumber(0n, 0),
+      totalSupply: toDecimalNumber(0n, 0),
     }
   }
 
+  const client = getClient(networkId)
   const erc20Contract = {
-    address: address,
+    address: contractAddress,
     abi: erc20Abi,
   } as const
-  const [symbol, decimals] = await getClient(networkId).multicall({
-    contracts: [
-      {
-        ...erc20Contract,
-        functionName: 'symbol',
-      },
-      {
-        ...erc20Contract,
-        functionName: 'decimals',
-      },
-    ],
-    allowFailure: false,
-  })
+  // Intentionally NOT using multicall here
+  // so we benefit from multicall batching happening in the client
+  // when this function is called in Promise.all
+  const [symbol, decimals, totalSupply, balance] = await Promise.all([
+    client.readContract({
+      ...erc20Contract,
+      functionName: 'symbol',
+    }),
+    client.readContract({
+      ...erc20Contract,
+      functionName: 'decimals',
+    }),
+    client.readContract({
+      ...erc20Contract,
+      functionName: 'totalSupply',
+    }),
+    address
+      ? client.readContract({
+          ...erc20Contract,
+          functionName: 'balanceOf',
+          args: [address],
+        })
+      : undefined,
+  ])
 
   return {
-    tokenId: getTokenId({ networkId: networkId, isNative: false, address }),
+    tokenId: getTokenId({
+      networkId: networkId,
+      isNative: false,
+      address: contractAddress,
+    }),
     networkId,
-    address,
+    address: contractAddress,
     symbol,
     decimals,
     priceUsd,
     imageUrl,
+    balance: toDecimalNumber(balance ?? 0n, decimals),
+    totalSupply: toDecimalNumber(totalSupply, decimals),
   }
 }
 
@@ -201,7 +228,7 @@ function getDataProps(
 }
 
 async function resolveAppTokenPosition(
-  address: string | undefined,
+  _address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
   tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
@@ -238,32 +265,6 @@ async function resolveAppTokenPosition(
       })
     ]!
 
-  const appTokenContract = {
-    address: positionDefinition.address as Address,
-    abi: erc20Abi,
-  } as const
-  const contractData = await getClient(positionDefinition.networkId).multicall({
-    contracts: [
-      {
-        ...appTokenContract,
-        functionName: 'balanceOf',
-        args: [(address as Address) ?? zeroAddress], // TODO: this is incorrect for intermediary app tokens
-      },
-      {
-        ...appTokenContract,
-        functionName: 'totalSupply',
-      },
-    ],
-    allowFailure: false,
-  })
-
-  let balance = contractData[0]
-  const totalSupply = contractData[1]
-  // If no user address is provided, use 0
-  if (!address) {
-    balance = 0n
-  }
-
   const displayProps = getDisplayProps(
     positionDefinition,
     resolvedTokensByTokenId,
@@ -295,18 +296,14 @@ async function resolveAppTokenPosition(
             address: token.address,
           })
         ],
-        toDecimalNumber(balance, positionTokenInfo.decimals),
+        positionTokenInfo.balance,
         pricePerShare[i],
       ),
     ),
     pricePerShare: pricePerShare.map(toSerializedDecimalNumber),
     priceUsd: toSerializedDecimalNumber(priceUsd),
-    balance: toSerializedDecimalNumber(
-      toDecimalNumber(balance, positionTokenInfo.decimals),
-    ),
-    supply: toSerializedDecimalNumber(
-      toDecimalNumber(totalSupply, positionTokenInfo.decimals),
-    ),
+    balance: toSerializedDecimalNumber(positionTokenInfo.balance),
+    supply: toSerializedDecimalNumber(positionTokenInfo.totalSupply),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
   }
 
@@ -421,7 +418,10 @@ export async function getPositions(
       ),
     ),
   ).then((definitions) => definitions.flat())
-  logger.debug({ definitions }, 'positions definitions')
+  logger.debug(
+    { definitions, count: definitions.length },
+    'positions definitions',
+  )
 
   // Get the base tokens info
   const baseTokensInfo = await getBaseTokensInfo(
@@ -454,27 +454,40 @@ export async function getPositions(
       position.tokens.map((token) => addSourceAppId(token, position.appId)),
     )
 
-    logger.debug({ allTokenDefinitions }, 'allTokenDefinitions')
-
-    // Get the tokens definitions for which we don't have the base token info or position definition
-    const unresolvedTokenDefinitions = allTokenDefinitions.filter(
-      (definition) => {
-        const definitionTokenId = getTokenId({
-          networkId: definition.networkId,
-          address: definition.address,
-        })
-        return (
-          !{ ...baseTokensInfo, ...unlistedBaseTokensInfo }[
-            definitionTokenId
-          ] &&
-          (!visitedDefinitions[definitionTokenId] ||
-            visitedDefinitions[definitionTokenId]?.type !==
-              'app-token-definition')
-        )
-      },
+    logger.debug(
+      { allTokenDefinitions, count: allTokenDefinitions.length },
+      'allTokenDefinitions',
     )
 
-    logger.debug({ unresolvedTokenDefinitions }, 'unresolvedTokenDefinitions')
+    // Get the tokens definitions for which we don't have the base token info or position definition
+    const unresolvedTokenDefinitionsByTokenId: Record<
+      string,
+      (typeof allTokenDefinitions)[number]
+    > = {}
+    for (const tokenDefinition of allTokenDefinitions) {
+      const definitionTokenId = getTokenId({
+        networkId: tokenDefinition.networkId,
+        address: tokenDefinition.address,
+      })
+      if (
+        baseTokensInfo[definitionTokenId] ||
+        unlistedBaseTokensInfo[definitionTokenId] ||
+        visitedDefinitions[definitionTokenId]?.type ===
+          'app-token-definition' ||
+        unresolvedTokenDefinitionsByTokenId[definitionTokenId]
+      ) {
+        continue
+      }
+      unresolvedTokenDefinitionsByTokenId[definitionTokenId] = tokenDefinition
+    }
+    const unresolvedTokenDefinitions = Object.values(
+      unresolvedTokenDefinitionsByTokenId,
+    )
+
+    logger.debug(
+      { unresolvedTokenDefinitions, count: unresolvedTokenDefinitions.length },
+      'unresolvedTokenDefinitions',
+    )
 
     // Get the token info for the unresolved token definitions
     const newUnlistedBaseTokensInfo: TokensInfo = {}
@@ -521,8 +534,14 @@ export async function getPositions(
       )
     ).filter((p): p is Exclude<typeof p, null | undefined> => p != null)
 
-    logger.debug({ appTokenDefinitions }, 'appTokenDefinitions')
-    logger.debug({ newUnlistedBaseTokensInfo }, 'newUnlistedBaseTokensInfo')
+    logger.debug(
+      { appTokenDefinitions, count: appTokenDefinitions.length },
+      'appTokenDefinitions',
+    )
+    logger.debug(
+      { newUnlistedBaseTokensInfo, count: newUnlistedBaseTokensInfo.length },
+      'newUnlistedBaseTokensInfo',
+    )
 
     unlistedBaseTokensInfo = {
       ...unlistedBaseTokensInfo,
@@ -546,16 +565,14 @@ export async function getPositions(
     Object.values(visitedDefinitions)
       .filter(
         (position): position is AppPositionDefinition =>
-          position?.type === 'app-token-definition' &&
-          !baseTokensByTokenId[
-            getTokenId({
-              networkId: position.networkId,
-              address: position.address,
-            })
-          ],
+          position?.type === 'app-token-definition',
       )
       .map((definition) =>
-        getERC20TokenInfo(definition.address as Address, definition.networkId),
+        getERC20TokenInfo(
+          definition.address as Address,
+          definition.networkId,
+          address ? (address as Address) : undefined,
+        ),
       ),
   )
   const appTokensByTokenId: TokensInfo = {}

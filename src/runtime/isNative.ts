@@ -11,6 +11,10 @@ const networkIdToNativeAssetAddress: Record<NetworkId, string> = {
   [NetworkId['ethereum-sepolia']]: ETHER_HEX_IDENTIFIER,
   [NetworkId['celo-mainnet']]: '0x471ece3750da237f93b8e339c536989b8978a438',
   [NetworkId['celo-alfajores']]: '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9',
+  [NetworkId['polygon-pos-mainnet']]: ETHER_HEX_IDENTIFIER,
+  [NetworkId['polygon-pos-amoy']]: ETHER_HEX_IDENTIFIER,
+  [NetworkId['base-mainnet']]: ETHER_HEX_IDENTIFIER,
+  [NetworkId['base-sepolia']]: ETHER_HEX_IDENTIFIER,
 }
 
 export function isNative({
