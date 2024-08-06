@@ -174,6 +174,57 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
   },
 ]
 
+const TEST_POSITIONS_CELO_EARN: Position[] = [
+  {
+    type: 'app-token',
+    networkId: NetworkId['celo-mainnet'],
+    address: '0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+    tokenId: 'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+    positionId: 'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+    appId: 'allbridge',
+    appName: 'Allbridge',
+    symbol: 'LP-USDT',
+    decimals: 6,
+    label: 'USDT',
+    displayProps: {
+      title: 'USDT',
+      description: 'Supplied (APR: 2.61%)',
+      imageUrl:
+        'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/allbridgecore.png',
+    },
+    dataProps: {
+      yieldRates: [
+        {
+          percentage: 2.61,
+          label: 'Earnings APR',
+          tokenId: 'celo-mainnet:0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+        },
+      ],
+      earningItems: [],
+      depositTokenId: 'celo-mainnet:0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+      withdrawTokenId:
+        'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+    },
+    tokens: [
+      {
+        address: '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+        decimals: 6,
+        symbol: 'USDT',
+        networkId: NetworkId['celo-mainnet'],
+        tokenId: 'celo-mainnet:0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+        priceUsd: '1' as SerializedDecimalNumber,
+        type: 'base-token',
+        balance: '0' as SerializedDecimalNumber,
+      },
+    ],
+    pricePerShare: ['1' as SerializedDecimalNumber],
+    priceUsd: '1' as SerializedDecimalNumber,
+    balance: '0' as SerializedDecimalNumber,
+    supply: '239859963.713137' as SerializedDecimalNumber,
+    availableShortcutIds: ['deposit', 'withdraw'],
+  },
+]
+
 jest.mocked(getPositions).mockImplementation(async (networkId) => {
   if (networkId === NetworkId['celo-mainnet']) {
     return TEST_POSITIONS_CELO
@@ -259,7 +310,7 @@ describe('GET /getPositions', () => {
 })
 
 describe('GET /getEarnPositions', () => {
-  it('returns earn positions', async () => {
+  it('returns earn positions for arbitrum', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
@@ -271,6 +322,21 @@ describe('GET /getEarnPositions', () => {
     expect(response.body).toEqual({
       message: 'OK',
       data: TEST_POSITIONS_ARBITRUM,
+    })
+  })
+  it('returns earn positions for celo', async () => {
+    jest.mocked(getPositions).mockResolvedValue(TEST_POSITIONS_CELO_EARN)
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .get('/getEarnPositions')
+      .query({
+        networkIds: [NetworkId['celo-mainnet']],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+    expect(response.body).toEqual({
+      message: 'OK',
+      data: TEST_POSITIONS_CELO_EARN,
     })
   })
 })
