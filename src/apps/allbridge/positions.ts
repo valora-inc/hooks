@@ -26,7 +26,10 @@ const hook: PositionsHook = {
   },
   async getPositionDefinitions(networkId, address) {
     const allbridgeTokenInfo = (await getAllbridgeTokenInfo({ networkId }))
-      .tokens
+      ?.tokens
+    if (!allbridgeTokenInfo) {
+      return []
+    }
 
     const client = getClient(networkId)
 

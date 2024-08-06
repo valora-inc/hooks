@@ -10,16 +10,22 @@ type SupportedAllbridgeChainSymbols =
   | 'OPT'
   | 'BAS'
 
-const ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID: Record<
-  SupportedAllbridgeChainSymbols,
-  NetworkId
+const NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL: Record<
+  NetworkId,
+  SupportedAllbridgeChainSymbols | undefined
 > = {
-  ETH: NetworkId['ethereum-mainnet'],
-  CEL: NetworkId['celo-mainnet'],
-  POL: NetworkId['polygon-pos-mainnet'],
-  ARB: NetworkId['arbitrum-one'],
-  OPT: NetworkId['op-mainnet'],
-  BAS: NetworkId['base-mainnet'],
+  [NetworkId['ethereum-mainnet']]: 'ETH',
+  [NetworkId['ethereum-sepolia']]: undefined,
+  [NetworkId['celo-mainnet']]: 'CEL',
+  [NetworkId['celo-alfajores']]: undefined,
+  [NetworkId['polygon-pos-mainnet']]: 'POL',
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['arbitrum-one']]: 'ARB',
+  [NetworkId['arbitrum-sepolia']]: undefined,
+  [NetworkId['op-mainnet']]: 'OPT',
+  [NetworkId['op-sepolia']]: undefined,
+  [NetworkId['base-mainnet']]: 'BAS',
+  [NetworkId['base-sepolia']]: undefined,
 }
 
 type AllbridgeApiResponse = {
@@ -76,27 +82,13 @@ export async function getAllbridgeTokenInfo({
   networkId,
 }: {
   networkId: NetworkId
-}): Promise<NetworkInfo> {
-  const tokenObj: Record<string, NetworkInfo> = {}
+}): Promise<NetworkInfo | undefined> {
   const allbridgeTokensInfoResponse: AllbridgeApiResponse = await got
     .get('https://core.api.allbridgecoreapi.net/token-info')
     .json()
-
-  Object.entries(allbridgeTokensInfoResponse).forEach(
-    ([allbridgeChain, chainNetworkInfo]) => {
-      if (
-        ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[
-          allbridgeChain as SupportedAllbridgeChainSymbols
-        ]
-      ) {
-        tokenObj[
-          ALLBRIDGE_BLOCKCHAIN_SYMBOL_TO_NETWORK_ID[
-            allbridgeChain as SupportedAllbridgeChainSymbols
-          ]
-        ] = chainNetworkInfo
-      }
-    },
-  )
-
-  return tokenObj[networkId]
+  const allbridgeBlockchain =
+    NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
+  return allbridgeBlockchain
+    ? allbridgeTokensInfoResponse[allbridgeBlockchain]
+    : undefined
 }
