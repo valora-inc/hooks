@@ -78,6 +78,7 @@ export interface EarningItem {
 export interface EarnDataProps {
   contractCreatedAt?: Date
   manageUrl?: string
+  tvl?: number
   yieldRates: YieldRate[]
   earningItems: EarningItem[]
   depositTokenId: string
