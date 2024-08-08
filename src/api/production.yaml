@@ -1,5 +1,5 @@
 # This is interestingly not set for us in the Cloud Function environment
 GOOGLE_CLOUD_PROJECT: celo-mobile-mainnet
-POSITION_IDS: 'curve,beefy,gooddollar,halofi,hedgey,locked-celo,mento,moola,stake-dao,ubeswap,uniswap'
+POSITION_IDS: 'curve,beefy,gooddollar,halofi,hedgey,locked-celo,mento,moola,stake-dao,ubeswap,uniswap,allbridge'
 SHORTCUT_IDS: 'gooddollar,hedgey,ubeswap'
 GET_TOKENS_INFO_URL: 'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/tokensInfo'
