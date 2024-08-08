@@ -178,9 +178,9 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
   {
     type: 'app-token',
     networkId: NetworkId['celo-mainnet'],
-    address: '0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
-    tokenId: 'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
-    positionId: 'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+    address: '0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af',
+    tokenId: 'celo-mainnet:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af',
+    positionId: 'celo-mainnet:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af',
     appId: 'allbridge',
     appName: 'Allbridge',
     symbol: 'LP-USDT',
@@ -203,7 +203,7 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
       earningItems: [],
       depositTokenId: 'celo-mainnet:0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
       withdrawTokenId:
-        'celo-mainnet:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af',
+        'celo-mainnet:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af',
     },
     tokens: [
       {
