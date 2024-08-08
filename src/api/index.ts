@@ -29,7 +29,7 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
   `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
   `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
   // Allbridge USDT
-  `${NetworkId['celo-mainnet']}:0xfb2C7c10e731EBe96Dabdf4A96D656Bfe8e2b5Af`,
+  `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
 
 function asyncHandler(handler: HttpFunction) {
