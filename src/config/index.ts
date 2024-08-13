@@ -8,6 +8,7 @@ export interface Config {
   GOOGLE_CLOUD_PROJECT: string
   POSITION_IDS: string[]
   SHORTCUT_IDS: string[]
+  EARN_SUPPORTED_NETWORK_IDS: NetworkId[]
 }
 
 export function networkIdToRpcUrlTransform(val: string | undefined) {
@@ -45,6 +46,7 @@ export function getConfig(): Config {
     GOOGLE_CLOUD_PROJECT: z.string().min(1),
     POSITION_IDS: z.string().transform((val) => val.split(',')),
     SHORTCUT_IDS: z.string().transform((val) => val.split(',')),
+    EARN_SUPPORTED_NETWORK_IDS: z.string().transform((val) => val.split(',') as NetworkId[]),
   })
 
   // Provide defaults in development
@@ -64,6 +66,10 @@ export function getConfig(): Config {
       .string()
       .default('')
       .transform((val) => (val === '' ? [] : val.split(','))),
+    EARN_SUPPORTED_NETWORK_IDS: z
+      .string()
+      .default('')
+      .transform((val) => (val === '' ? [] as NetworkId[] : val.split(',') as NetworkId[])),
   })
 
   return process.env.NODE_ENV === 'production'
