@@ -12,9 +12,7 @@ import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
 import { getAllbridgeTokenInfo } from './api'
 import { poolAbi } from './abis/pool'
-
-const ALLBRIDGE_LOGO =
-  'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/allbridgecore.png'
+import { ALLBRIDGE_LOGO, ALLBRIDGE_POOLS_BASE_URL, ALLBRIGE_CONTRACT_CREATED_AT, NETWORK_ID_TO_ALLBRIDGE_CHAIN } from './constants'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -84,7 +82,14 @@ const hook: PositionsHook = {
               imageUrl: ALLBRIDGE_LOGO,
             },
             dataProps: {
-              // TODO(ACT-1328): Add manageUrl and contractCreatedAt
+              manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,
+              contractCreatedAt:
+                ALLBRIGE_CONTRACT_CREATED_AT[
+                  getTokenId({
+                    networkId,
+                    address: tokenInfo.poolAddress.toLowerCase(),
+                  })
+                ],
               yieldRates: [
                 {
                   percentage: apr,
