@@ -18,11 +18,6 @@ import {
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
 
-const EARN_SUPPORTED_NETWORK_IDS = new Set([
-  NetworkId['arbitrum-one'],
-  NetworkId['arbitrum-sepolia'],
-  NetworkId['celo-mainnet'],
-])
 const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
 const EARN_SUPPORTED_POSITION_IDS = new Set([
   // Aave USDC
@@ -134,7 +129,7 @@ function createApp() {
         getEarnPositionsRequestSchema,
       )
       const networkIds = getNetworkIds(parsedRequest.query).filter(
-        (networkId) => EARN_SUPPORTED_NETWORK_IDS.has(networkId),
+        (networkId) => config.EARN_SUPPORTED_NETWORK_IDS.includes(networkId),
       )
 
       const positions = (
