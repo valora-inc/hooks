@@ -12,7 +12,12 @@ import { getClient } from '../../runtime/client'
 import { uiPoolDataProviderV3Abi } from './abis/ui-pool-data-provider-v3'
 import { getTokenId } from '../../runtime/getTokenId'
 import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
-import { AAVE_CONTRACT_CREATED_AT, AAVE_LOGO, AAVE_POOLS_BASE_URL, AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
+import {
+  AAVE_CONTRACT_CREATED_AT,
+  AAVE_LOGO,
+  AAVE_POOLS_BASE_URL,
+  AAVE_V3_ADDRESSES_BY_NETWORK_ID,
+} from './constants'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 

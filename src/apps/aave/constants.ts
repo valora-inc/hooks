@@ -83,11 +83,13 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
 }
 
 export const AAVE_LOGO =
-'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png'
+  'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png'
 
 export const AAVE_POOLS_BASE_URL = 'https://app.aave.com/'
 
 export const AAVE_CONTRACT_CREATED_AT: Record<string, string> = {
-  [`${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`]: '2023-06-28',
-  [`${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`]: '2024-03-08',
+  [`${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`]:
+    '2023-06-28T10:09:48.000Z',
+  [`${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`]:
+    '2024-03-08T14:23:53.000Z',
 }

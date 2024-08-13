@@ -12,7 +12,12 @@ import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
 import { getAllbridgeTokenInfo } from './api'
 import { poolAbi } from './abis/pool'
-import { ALLBRIDGE_LOGO, ALLBRIDGE_POOLS_BASE_URL, ALLBRIGE_CONTRACT_CREATED_AT, NETWORK_ID_TO_ALLBRIDGE_CHAIN } from './constants'
+import {
+  ALLBRIDGE_LOGO,
+  ALLBRIDGE_POOLS_BASE_URL,
+  ALLBRIGE_CONTRACT_CREATED_AT,
+  NETWORK_ID_TO_ALLBRIDGE_CHAIN,
+} from './constants'
 
 const hook: PositionsHook = {
   getInfo() {

@@ -33,5 +33,6 @@ export const NETWORK_ID_TO_ALLBRIDGE_CHAIN: Record<
 }
 
 export const ALLBRIGE_CONTRACT_CREATED_AT: Record<string, string> = {
-  [`${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`]: '2024-05-08',
+  [`${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`]:
+    '2024-05-08T09:09:55.000Z',
 }
