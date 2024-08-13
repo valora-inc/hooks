@@ -1,6 +1,6 @@
 import { NetworkId } from '../../types/networkId'
 
-export enum AllbridgeChain {
+enum AllbridgeChain {
   CEL = 'CEL',
   ETH = 'ETH',
   ARB = 'ARB',
