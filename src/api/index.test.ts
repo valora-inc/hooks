@@ -17,7 +17,10 @@ jest.mocked(getConfig).mockReturnValue({
   GOOGLE_CLOUD_PROJECT: 'dev-project',
   SHORTCUT_IDS: [],
   NETWORK_ID_TO_RPC_URL: {},
-  EARN_SUPPORTED_NETWORK_IDS: [NetworkId['celo-mainnet'], NetworkId['arbitrum-one']],
+  EARN_SUPPORTED_NETWORK_IDS: [
+    NetworkId['celo-mainnet'],
+    NetworkId['arbitrum-one'],
+  ],
 })
 import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
 import { ZodAddressLowerCased } from '../types/address'

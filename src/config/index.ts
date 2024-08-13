@@ -46,7 +46,9 @@ export function getConfig(): Config {
     GOOGLE_CLOUD_PROJECT: z.string().min(1),
     POSITION_IDS: z.string().transform((val) => val.split(',')),
     SHORTCUT_IDS: z.string().transform((val) => val.split(',')),
-    EARN_SUPPORTED_NETWORK_IDS: z.string().transform((val) => val.split(',') as NetworkId[]),
+    EARN_SUPPORTED_NETWORK_IDS: z
+      .string()
+      .transform((val) => val.split(',') as NetworkId[]),
   })
 
   // Provide defaults in development
@@ -69,7 +71,9 @@ export function getConfig(): Config {
     EARN_SUPPORTED_NETWORK_IDS: z
       .string()
       .default('')
-      .transform((val) => (val === '' ? [] as NetworkId[] : val.split(',') as NetworkId[])),
+      .transform((val) =>
+        val === '' ? ([] as NetworkId[]) : (val.split(',') as NetworkId[]),
+      ),
   })
 
   return process.env.NODE_ENV === 'production'
