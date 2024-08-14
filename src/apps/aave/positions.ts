@@ -17,6 +17,7 @@ import {
   AAVE_LOGO,
   AAVE_POOLS_BASE_URL,
   AAVE_V3_ADDRESSES_BY_NETWORK_ID,
+  NETWORK_ID_TO_AAVE_MARKET_NAME,
 } from './constants'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
@@ -75,7 +76,10 @@ const hook: PositionsHook = {
           allowFailure: false,
         })
       : [undefined, undefined]
-
+    const manageUrl =
+      AAVE_POOLS_BASE_URL + (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
+        ? `?marketName=${NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]}`
+        : '')
     return reservesData.flatMap((reserveData, i) => {
       const supplyApy = getApyFromRayApr(reserveData.liquidityRate)
       const variableBorrowApy = getApyFromRayApr(reserveData.variableBorrowRate)
@@ -123,7 +127,7 @@ const hook: PositionsHook = {
               imageUrl: AAVE_LOGO,
             },
             dataProps: {
-              manageUrl: AAVE_POOLS_BASE_URL,
+              manageUrl,
               contractCreatedAt:
                 AAVE_CONTRACT_CREATED_AT[
                   getTokenId({
