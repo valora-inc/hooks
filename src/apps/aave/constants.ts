@@ -81,3 +81,41 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
     pool: '0x07ea79f68b2b3df564d0a34f8e19d9b1e339814b',
   },
 }
+
+enum AaveMarketName {
+  proto_mainnet_v3 = 'proto_mainnet_v3',
+  proto_arbitrum_v3 = 'proto_arbitrum_v3',
+  proto_optimism_v3 = 'proto_optimism_v3',
+  proto_polygon_v3 = 'proto_polygon_v3',
+  proto_base_v3 = 'proto_base_v3',
+}
+
+export const AAVE_LOGO =
+  'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png'
+
+export const AAVE_POOLS_BASE_URL = 'https://app.aave.com/'
+
+export const NETWORK_ID_TO_AAVE_MARKET_NAME: Record<
+  NetworkId,
+  AaveMarketName | undefined
+> = {
+  [NetworkId['celo-mainnet']]: undefined,
+  [NetworkId['celo-alfajores']]: undefined,
+  [NetworkId['ethereum-mainnet']]: AaveMarketName.proto_mainnet_v3,
+  [NetworkId['ethereum-sepolia']]: undefined,
+  [NetworkId['arbitrum-one']]: AaveMarketName.proto_arbitrum_v3,
+  [NetworkId['arbitrum-sepolia']]: undefined,
+  [NetworkId['op-mainnet']]: AaveMarketName.proto_optimism_v3,
+  [NetworkId['op-sepolia']]: undefined,
+  [NetworkId['polygon-pos-mainnet']]: AaveMarketName.proto_polygon_v3,
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-mainnet']]: AaveMarketName.proto_base_v3,
+  [NetworkId['base-sepolia']]: undefined,
+}
+
+export const AAVE_CONTRACT_CREATED_AT: Record<string, string> = {
+  [`${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`]:
+    '2023-06-28T10:09:48.000Z',
+  [`${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`]:
+    '2024-03-08T14:23:53.000Z',
+}
