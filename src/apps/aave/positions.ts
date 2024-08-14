@@ -77,7 +77,8 @@ const hook: PositionsHook = {
         })
       : [undefined, undefined]
     const manageUrl =
-      AAVE_POOLS_BASE_URL + (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
+      AAVE_POOLS_BASE_URL +
+      (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
         ? `?marketName=${NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]}`
         : '')
     return reservesData.flatMap((reserveData, i) => {

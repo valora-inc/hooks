@@ -97,20 +97,21 @@ export const AAVE_POOLS_BASE_URL = 'https://app.aave.com/'
 
 export const NETWORK_ID_TO_AAVE_MARKET_NAME: Record<
   NetworkId,
-  AaveMarketName | undefined> = {
-    [NetworkId['celo-mainnet']]: undefined,
-    [NetworkId['celo-alfajores']]: undefined,
-    [NetworkId['ethereum-mainnet']]: AaveMarketName.proto_mainnet_v3,
-    [NetworkId['ethereum-sepolia']]: undefined,
-    [NetworkId['arbitrum-one']]: AaveMarketName.proto_arbitrum_v3,
-    [NetworkId['arbitrum-sepolia']]: undefined,
-    [NetworkId['op-mainnet']]: AaveMarketName.proto_optimism_v3,
-    [NetworkId['op-sepolia']]: undefined,
-    [NetworkId['polygon-pos-mainnet']]: AaveMarketName.proto_polygon_v3,
-    [NetworkId['polygon-pos-amoy']]: undefined,
-    [NetworkId['base-mainnet']]: AaveMarketName.proto_base_v3,
-    [NetworkId['base-sepolia']]: undefined
-  }
+  AaveMarketName | undefined
+> = {
+  [NetworkId['celo-mainnet']]: undefined,
+  [NetworkId['celo-alfajores']]: undefined,
+  [NetworkId['ethereum-mainnet']]: AaveMarketName.proto_mainnet_v3,
+  [NetworkId['ethereum-sepolia']]: undefined,
+  [NetworkId['arbitrum-one']]: AaveMarketName.proto_arbitrum_v3,
+  [NetworkId['arbitrum-sepolia']]: undefined,
+  [NetworkId['op-mainnet']]: AaveMarketName.proto_optimism_v3,
+  [NetworkId['op-sepolia']]: undefined,
+  [NetworkId['polygon-pos-mainnet']]: AaveMarketName.proto_polygon_v3,
+  [NetworkId['polygon-pos-amoy']]: undefined,
+  [NetworkId['base-mainnet']]: AaveMarketName.proto_base_v3,
+  [NetworkId['base-sepolia']]: undefined,
+}
 
 export const AAVE_CONTRACT_CREATED_AT: Record<string, string> = {
   [`${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`]:
