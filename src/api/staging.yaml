@@ -3,3 +3,4 @@ GOOGLE_CLOUD_PROJECT: celo-mobile-alfajores
 POSITION_IDS: 'curve,gooddollar,halofi,hedgey,locked-celo,mento,moola,stake-dao,ubeswap,uniswap,allbridge'
 SHORTCUT_IDS: 'gooddollar,hedgey,ubeswap'
 GET_TOKENS_INFO_URL: 'https://blockchain-api-dot-celo-mobile-alfajores.appspot.com/tokensInfo'
+EARN_SUPPORTED_NETWORK_IDS: 'arbitrum-sepolia'
