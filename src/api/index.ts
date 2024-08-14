@@ -27,6 +27,32 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
   `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
 
+// Extract the Valora app version from the User-Agent (available since Valora 1.49.0).
+// Examples:
+// - iOS: Valora/1.49.0 (iOS 14.5; iPhone)
+// - Android: Valora/1.49.0 (Android 12; Pixel 5)
+// See https://regex101.com/r/GItFAO/2
+function getValoraAppVersion(userAgent: string | undefined) {
+  const appInfo = getAppInfoFromUserAgent(userAgent)
+  return appInfo?.app?.toLowerCase() === 'valora' ? appInfo.version : undefined
+}
+
+// Extract app and version from User-Agent (Valora sets this since 1.49.0).
+// Examples:
+// - iOS: {app}/{version} (iOS 14.5; iPhone)
+// - Android: {app}/{version} (Android 12; Pixel 5)
+// See https://regex101.com/r/GItFAO/3
+// TODO: consider extracting this into a separate package
+function getAppInfoFromUserAgent(userAgent: string | undefined):
+  | {
+      app?: string
+      version?: string
+    }
+  | undefined {
+  const match = userAgent?.match(/^([^\s/]+)(?:\/(\S+))?/)
+  return match ? { app: match[1], version: match[2] } : undefined
+}
+
 function asyncHandler(handler: HttpFunction) {
   return valoraAsyncHandler(handler, logger)
 }
@@ -98,12 +124,20 @@ function createApp() {
     '/getPositions',
     asyncHandler(async (req, res) => {
       const parsedRequest = await parseRequest(req, getHooksRequestSchema)
+      const userAgent = req.header('user-agent')
+      const valoraAppVersion = getValoraAppVersion(userAgent)
+      const returnAavePositions = valoraAppVersion
+        ? valoraAppVersion >= '1.90.0'
+        : false
       const { address } = parsedRequest.query
       const networkIds = getNetworkIds(parsedRequest.query)
+      const appIds = config.POSITION_IDS.filter((appId) =>
+        returnAavePositions ? true : appId !== 'aave',
+      )
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
-            getPositions(networkId, address, config.POSITION_IDS),
+            getPositions(networkId, address, appIds),
           ),
         )
       ).flat()
