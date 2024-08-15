@@ -76,7 +76,7 @@ export interface EarningItem {
 }
 
 export interface EarnDataProps {
-  contractCreatedAt?: number
+  contractCreatedAt?: string // ISO string
   manageUrl?: string
   tvl?: number
   yieldRates: YieldRate[]
