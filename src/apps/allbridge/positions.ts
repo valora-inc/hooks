@@ -36,7 +36,7 @@ const hook: PositionsHook = {
 
     const client = getClient(networkId)
 
-    const [balances, rewards] = await Promise.all([
+    const [balances, rewards, totalSupplies, lpTokenDecimals] = await Promise.all([
       await Promise.all(
         allbridgeTokenInfo.map(async (tokenInfo) => {
           return address
@@ -59,6 +59,26 @@ const hook: PositionsHook = {
                 args: [address as Address],
               })
             : undefined
+        }),
+      ),
+      await Promise.all(
+        allbridgeTokenInfo.map(async (tokenInfo) => {
+          return client.readContract({
+            address: tokenInfo.poolAddress,
+            abi: poolAbi,
+            functionName: 'totalSupply',
+            args: [],
+          })
+        }),
+      ),
+      await Promise.all(
+        allbridgeTokenInfo.map(async (tokenInfo) => {
+          return client.readContract({
+            address: tokenInfo.poolAddress,
+            abi: poolAbi,
+            functionName: 'decimals',
+            args: [],
+          })
         }),
       ),
     ])
@@ -95,6 +115,10 @@ const hook: PositionsHook = {
                     address: tokenInfo.poolAddress.toLowerCase(),
                   })
                 ],
+              tvl: toDecimalNumber(
+                totalSupplies[i],
+                lpTokenDecimals[i],
+              ).toNumber(),
               yieldRates: [
                 {
                   percentage: apr,

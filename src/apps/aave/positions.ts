@@ -19,6 +19,7 @@ import {
   AAVE_V3_ADDRESSES_BY_NETWORK_ID,
   NETWORK_ID_TO_AAVE_MARKET_NAME,
 } from './constants'
+import { aTokenAbi } from './abis/atoken'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 
@@ -76,6 +77,30 @@ const hook: PositionsHook = {
           allowFailure: false,
         })
       : [undefined, undefined]
+
+    const [totalSupplies, lpTokenDecimals] = await Promise.all([
+      await Promise.all(
+        reservesData.map(async ({ aTokenAddress }) => {
+          return client.readContract({
+            address: aTokenAddress,
+            abi: aTokenAbi,
+            functionName: 'totalSupply',
+            args: [],
+          })
+        }),
+      ),
+      await Promise.all(
+        reservesData.map(async ({ aTokenAddress }) => {
+          return client.readContract({
+            address: aTokenAddress,
+            abi: aTokenAbi,
+            functionName: 'decimals',
+            args: [],
+          })
+        }),
+      ),
+    ])
+
     const manageUrl =
       AAVE_POOLS_BASE_URL +
       (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
@@ -136,6 +161,10 @@ const hook: PositionsHook = {
                     address: reserveData.aTokenAddress.toLowerCase(),
                   })
                 ],
+              tvl: toDecimalNumber(
+                totalSupplies[i],
+                lpTokenDecimals[i],
+              ).toNumber(),
               yieldRates: [
                 {
                   percentage: supplyApy,
