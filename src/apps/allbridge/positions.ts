@@ -36,52 +36,53 @@ const hook: PositionsHook = {
 
     const client = getClient(networkId)
 
-    const [balances, rewards, totalSupplies, lpTokenDecimals] = await Promise.all([
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return address
-            ? client.readContract({
-                address: tokenInfo.poolAddress,
-                abi: poolAbi,
-                functionName: 'balanceOf',
-                args: [address as Address],
-              })
-            : undefined
-        }),
-      ),
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return address
-            ? client.readContract({
-                address: tokenInfo.poolAddress,
-                abi: poolAbi,
-                functionName: 'pendingReward',
-                args: [address as Address],
-              })
-            : undefined
-        }),
-      ),
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return client.readContract({
-            address: tokenInfo.poolAddress,
-            abi: poolAbi,
-            functionName: 'totalSupply',
-            args: [],
-          })
-        }),
-      ),
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return client.readContract({
-            address: tokenInfo.poolAddress,
-            abi: poolAbi,
-            functionName: 'decimals',
-            args: [],
-          })
-        }),
-      ),
-    ])
+    const [balances, rewards, totalSupplies, lpTokenDecimals] =
+      await Promise.all([
+        await Promise.all(
+          allbridgeTokenInfo.map(async (tokenInfo) => {
+            return address
+              ? client.readContract({
+                  address: tokenInfo.poolAddress,
+                  abi: poolAbi,
+                  functionName: 'balanceOf',
+                  args: [address as Address],
+                })
+              : undefined
+          }),
+        ),
+        await Promise.all(
+          allbridgeTokenInfo.map(async (tokenInfo) => {
+            return address
+              ? client.readContract({
+                  address: tokenInfo.poolAddress,
+                  abi: poolAbi,
+                  functionName: 'pendingReward',
+                  args: [address as Address],
+                })
+              : undefined
+          }),
+        ),
+        await Promise.all(
+          allbridgeTokenInfo.map(async (tokenInfo) => {
+            return client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'totalSupply',
+              args: [],
+            })
+          }),
+        ),
+        await Promise.all(
+          allbridgeTokenInfo.map(async (tokenInfo) => {
+            return client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'decimals',
+              args: [],
+            })
+          }),
+        ),
+      ])
 
     return allbridgeTokenInfo.flatMap((tokenInfo, i) => {
       const apr = new BigNumber(tokenInfo.apr7d).toNumber() * 100
