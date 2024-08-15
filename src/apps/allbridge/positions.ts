@@ -6,7 +6,7 @@ import {
   ContractPositionDefinition,
 } from '../../types/positions'
 import { Address } from 'viem'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import { DecimalNumber, toDecimalNumber, toSerializedDecimalNumber } from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
@@ -116,10 +116,10 @@ const hook: PositionsHook = {
                     address: tokenInfo.poolAddress.toLowerCase(),
                   })
                 ],
-              tvl: toDecimalNumber(
+              tvl: toSerializedDecimalNumber(toDecimalNumber(
                 totalSupplies[i],
                 lpTokenDecimals[i],
-              ).toNumber(),
+              )),
               yieldRates: [
                 {
                   percentage: apr,
