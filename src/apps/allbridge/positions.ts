@@ -6,7 +6,11 @@ import {
   ContractPositionDefinition,
 } from '../../types/positions'
 import { Address } from 'viem'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import {
+  DecimalNumber,
+  toDecimalNumber,
+  toSerializedDecimalNumber,
+} from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
@@ -36,32 +40,53 @@ const hook: PositionsHook = {
 
     const client = getClient(networkId)
 
-    const [balances, rewards] = await Promise.all([
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return address
-            ? client.readContract({
-                address: tokenInfo.poolAddress,
-                abi: poolAbi,
-                functionName: 'balanceOf',
-                args: [address as Address],
-              })
-            : undefined
-        }),
-      ),
-      await Promise.all(
-        allbridgeTokenInfo.map(async (tokenInfo) => {
-          return address
-            ? client.readContract({
-                address: tokenInfo.poolAddress,
-                abi: poolAbi,
-                functionName: 'pendingReward',
-                args: [address as Address],
-              })
-            : undefined
-        }),
-      ),
-    ])
+    const [balances, rewards, totalSupplies, lpTokenDecimals] =
+      await Promise.all([
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
+            return address
+              ? client.readContract({
+                  address: tokenInfo.poolAddress,
+                  abi: poolAbi,
+                  functionName: 'balanceOf',
+                  args: [address as Address],
+                })
+              : undefined
+          }),
+        ),
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
+            return address
+              ? client.readContract({
+                  address: tokenInfo.poolAddress,
+                  abi: poolAbi,
+                  functionName: 'pendingReward',
+                  args: [address as Address],
+                })
+              : undefined
+          }),
+        ),
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
+            return client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'totalSupply',
+              args: [],
+            })
+          }),
+        ),
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
+            return client.readContract({
+              address: tokenInfo.poolAddress,
+              abi: poolAbi,
+              functionName: 'decimals',
+              args: [],
+            })
+          }),
+        ),
+      ])
 
     return allbridgeTokenInfo.flatMap((tokenInfo, i) => {
       const apr = new BigNumber(tokenInfo.apr7d).toNumber() * 100
@@ -95,6 +120,9 @@ const hook: PositionsHook = {
                     address: tokenInfo.poolAddress.toLowerCase(),
                   })
                 ],
+              tvl: toSerializedDecimalNumber(
+                toDecimalNumber(totalSupplies[i], lpTokenDecimals[i]),
+              ),
               yieldRates: [
                 {
                   percentage: apr,

@@ -6,7 +6,11 @@ import {
   ContractPositionDefinition,
 } from '../../types/positions'
 import { Address } from 'viem'
-import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
+import {
+  DecimalNumber,
+  toDecimalNumber,
+  toSerializedDecimalNumber,
+} from '../../types/numbers'
 import BigNumber from 'bignumber.js'
 import { getClient } from '../../runtime/client'
 import { uiPoolDataProviderV3Abi } from './abis/ui-pool-data-provider-v3'
@@ -19,6 +23,7 @@ import {
   AAVE_V3_ADDRESSES_BY_NETWORK_ID,
   NETWORK_ID_TO_AAVE_MARKET_NAME,
 } from './constants'
+import { aTokenAbi } from './abis/atoken'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 
@@ -76,6 +81,30 @@ const hook: PositionsHook = {
           allowFailure: false,
         })
       : [undefined, undefined]
+
+    const [totalSupplies, lpTokenDecimals] = await Promise.all([
+      Promise.all(
+        reservesData.map(({ aTokenAddress }) => {
+          return client.readContract({
+            address: aTokenAddress,
+            abi: aTokenAbi,
+            functionName: 'totalSupply',
+            args: [],
+          })
+        }),
+      ),
+      Promise.all(
+        reservesData.map(({ aTokenAddress }) => {
+          return client.readContract({
+            address: aTokenAddress,
+            abi: aTokenAbi,
+            functionName: 'decimals',
+            args: [],
+          })
+        }),
+      ),
+    ])
+
     const manageUrl =
       AAVE_POOLS_BASE_URL +
       (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
@@ -136,6 +165,9 @@ const hook: PositionsHook = {
                     address: reserveData.aTokenAddress.toLowerCase(),
                   })
                 ],
+              tvl: toSerializedDecimalNumber(
+                toDecimalNumber(totalSupplies[i], lpTokenDecimals[i]),
+              ),
               yieldRates: [
                 {
                   percentage: supplyApy,
