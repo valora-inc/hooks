@@ -42,8 +42,8 @@ const hook: PositionsHook = {
 
     const [balances, rewards, totalSupplies, lpTokenDecimals] =
       await Promise.all([
-        await Promise.all(
-          allbridgeTokenInfo.map(async (tokenInfo) => {
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
             return address
               ? client.readContract({
                   address: tokenInfo.poolAddress,
@@ -54,8 +54,8 @@ const hook: PositionsHook = {
               : undefined
           }),
         ),
-        await Promise.all(
-          allbridgeTokenInfo.map(async (tokenInfo) => {
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
             return address
               ? client.readContract({
                   address: tokenInfo.poolAddress,
@@ -66,8 +66,8 @@ const hook: PositionsHook = {
               : undefined
           }),
         ),
-        await Promise.all(
-          allbridgeTokenInfo.map(async (tokenInfo) => {
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
             return client.readContract({
               address: tokenInfo.poolAddress,
               abi: poolAbi,
@@ -76,8 +76,8 @@ const hook: PositionsHook = {
             })
           }),
         ),
-        await Promise.all(
-          allbridgeTokenInfo.map(async (tokenInfo) => {
+        Promise.all(
+          allbridgeTokenInfo.map((tokenInfo) => {
             return client.readContract({
               address: tokenInfo.poolAddress,
               abi: poolAbi,

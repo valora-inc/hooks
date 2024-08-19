@@ -83,8 +83,8 @@ const hook: PositionsHook = {
       : [undefined, undefined]
 
     const [totalSupplies, lpTokenDecimals] = await Promise.all([
-      await Promise.all(
-        reservesData.map(async ({ aTokenAddress }) => {
+      Promise.all(
+        reservesData.map(({ aTokenAddress }) => {
           return client.readContract({
             address: aTokenAddress,
             abi: aTokenAbi,
@@ -93,8 +93,8 @@ const hook: PositionsHook = {
           })
         }),
       ),
-      await Promise.all(
-        reservesData.map(async ({ aTokenAddress }) => {
+      Promise.all(
+        reservesData.map(({ aTokenAddress }) => {
           return client.readContract({
             address: aTokenAddress,
             abi: aTokenAbi,
