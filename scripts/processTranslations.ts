@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 import fs from 'fs'
 import i18next from 'i18next'
