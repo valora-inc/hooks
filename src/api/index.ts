@@ -41,6 +41,9 @@ i18next
     fallbackLng: 'en',
     preload: ['en'],
   })
+  .catch((error) => {
+    throw new Error(`Failed to initialize i18next: ${error}`)
+  })
 
 // Copied over from https://github.com/valora-inc/valora-rest-api/blob/main/src/middleware/requestMetadata.ts#L65
 function getValoraAppVersion(userAgent: string | undefined) {
