@@ -1,5 +1,6 @@
 import { DecimalNumber, SerializedDecimalNumber } from './numbers'
 import { NetworkId } from './networkId'
+import { TFunction } from 'i18next'
 
 // Interface that authors will implement
 export interface PositionsHook {
@@ -11,6 +12,7 @@ export interface PositionsHook {
   getPositionDefinitions(
     networkId: NetworkId,
     address?: string,
+    t?: TFunction<'translation', undefined>,
   ): Promise<PositionDefinition[]>
 
   // Get an app token definition from a token definition

@@ -4,11 +4,11 @@ import hook from './positions'
 
 describe('getPositionDefinitions', () => {
   it('should get the address definitions successfully', async () => {
-    const positions = await getPositions(
-      NetworkId['celo-mainnet'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      ['ubeswap'],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      appIds: ['ubeswap'],
+    })
 
     // Uniswap v2 farm definitions
     expect(

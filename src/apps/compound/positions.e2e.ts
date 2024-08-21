@@ -4,11 +4,11 @@ import hook from './positions'
 
 describe('getPositionDefinitions', () => {
   it('should get the address definitions successfully for supply & collateral', async () => {
-    const positions = await getPositions(
-      NetworkId['op-mainnet'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      ['compound'],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['op-mainnet'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      appIds: ['compound'],
+    })
 
     const supplyPosition = positions.find((p) =>
       p.displayProps.title.endsWith(' Supply'),
@@ -22,11 +22,11 @@ describe('getPositionDefinitions', () => {
   })
 
   it('should get the address definitions successfully for debt & collateral', async () => {
-    const positions = await getPositions(
-      NetworkId['arbitrum-one'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      ['compound'],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['arbitrum-one'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      appIds: ['compound'],
+    })
 
     const collateralPosition = positions.find((p) =>
       p.displayProps.title.endsWith(' Collateral'),

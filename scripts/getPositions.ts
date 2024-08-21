@@ -49,7 +49,11 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
-  const positions = await getPositions(argv.networkId, argv.address, argv.apps)
+  const positions = await getPositions({
+    networkId: argv.networkId,
+    address: argv.address,
+    appIds: argv.apps,
+  })
   console.log('positions', JSON.stringify(positions, null, ' '))
 
   console.table(

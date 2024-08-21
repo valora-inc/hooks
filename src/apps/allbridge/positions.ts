@@ -31,7 +31,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions(networkId, address, t) {
     const allbridgeTokenInfo = (await getAllbridgeTokenInfo({ networkId }))
       ?.tokens
     if (!allbridgeTokenInfo) {
@@ -126,7 +126,7 @@ const hook: PositionsHook = {
               yieldRates: [
                 {
                   percentage: apr,
-                  label: 'Earnings APR', // TODO(ACT-1331): Replace with localized string
+                  label: t ? t('yieldRates.earningsApr') : 'Earnings APR',
                   tokenId: getTokenId({
                     networkId,
                     address: tokenInfo.tokenAddress.toLowerCase(),
@@ -140,7 +140,7 @@ const hook: PositionsHook = {
                         pendingReward,
                         tokenInfo.decimals,
                       ),
-                      label: 'Earnings', // TODO(ACT-1331): Replace with localized string
+                      label: t ? t('earningItems.earnings') : 'Earnings',
                       tokenId: getTokenId({
                         networkId,
                         address: tokenInfo.tokenAddress.toLowerCase(),

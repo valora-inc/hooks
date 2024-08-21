@@ -47,7 +47,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions(networkId, address, t) {
     const aaveAddresses = AAVE_V3_ADDRESSES_BY_NETWORK_ID[networkId]
     if (!aaveAddresses) {
       return []
@@ -171,7 +171,7 @@ const hook: PositionsHook = {
               yieldRates: [
                 {
                   percentage: supplyApy,
-                  label: 'Earnings APY', // TODO(ACT-1331): Replace with localized string
+                  label: t ? t('yieldRates.earningsApy') : 'Earnings APY',
                   tokenId: getTokenId({
                     networkId,
                     address: reserveData.underlyingAsset.toLowerCase(),
@@ -184,7 +184,7 @@ const hook: PositionsHook = {
                       info.userUnclaimedRewards,
                       info.rewardTokenDecimals,
                     ),
-                    label: 'Rewards', // TODO(ACT-1331): Replace with localized string
+                    label: t ? t('earningItems.rewards') : 'Rewards',
                     tokenId: getTokenId({
                       networkId,
                       address: info.rewardTokenAddress.toLowerCase(),

@@ -85,11 +85,11 @@ describe(getPositions, () => {
     getSpy.mockReturnValue({
       json: jest.fn().mockResolvedValue(mockTokensInfo),
     } as any)
-    const positions = await getPositions(
-      NetworkId['celo-mainnet'],
-      '0x0000000000000000000000000000000000007e57',
-      [],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x0000000000000000000000000000000000007e57',
+      appIds: [],
+    })
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
     expect(loggerErrorSpy).toHaveBeenCalledTimes(1)
@@ -138,11 +138,11 @@ describe(getPositions, () => {
       'test-hook': testHook,
     })
     await expect(
-      getPositions(
-        NetworkId['celo-mainnet'],
-        '0x0000000000000000000000000000000000007e57',
-        [],
-      ),
+      getPositions({
+        networkId: NetworkId['celo-mainnet'],
+        address: '0x0000000000000000000000000000000000007e57',
+        appIds: [],
+      }),
     ).rejects.toThrow(
       "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo-mainnet)",
     )
@@ -222,11 +222,11 @@ describe(getPositions, () => {
     getSpy.mockReturnValue({
       json: jest.fn().mockResolvedValue(mockTokensInfo),
     } as any)
-    const positions = await getPositions(
-      NetworkId['op-mainnet'],
-      '0x0000000000000000000000000000000000007e57',
-      [],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['op-mainnet'],
+      address: '0x0000000000000000000000000000000000007e57',
+      appIds: [],
+    })
     expect(positions.length).toBe(1)
     const beefyPosition = positions[0] as AppTokenPosition
     expect(beefyPosition.appId).toBe('beefy-price-escape')
@@ -309,11 +309,11 @@ describe(getPositions, () => {
     getSpy.mockReturnValue({
       json: jest.fn().mockResolvedValue(mockTokensInfo),
     } as any)
-    const positions = await getPositions(
-      NetworkId['celo-mainnet'],
-      '0x0000000000000000000000000000000000007e57',
-      [],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x0000000000000000000000000000000000007e57',
+      appIds: [],
+    })
     // Just 3 calls to readContract, one for each unique token address and networkId
     expect(mockReadContract).toHaveBeenCalledTimes(3)
     expect(positions.length).toBe(2)
@@ -329,11 +329,11 @@ describe(getPositions, () => {
     getSpy.mockReturnValue({
       json: jest.fn().mockResolvedValue(mockTokensInfo),
     } as any)
-    const positions = await getPositions(
-      NetworkId['celo-mainnet'],
-      '0x0000000000000000000000000000000000007e57',
-      [],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x0000000000000000000000000000000000007e57',
+      appIds: [],
+    })
     expect(positions.length).toBe(1)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(1)
     expect(loggerWarnSpy).toHaveBeenCalledWith(
@@ -369,11 +369,11 @@ describe(getPositions, () => {
     getSpy.mockReturnValue({
       json: jest.fn().mockResolvedValue(mockTokensInfo),
     } as any)
-    const positions = await getPositions(
-      NetworkId['celo-mainnet'],
-      '0x0000000000000000000000000000000000007e57',
-      [],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x0000000000000000000000000000000000007e57',
+      appIds: [],
+    })
     expect(positions.length).toBe(2)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(0)
   })

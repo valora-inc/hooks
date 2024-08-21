@@ -28,6 +28,7 @@ import { getClient } from './client'
 import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'
 import { getConfig } from '../config'
+import { TFunction } from 'i18next'
 
 interface RawTokenInfo {
   address?: string
@@ -392,17 +393,23 @@ function addSourceAppId<T>(definition: T, sourceAppId: string) {
 }
 
 // This is the main logic to get positions
-export async function getPositions(
-  networkId: NetworkId,
-  address: string | undefined,
-  appIds: string[] = [],
-) {
+export async function getPositions({
+  networkId,
+  address,
+  appIds = [],
+  t,
+}: {
+  networkId: NetworkId
+  address: string | undefined
+  appIds: string[]
+  t?: TFunction<'translation', undefined>
+}) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, hook]) =>
-      hook.getPositionDefinitions(networkId, address).then(
+      hook.getPositionDefinitions(networkId, address, t).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },

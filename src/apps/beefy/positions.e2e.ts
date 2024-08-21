@@ -4,11 +4,11 @@ import { getPositions } from '../../runtime/getPositions'
 
 describe('getPositionDefinitions', () => {
   it('should get the address definitions successfully', async () => {
-    const positions = await getPositions(
-      NetworkId['op-mainnet'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      ['beefy'],
-    )
+    const positions = await getPositions({
+      networkId: NetworkId['op-mainnet'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      appIds: ['beefy'],
+    })
 
     expect(
       positions.filter((p) => p.type === 'app-token').length,
