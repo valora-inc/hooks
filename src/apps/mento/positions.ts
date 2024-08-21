@@ -6,14 +6,8 @@ import { Address } from 'viem'
 import { toDecimalNumber } from '../../types/numbers'
 import { NetworkId } from '../../types/networkId'
 import { getClient } from '../../runtime/client'
-import { airdropAbi } from './abis/airdrop'
-import got from 'got'
 import { getTokenId } from '../../runtime/getTokenId'
 import { lockingAbi } from './abis/locking'
-
-const AIRDROP_CSV_URL =
-  'https://raw.githubusercontent.com/mento-protocol/airgrab-interface/main/src/lib/merkle/list.csv'
-const AIRDROP_ADDRESS = '0x7d8e73deafdbafc98fdbe7974168cfa6d8b9ae0c'
 
 const VE_MENTO_ADDRESS_BY_NETWORK_ID: {
   [networkId: string]: Address | undefined
