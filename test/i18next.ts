@@ -10,16 +10,15 @@ testI18next
   .use(Backend)
   .use(i18nextMiddleware.LanguageDetector)
   .init({
+    // Sync init, so t can be used immediately
+    initImmediate: false,
     backend: {
       // eslint-disable-next-line no-path-concat
-      loadPath: '../../locales/{{lng}}.json',
+      loadPath: `${__dirname}/../locales/{{lng}}.json`,
     },
     debug: true,
-    fallbackLng: 'en',
-    preload: ['en'],
-  })
-  .catch((error) => {
-    throw new Error(`Failed to initialize i18next: ${error}`)
+    fallbackLng: 'base',
+    preload: ['base'],
   })
 
 export const t = testI18next.t.bind(testI18next)
