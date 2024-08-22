@@ -65,7 +65,7 @@ const failingTestHook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions({networkId: _networkId}) {
+  async getPositionDefinitions({ networkId: _networkId }) {
     throw new Error('This hook fails')
   },
 }
