@@ -19,7 +19,7 @@ const hook: PositionsHook = {
         'Grow wealth with crypto, earn rewards, badges & more. We make personal finance fun.',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions({networkId, address}) {
     if (networkId !== NetworkId['celo-mainnet'] || !address) {
       // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
       return []

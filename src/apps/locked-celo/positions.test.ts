@@ -1,5 +1,6 @@
 import hook from './positions'
 import { NetworkId } from '../../types/networkId'
+import { t } from '../../../test/i18next'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -16,10 +17,11 @@ describe('getPositionDefinitions', () => {
       12n * 10n ** 18n, // 12 locked celo
       [[], []], // pending withdrawals
     ])
-    const positions = await hook.getPositionDefinitions(
-      NetworkId['celo-mainnet'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-    )
+    const positions = await hook.getPositionDefinitions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      t,
+    })
 
     expect(positions.length).toBe(1)
   })
@@ -29,10 +31,11 @@ describe('getPositionDefinitions', () => {
       0n, // 0 locked celo
       [[], []], // pending withdrawals
     ])
-    const positions = await hook.getPositionDefinitions(
-      NetworkId['celo-mainnet'],
-      '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-    )
+    const positions = await hook.getPositionDefinitions({
+      networkId: NetworkId['celo-mainnet'],
+      address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+      t,
+    })
 
     expect(positions.length).toBe(0)
   })

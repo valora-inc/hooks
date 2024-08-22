@@ -30,6 +30,8 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
   `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
 
+const DEFAULT_LANGUAGE = 'en'
+
 i18next
   .use(Backend)
   .use(i18nextMiddleware.LanguageDetector)
@@ -38,8 +40,8 @@ i18next
       // eslint-disable-next-line no-path-concat
       loadPath: '../../locales/{{lng}}.json',
     },
-    fallbackLng: 'en',
-    preload: ['en'],
+    fallbackLng: DEFAULT_LANGUAGE,
+    preload: [DEFAULT_LANGUAGE],
   })
   .catch((error) => {
     throw new Error(`Failed to initialize i18next: ${error}`)

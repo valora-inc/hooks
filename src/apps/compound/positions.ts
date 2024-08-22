@@ -62,8 +62,8 @@ const hook: PositionsHook = {
     }
   },
   async getPositionDefinitions(
-    networkId: NetworkId,
-    address: Address | undefined,
+    {networkId,
+    address}
   ) {
     const markets = MARKETS.filter((market) => market.networkId === networkId)
     if (!markets.length || !address) {
@@ -76,7 +76,7 @@ const hook: PositionsHook = {
       code: compoundMulticallBytecode,
       abi: compoundMulticallAbi,
       functionName: 'getUserPositions',
-      args: [address, markets.map((m) => m.address)],
+      args: [address as Address, markets.map((m) => m.address)],
     })
 
     return results.flatMap(

@@ -1,5 +1,6 @@
 import { getPositions } from './getPositions'
 import { NetworkId } from '../types/networkId'
+import { t } from '../../test/i18next'
 
 describe('getPositions', () => {
   it.each([NetworkId['celo-mainnet'], NetworkId['ethereum-mainnet']])(
@@ -9,6 +10,7 @@ describe('getPositions', () => {
         networkId,
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         appIds: [],
+        t,
       })
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
@@ -25,6 +27,7 @@ describe('getPositions', () => {
         networkId,
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         appIds: [appId],
+        t,
       })
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
@@ -40,6 +43,7 @@ describe('getPositions', () => {
         networkId: NetworkId['celo-mainnet'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         appIds: ['does-not-exist'],
+        t,
       }),
     ).rejects.toThrow(
       /No app with id 'does-not-exist' found, available apps: \w+/,
@@ -49,6 +53,7 @@ describe('getPositions', () => {
         networkId: NetworkId['ethereum-mainnet'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         appIds: ['does-not-exist'],
+        t,
       }),
     ).rejects.toThrow(
       /No app with id 'does-not-exist' found, available apps: \w+/,

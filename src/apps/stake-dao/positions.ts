@@ -162,7 +162,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions({ networkId, address }) {
     return await getVaultPositionDefinitions(
       networkId,
       address ? (address as Address) : undefined,

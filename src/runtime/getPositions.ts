@@ -402,14 +402,14 @@ export async function getPositions({
   networkId: NetworkId
   address: string | undefined
   appIds: string[]
-  t?: TFunction<'translation', undefined>
+  t: TFunction<'translation', undefined>
 }) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, hook]) =>
-      hook.getPositionDefinitions(networkId, address, t).then(
+      hook.getPositionDefinitions({networkId, address, t}).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },

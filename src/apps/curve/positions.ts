@@ -189,7 +189,7 @@ const hook: PositionsHook = {
       description: 'Curve pools',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions({networkId, address}) {
     return getPoolPositionDefinitions(
       networkId,
       address ? (address as Address) : undefined,

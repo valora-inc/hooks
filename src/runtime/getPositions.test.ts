@@ -12,6 +12,7 @@ import { logger } from '../log'
 import { NetworkId } from '../types/networkId'
 import got from 'got'
 import * as mockTokensInfo from './mockTokensInfo.json'
+import { t } from '../../test/i18next'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -33,7 +34,7 @@ const lockedCeloTestHook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(networkId, _address) {
+  async getPositionDefinitions({ networkId }) {
     const position: ContractPositionDefinition = {
       type: 'contract-position-definition',
       networkId,
@@ -64,7 +65,7 @@ const failingTestHook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(_network, _address) {
+  async getPositionDefinitions({}) {
     throw new Error('This hook fails')
   },
 }
@@ -89,6 +90,7 @@ describe(getPositions, () => {
       networkId: NetworkId['celo-mainnet'],
       address: '0x0000000000000000000000000000000000007e57',
       appIds: [],
+      t,
     })
     expect(positions.length).toBe(1)
     expect(positions.map((p) => p.appId)).toEqual(['locked-celo-test'])
@@ -108,7 +110,7 @@ describe(getPositions, () => {
           description: '',
         }
       },
-      async getPositionDefinitions(networkId, _address) {
+      async getPositionDefinitions({ networkId }) {
         const position: AppTokenPositionDefinition = {
           type: 'app-token-definition',
           networkId,
@@ -142,6 +144,7 @@ describe(getPositions, () => {
         networkId: NetworkId['celo-mainnet'],
         address: '0x0000000000000000000000000000000000007e57',
         appIds: [],
+        t,
       }),
     ).rejects.toThrow(
       "Positions hook for app 'test-hook' does not implement 'getAppTokenDefinition'. Please implement it to resolve the intermediary app token definition for 0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e (celo-mainnet)",
@@ -158,7 +161,7 @@ describe(getPositions, () => {
         }
       },
 
-      async getPositionDefinitions(networkId: NetworkId, _address: string) {
+      async getPositionDefinitions({ networkId }) {
         if (networkId !== NetworkId['op-mainnet']) {
           return []
         }
@@ -226,6 +229,7 @@ describe(getPositions, () => {
       networkId: NetworkId['op-mainnet'],
       address: '0x0000000000000000000000000000000000007e57',
       appIds: [],
+      t,
     })
     expect(positions.length).toBe(1)
     const beefyPosition = positions[0] as AppTokenPosition
@@ -250,7 +254,7 @@ describe(getPositions, () => {
           description: '',
         }
       },
-      async getPositionDefinitions(networkId, _address) {
+      async getPositionDefinitions({ networkId }) {
         const position: ContractPositionDefinition = {
           type: 'contract-position-definition',
           networkId,
@@ -313,6 +317,7 @@ describe(getPositions, () => {
       networkId: NetworkId['celo-mainnet'],
       address: '0x0000000000000000000000000000000000007e57',
       appIds: [],
+      t,
     })
     // Just 3 calls to readContract, one for each unique token address and networkId
     expect(mockReadContract).toHaveBeenCalledTimes(3)
@@ -333,6 +338,7 @@ describe(getPositions, () => {
       networkId: NetworkId['celo-mainnet'],
       address: '0x0000000000000000000000000000000000007e57',
       appIds: [],
+      t,
     })
     expect(positions.length).toBe(1)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(1)
@@ -354,9 +360,9 @@ describe(getPositions, () => {
       'test-hook': lockedCeloTestHook,
       'test-hook2': {
         ...lockedCeloTestHook,
-        async getPositionDefinitions(networkId, _address) {
+        async getPositionDefinitions({ networkId }) {
           return lockedCeloTestHook
-            .getPositionDefinitions(networkId, _address)
+            .getPositionDefinitions({ networkId, t })
             .then((positions) =>
               positions.map((p) => ({
                 ...p,
@@ -373,6 +379,7 @@ describe(getPositions, () => {
       networkId: NetworkId['celo-mainnet'],
       address: '0x0000000000000000000000000000000000007e57',
       appIds: [],
+      t,
     })
     expect(positions.length).toBe(2)
     expect(loggerWarnSpy).toHaveBeenCalledTimes(0)

@@ -47,7 +47,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions(networkId, address, t) {
+  async getPositionDefinitions({networkId, address, t}) {
     const aaveAddresses = AAVE_V3_ADDRESSES_BY_NETWORK_ID[networkId]
     if (!aaveAddresses) {
       return []
