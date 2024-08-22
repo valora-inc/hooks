@@ -402,7 +402,7 @@ export async function getPositions({
   networkId: NetworkId
   address: string | undefined
   appIds: string[]
-  t?: TFunction<'translation', undefined>
+  t: TFunction<'translation', undefined>
 }) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
