@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { Token } from '../src/types/positions'
 import { getPositions } from '../src/runtime/getPositions'
 import { NetworkId } from '../src/types/networkId'
+import { t } from '../test/i18next'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -53,6 +54,7 @@ void (async () => {
     networkId: argv.networkId,
     address: argv.address,
     appIds: argv.apps,
+    t,
   })
   console.log('positions', JSON.stringify(positions, null, ' '))
 
