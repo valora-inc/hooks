@@ -409,7 +409,7 @@ export async function getPositions({
   // First get all position definitions for the given address
   const definitions = await Promise.all(
     Object.entries(hooksByAppId).map(([appId, hook]) =>
-      hook.getPositionDefinitions({networkId, address, t}).then(
+      hook.getPositionDefinitions({ networkId, address, t }).then(
         (definitions) => {
           return definitions.map((definition) => addAppId(definition, appId))
         },

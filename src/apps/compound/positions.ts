@@ -61,10 +61,7 @@ const hook: PositionsHook = {
       description: 'Compound markets',
     }
   },
-  async getPositionDefinitions(
-    {networkId,
-    address}
-  ) {
+  async getPositionDefinitions({ networkId, address }) {
     const markets = MARKETS.filter((market) => market.networkId === networkId)
     if (!markets.length || !address) {
       return []

@@ -44,7 +44,7 @@ const hook: PositionsHook = {
   getInfo() {
     return { name: 'MyDapp' }
   },
-  async getPositionDefinitions({network, address, t}) {
+  async getPositionDefinitions({ network, address, t }) {
     // TODO: implement
   },
 }
@@ -82,7 +82,7 @@ const hook: PositionsHook = {
   getInfo() {
     return { name: 'MyDapp' }
   },
-  async getPositionDefinitions({network, address, t}) {
+  async getPositionDefinitions({ network, address, t }) {
     // [...] more code here not shown for brevity
     const positions: PositionDefinition[] = [
       {

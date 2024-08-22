@@ -99,7 +99,7 @@ const hook: PositionsHook = {
       description: '',
     }
   },
-  async getPositionDefinitions({networkId, address}) {
+  async getPositionDefinitions({ networkId, address }) {
     if (!address) {
       return []
     }

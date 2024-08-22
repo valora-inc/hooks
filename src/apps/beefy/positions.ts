@@ -291,7 +291,7 @@ const hook: PositionsHook = {
       description: 'Beefy vaults',
     }
   },
-  async getPositionDefinitions({networkId, address}) {
+  async getPositionDefinitions({ networkId, address }) {
     const multicallAddress = BEEFY_MULTICALL_ADDRESS[networkId]
     if (!multicallAddress) {
       return []

@@ -11,17 +11,17 @@ describe.each([NetworkId['arbitrum-one'], NetworkId['ethereum-mainnet']])(
         // TODO: add one
         return
       }
-      const positions = await hook.getPositionDefinitions(
-        {networkId,
+      const positions = await hook.getPositionDefinitions({
+        networkId,
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      t}
-      )
+        t,
+      })
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
     })
 
     it('should get definitions successfully when no address is provided', async () => {
-      const positions = await hook.getPositionDefinitions({networkId, t})
+      const positions = await hook.getPositionDefinitions({ networkId, t })
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
     })

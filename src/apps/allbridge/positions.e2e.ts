@@ -16,7 +16,7 @@ describe.each([NetworkId['celo-mainnet']])(
     })
 
     it('should get definitions successfully when no address is provided', async () => {
-      const positions = await hook.getPositionDefinitions({networkId, t})
+      const positions = await hook.getPositionDefinitions({ networkId, t })
       // Simple check to make sure we got some definitions
       expect(positions.length).toBeGreaterThan(0)
     })
