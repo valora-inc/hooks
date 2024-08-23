@@ -126,7 +126,7 @@ const hook: PositionsHook = {
               yieldRates: [
                 {
                   percentage: apr,
-                  label: t ? t('yieldRates.earningsApr') : 'Earnings APR',
+                  label: t('yieldRates.earningsApr'),
                   tokenId: getTokenId({
                     networkId,
                     address: tokenInfo.tokenAddress.toLowerCase(),
@@ -140,7 +140,7 @@ const hook: PositionsHook = {
                         pendingReward,
                         tokenInfo.decimals,
                       ),
-                      label: t ? t('earningItems.earnings') : 'Earnings',
+                      label: t('earningItems.earnings'),
                       tokenId: getTokenId({
                         networkId,
                         address: tokenInfo.tokenAddress.toLowerCase(),

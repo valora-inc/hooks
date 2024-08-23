@@ -171,7 +171,7 @@ const hook: PositionsHook = {
               yieldRates: [
                 {
                   percentage: supplyApy,
-                  label: t ? t('yieldRates.earningsApy') : 'Earnings APY',
+                  label: t('yieldRates.earningsApy'),
                   tokenId: getTokenId({
                     networkId,
                     address: reserveData.underlyingAsset.toLowerCase(),
@@ -184,7 +184,7 @@ const hook: PositionsHook = {
                       info.userUnclaimedRewards,
                       info.rewardTokenDecimals,
                     ),
-                    label: t ? t('earningItems.rewards') : 'Rewards',
+                    label: t('earningItems.rewards'),
                     tokenId: getTokenId({
                       networkId,
                       address: info.rewardTokenAddress.toLowerCase(),

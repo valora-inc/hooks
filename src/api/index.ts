@@ -30,7 +30,7 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
   `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
 
-const DEFAULT_LANGUAGE = 'en'
+const DEFAULT_LANGUAGE = 'base'
 
 i18next
   .use(Backend)
