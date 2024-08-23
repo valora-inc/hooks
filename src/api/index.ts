@@ -1,14 +1,17 @@
 import { http, HttpFunction } from '@google-cloud/functions-framework'
-import { createLoggingMiddleware } from '@valora/logging'
 import {
-  asyncHandler as valoraAsyncHandler,
   HttpError,
+  asyncHandler as valoraAsyncHandler,
 } from '@valora/http-handler'
+import { createLoggingMiddleware } from '@valora/logging'
 import express from 'express'
+import i18next from 'i18next'
+import Backend from 'i18next-fs-backend'
+import i18nextMiddleware from 'i18next-http-middleware'
+import path from 'path'
 import { z } from 'zod'
 import { getConfig } from '../config'
 import { logger } from '../log'
-import { parseRequest } from './parseRequest'
 import { getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
 import {
@@ -17,9 +20,7 @@ import {
   NetworkId,
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
-import i18nextMiddleware from 'i18next-http-middleware'
+import { parseRequest } from './parseRequest'
 
 const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
 const EARN_SUPPORTED_POSITION_IDS = new Set([
@@ -38,7 +39,7 @@ i18next
   .init({
     backend: {
       // eslint-disable-next-line no-path-concat
-      loadPath: '../../locales/{{lng}}.json',
+      loadPath: path.join(__dirname, '../../locales/{{lng}}.json'),
     },
     fallbackLng: DEFAULT_LANGUAGE,
     preload: [DEFAULT_LANGUAGE],
