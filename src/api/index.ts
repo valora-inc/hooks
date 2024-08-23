@@ -32,7 +32,8 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
 
 const DEFAULT_LANGUAGE = 'base'
 
-i18next
+const i18nextInstance = i18next.createInstance()
+i18nextInstance
   .use(Backend)
   .use(i18nextMiddleware.LanguageDetector)
   .init({
@@ -109,7 +110,7 @@ function createApp() {
       projectId: config.GOOGLE_CLOUD_PROJECT,
     }),
   )
-  app.use(i18nextMiddleware.handle(i18next))
+  app.use(i18nextMiddleware.handle(i18nextInstance))
 
   const getHooksRequestSchema = z.object({
     query: z.intersection(
