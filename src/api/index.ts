@@ -20,6 +20,7 @@ import { Transaction } from '../types/shortcuts'
 import i18next from 'i18next'
 import Backend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
+import path from 'path'
 
 const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
 const EARN_SUPPORTED_POSITION_IDS = new Set([
@@ -39,7 +40,7 @@ i18nextInstance
   .init({
     backend: {
       // eslint-disable-next-line no-path-concat
-      loadPath: '../../locales/{{lng}}.json',
+      loadPath: path.join(__dirname, '../../locales/{{lng}}.json'),
     },
     fallbackLng: DEFAULT_LANGUAGE,
     preload: [DEFAULT_LANGUAGE],
