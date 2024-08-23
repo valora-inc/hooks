@@ -1,7 +1,7 @@
 {
   "yieldRates": {
     "earningsApy": "Earnings APY",
-    "earningsApr": "Earnings Apr"
+    "earningsApr": "Earnings APR"
   },
   "earningItems": { "rewards": "Rewards", "earnings": "Earnings" }
 }
