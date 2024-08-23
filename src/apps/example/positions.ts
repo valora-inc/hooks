@@ -18,7 +18,7 @@ const hook: PositionsHook = {
     }
   },
 
-  async getPositionDefinitions(networkId: NetworkId, _address: string) {
+  async getPositionDefinitions({ networkId }) {
     //
     // This example pretend position only exists on Celo.
     //

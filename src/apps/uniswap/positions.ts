@@ -143,7 +143,7 @@ const hook: PositionsHook = {
       description: 'Uniswap pools',
     }
   },
-  async getPositionDefinitions(networkId, address) {
+  async getPositionDefinitions({ networkId, address }) {
     const addresses = UNI_V3_ADDRESSES_BY_NETWORK_ID[networkId]
     if (!addresses || !address) {
       return []

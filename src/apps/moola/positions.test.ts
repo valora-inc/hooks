@@ -1,5 +1,6 @@
 import hook from './positions'
 import { NetworkId } from '../../types/networkId'
+import { t } from '../../../test/i18next'
 
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -25,10 +26,11 @@ describe('getPositionDefinitions', () => {
       0n, // 0 cREAL stable debt
       2n * 10n ** 18n, // 2 CELO stable debt
     ])
-    const positions = await hook.getPositionDefinitions(
-      mockNetworkId,
-      mockAddress,
-    )
+    const positions = await hook.getPositionDefinitions({
+      networkId: mockNetworkId,
+      address: mockAddress,
+      t,
+    })
 
     expect(positions.length).toBe(2)
     expect(positions.map((p) => p.displayProps)).toMatchInlineSnapshot(`
@@ -58,10 +60,11 @@ describe('getPositionDefinitions', () => {
       0n, // 0 cREAL stable debt
       0n, // 0 CELO stable debt
     ])
-    const positions = await hook.getPositionDefinitions(
-      mockNetworkId,
-      mockAddress,
-    )
+    const positions = await hook.getPositionDefinitions({
+      networkId: mockNetworkId,
+      address: mockAddress,
+      t,
+    })
 
     expect(positions.length).toBe(0)
   })

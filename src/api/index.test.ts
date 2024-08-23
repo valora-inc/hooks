@@ -229,7 +229,7 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
   },
 ]
 
-jest.mocked(getPositions).mockImplementation(async (networkId) => {
+jest.mocked(getPositions).mockImplementation(async ({ networkId }) => {
   if (networkId === NetworkId['celo-mainnet']) {
     return TEST_POSITIONS_CELO
   } else if (networkId === NetworkId['ethereum-mainnet']) {

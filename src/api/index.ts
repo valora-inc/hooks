@@ -17,6 +17,9 @@ import {
   NetworkId,
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
+import i18next from 'i18next'
+import Backend from 'i18next-fs-backend'
+import i18nextMiddleware from 'i18next-http-middleware'
 
 const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
 const EARN_SUPPORTED_POSITION_IDS = new Set([
@@ -26,6 +29,23 @@ const EARN_SUPPORTED_POSITION_IDS = new Set([
   // Allbridge USDT
   `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
+
+const DEFAULT_LANGUAGE = 'base'
+
+i18next
+  .use(Backend)
+  .use(i18nextMiddleware.LanguageDetector)
+  .init({
+    backend: {
+      // eslint-disable-next-line no-path-concat
+      loadPath: '../../locales/{{lng}}.json',
+    },
+    fallbackLng: DEFAULT_LANGUAGE,
+    preload: [DEFAULT_LANGUAGE],
+  })
+  .catch((error) => {
+    throw new Error(`Failed to initialize i18next: ${error}`)
+  })
 
 // Copied over from https://github.com/valora-inc/valora-rest-api/blob/main/src/middleware/requestMetadata.ts#L65
 function getValoraAppVersion(userAgent: string | undefined) {
@@ -89,6 +109,7 @@ function createApp() {
       projectId: config.GOOGLE_CLOUD_PROJECT,
     }),
   )
+  app.use(i18nextMiddleware.handle(i18next))
 
   const getHooksRequestSchema = z.object({
     query: z.intersection(
@@ -128,7 +149,7 @@ function createApp() {
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
-            getPositions(networkId, address, appIds),
+            getPositions({ networkId, address, appIds, t: req.t }),
           ),
         )
       ).flat()
@@ -160,12 +181,13 @@ function createApp() {
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
-            getPositions(
+            getPositions({
               networkId,
               // Earn positions are not user-specific
-              undefined,
-              EARN_SUPPORTED_APP_IDS,
-            ),
+              address: undefined,
+              appIds: EARN_SUPPORTED_APP_IDS,
+              t: req.t,
+            }),
           ),
         )
       )
