@@ -119,3 +119,5 @@ export const AAVE_CONTRACT_CREATED_AT: Record<string, string> = {
   [`${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`]:
     '2024-03-08T14:23:53.000Z',
 }
+
+export const AAVE_TERMS_URL = 'https://aave.com/terms-of-service'
