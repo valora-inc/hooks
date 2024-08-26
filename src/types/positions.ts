@@ -84,6 +84,7 @@ export interface EarningItem {
 export interface EarnDataProps {
   contractCreatedAt?: string // ISO string
   manageUrl?: string
+  termsUrl?: string
   tvl?: SerializedDecimalNumber
   yieldRates: YieldRate[]
   earningItems: EarningItem[]
