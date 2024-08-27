@@ -9,7 +9,11 @@ import {
   Transaction,
 } from '../../types/shortcuts'
 import { poolAbi } from './abis/pool'
-import { simulateTransactions } from '../../runtime/simulateTransactions'
+import {
+  UnsupportedSimulateRequest,
+  simulateTransactions,
+} from '../../runtime/simulateTransactions'
+import { logger } from '../../log'
 
 // Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
@@ -95,6 +99,9 @@ const hook: ShortcutsHook = {
               SIMULATED_DEPOSIT_GAS_PADDING
             supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
           } catch (error) {
+            if (!(error instanceof UnsupportedSimulateRequest)) {
+              logger.warn(error, 'Unexpected error during simulateTransactions')
+            }
             supplyTx.gas = GAS
             supplyTx.estimatedGasUse = GAS / 3n
           }
