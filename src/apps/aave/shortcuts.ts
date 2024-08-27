@@ -13,8 +13,13 @@ import { aTokenAbi } from './abis/atoken'
 import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 
-// Hardcoding for now
+import { getConfig } from '../../config'
+import { simulateTransactions } from '../../runtime/simulateTransactions'
+
+// Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
+// Padding we add to simulation gas to ensure we specify enough
+const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
@@ -83,14 +88,29 @@ const hook: ShortcutsHook = {
               functionName: 'supply',
               args: [token.address, amountToSupply, walletAddress, 0],
             }),
-            // TODO: consider moving this concern to the runtime
-            // which would simulate the transaction(s) to get these
-            gas: GAS,
-            estimatedGasUse: GAS / 3n,
           }
 
           transactions.push(supplyTx)
 
+          // TODO: consider moving this concern to the runtime
+          const simulateTransactionsUrl = getConfig().SIMULATE_TRANSACTIONS_URL
+          if (simulateTransactionsUrl) {
+            const simulatedTransactions = await simulateTransactions({
+              url: simulateTransactionsUrl,
+              transactions,
+              networkId,
+            })
+
+            const supplySimulatedTx =
+              simulatedTransactions[simulatedTransactions.length - 1]
+            supplyTx.gas =
+              BigInt(supplySimulatedTx.gasNeeded) +
+              SIMULATED_DEPOSIT_GAS_PADDING
+            supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
+          } else {
+            supplyTx.gas = GAS
+            supplyTx.estimatedGasUse = GAS / 3n
+          }
           return transactions
         },
       }),
