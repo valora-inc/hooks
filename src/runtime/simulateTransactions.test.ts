@@ -9,6 +9,14 @@ describe('simulateTransactions', () => {
   // Doesn't matter what the transactions are
   const mockTransactions = [{}, {}] as Transaction[]
 
+  beforeAll(() => {
+    process.env.SIMULATE_TRANSACTIONS_URL = 'http://foo.com/simulate'
+  })
+
+  afterAll(() => {
+    delete process.env.SIMULATE_TRANSACTIONS_URL
+  })
+
   it('returns successfully', async () => {
     const mockedGot = jest.mocked(got)
     mockedGot.post = jest.fn().mockReturnValue({
@@ -23,7 +31,6 @@ describe('simulateTransactions', () => {
 
     await expect(
       simulateTransactions({
-        url: 'http://foo.com/simulate',
         transactions: mockTransactions,
         networkId: NetworkId['ethereum-mainnet'],
       }),
@@ -41,7 +48,6 @@ describe('simulateTransactions', () => {
 
     await expect(
       simulateTransactions({
-        url: 'http://foo.com/simulate',
         transactions: mockTransactions,
         networkId: NetworkId['ethereum-mainnet'],
       }),
@@ -62,7 +68,6 @@ describe('simulateTransactions', () => {
 
     await expect(
       simulateTransactions({
-        url: 'http://foo.com/simulate',
         transactions: mockTransactions,
         networkId: NetworkId['ethereum-mainnet'],
       }),
