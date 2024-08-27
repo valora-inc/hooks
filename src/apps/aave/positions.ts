@@ -20,6 +20,7 @@ import {
   AAVE_CONTRACT_CREATED_AT,
   AAVE_LOGO,
   AAVE_POOLS_BASE_URL,
+  AAVE_TERMS_URL,
   AAVE_V3_ADDRESSES_BY_NETWORK_ID,
   NETWORK_ID_TO_AAVE_MARKET_NAME,
 } from './constants'
@@ -172,6 +173,7 @@ const hook: PositionsHook = {
             },
             dataProps: {
               manageUrl,
+              termsUrl: AAVE_TERMS_URL,
               contractCreatedAt:
                 AAVE_CONTRACT_CREATED_AT[
                   getTokenId({

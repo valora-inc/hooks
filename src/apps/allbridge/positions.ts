@@ -19,6 +19,7 @@ import { poolAbi } from './abis/pool'
 import {
   ALLBRIDGE_LOGO,
   ALLBRIDGE_POOLS_BASE_URL,
+  ALLBRIDGE_TERMS_URL,
   ALLBRIGE_CONTRACT_CREATED_AT,
   NETWORK_ID_TO_ALLBRIDGE_CHAIN,
 } from './constants'
@@ -128,6 +129,7 @@ const hook: PositionsHook = {
             },
             dataProps: {
               manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,
+              termsUrl: ALLBRIDGE_TERMS_URL,
               contractCreatedAt:
                 ALLBRIGE_CONTRACT_CREATED_AT[
                   getTokenId({
