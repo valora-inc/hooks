@@ -12,8 +12,6 @@ import { poolV3Abi } from './abis/pool-v3'
 import { aTokenAbi } from './abis/atoken'
 import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
-
-import { getConfig } from '../../config'
 import { simulateTransactions } from '../../runtime/simulateTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
@@ -93,24 +91,23 @@ const hook: ShortcutsHook = {
           transactions.push(supplyTx)
 
           // TODO: consider moving this concern to the runtime
-          const simulateTransactionsUrl = getConfig().SIMULATE_TRANSACTIONS_URL
-          if (simulateTransactionsUrl) {
+          try {
             const simulatedTransactions = await simulateTransactions({
-              url: simulateTransactionsUrl,
               transactions,
               networkId,
             })
-
             const supplySimulatedTx =
               simulatedTransactions[simulatedTransactions.length - 1]
+
             supplyTx.gas =
               BigInt(supplySimulatedTx.gasNeeded) +
               SIMULATED_DEPOSIT_GAS_PADDING
             supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
-          } else {
+          } catch (error) {
             supplyTx.gas = GAS
             supplyTx.estimatedGasUse = GAS / 3n
           }
+
           return transactions
         },
       }),

@@ -1,6 +1,7 @@
 import got from 'got'
 import { NetworkId } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
+import { getConfig } from '../config'
 
 type SimulatedTransactionResponse = {
   status: 'OK'
@@ -14,14 +15,17 @@ type SimulatedTransactionResponse = {
 }
 
 export async function simulateTransactions({
-  url,
   transactions,
   networkId,
 }: {
-  url: string
   transactions: Transaction[]
   networkId: NetworkId
 }) {
+  const url = getConfig().SIMULATE_TRANSACTIONS_URL
+  if (!url) {
+    throw new Error('No SIMULATE_TRANSACTIONS_URL value set')
+  }
+
   const response = await got
     .post(url, {
       json: {
