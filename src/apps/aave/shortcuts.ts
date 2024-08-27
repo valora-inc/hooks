@@ -32,22 +32,22 @@ const hook: ShortcutsHook = {
         name: 'Deposit',
         description: 'Lend your assets to earn interest',
         networkIds: [networkId],
-        // category: 'deposit',
+        category: 'deposit',
         triggerInputShape: {
           token: z.object({
             // TODO: consider requiring only tokenId and (decimal) amount
             // Right now it would mean more changes in hooks
             address: ZodAddressLowerCased,
             decimals: z.coerce.number(),
-            amount: z.string(), // in decimal string
           }),
+          amount: z.string(), // in decimal string
         },
-        async onTrigger({ networkId, address, token }) {
+        async onTrigger({ networkId, address, token, amount }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToSupply = parseUnits(token.amount, token.decimals)
+          const amountToSupply = parseUnits(amount, token.decimals)
 
           const client = getClient(networkId)
 
@@ -99,7 +99,7 @@ const hook: ShortcutsHook = {
         name: 'Withdraw',
         description: 'Withdraw your assets',
         networkIds: [networkId],
-        // category: 'withdraw',
+        category: 'withdraw',
         triggerInputShape: {
           // This is the A token
           token: z.object({
@@ -107,15 +107,15 @@ const hook: ShortcutsHook = {
             // Right now it would mean more changes in hooks
             address: ZodAddressLowerCased,
             decimals: z.coerce.number(),
-            amount: z.string(), // in decimal string
           }),
+          amount: z.string(), // in decimal string
         },
-        async onTrigger({ networkId, address, token }) {
+        async onTrigger({ networkId, address, token, amount }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToWithdraw = parseUnits(token.amount, token.decimals)
+          const amountToWithdraw = parseUnits(amount, token.decimals)
 
           const client = getClient(networkId)
 

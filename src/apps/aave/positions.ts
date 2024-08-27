@@ -151,6 +151,20 @@ const hook: PositionsHook = {
               { address: reserveData.underlyingAsset.toLowerCase(), networkId },
             ],
             availableShortcutIds: ['deposit', 'withdraw'],
+            shortcutTriggerArgs: {
+              deposit: {
+                token: {
+                  address: reserveData.underlyingAsset.toLowerCase(),
+                  decimals: Number(reserveData.decimals),
+                },
+              },
+              withdraw: {
+                token: {
+                  address: reserveData.aTokenAddress.toLowerCase(),
+                  decimals: lpTokenDecimals[i],
+                },
+              },
+            },
             displayProps: {
               title: reserveData.symbol,
               description: `Supplied (APY: ${supplyApy.toFixed(2)}%)`,

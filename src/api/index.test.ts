@@ -74,6 +74,7 @@ const TEST_POSITIONS_CELO: Position[] = [
     balance: '160.006517430032680046' as SerializedDecimalNumber,
     supply: '170.324243277473535226' as SerializedDecimalNumber,
     availableShortcutIds: [],
+    shortcutTriggerArgs: {},
   },
 ]
 
@@ -124,6 +125,7 @@ const TEST_POSITIONS_ETHEREUM: Position[] = [
     balance: '100.01' as SerializedDecimalNumber,
     supply: '170.10' as SerializedDecimalNumber,
     availableShortcutIds: [],
+    shortcutTriggerArgs: {},
   },
 ]
 
@@ -175,6 +177,7 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
     balance: '0' as SerializedDecimalNumber,
     supply: '239859963.713137' as SerializedDecimalNumber,
     availableShortcutIds: ['deposit', 'withdraw'],
+    shortcutTriggerArgs: {},
   },
 ]
 
@@ -226,6 +229,7 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
     balance: '0' as SerializedDecimalNumber,
     supply: '239859963.713137' as SerializedDecimalNumber,
     availableShortcutIds: ['deposit', 'withdraw'],
+    shortcutTriggerArgs: {},
   },
 ]
 

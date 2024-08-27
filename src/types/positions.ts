@@ -102,6 +102,10 @@ export interface AbstractPositionDefinition {
   })[]
 
   availableShortcutIds?: string[] // Allows to apply shortcuts to positions
+  shortcutTriggerArgs?: {
+    // A map of shortcutId to trigger args
+    [shortcutId in string]?: Record<string, any>
+  }
 }
 
 export interface PricePerShareContext {
@@ -157,6 +161,10 @@ export interface AbstractPosition {
   dataProps?: DataProps
   tokens: (Token & { category?: TokenCategory })[]
   availableShortcutIds: string[] // Allows to apply shortcuts to positions
+  shortcutTriggerArgs: {
+    // A map of shortcutId to trigger args
+    [shortcutId in string]?: Record<string, any>
+  }
 }
 
 export interface AbstractToken {

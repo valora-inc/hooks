@@ -106,6 +106,21 @@ const hook: PositionsHook = {
               { address: tokenInfo.tokenAddress.toLowerCase(), networkId },
             ],
             availableShortcutIds: ['deposit', 'withdraw'],
+            shortcutTriggerArgs: {
+              deposit: {
+                token: {
+                  address: tokenInfo.tokenAddress.toLowerCase(),
+                  decimals: tokenInfo.decimals,
+                },
+                positionAddress: tokenInfo.poolAddress.toLowerCase(),
+              },
+              withdraw: {
+                token: {
+                  decimals: tokenInfo.decimals,
+                },
+                positionAddress: tokenInfo.poolAddress.toLowerCase(),
+              },
+            },
             displayProps: {
               title: tokenInfo.symbol,
               description: `Supplied (APR: ${apr.toFixed(2)}%)`,
@@ -173,6 +188,11 @@ const hook: PositionsHook = {
               },
             ],
             availableShortcutIds: ['claim-rewards'],
+            shortcutTriggerArgs: {
+              'claim-rewards': {
+                positionAddress: tokenInfo.poolAddress.toLowerCase(),
+              },
+            },
             balances: [toDecimalNumber(pendingReward, tokenInfo.decimals)],
             displayProps: {
               title: `${tokenInfo.symbol} supply incentives`,
