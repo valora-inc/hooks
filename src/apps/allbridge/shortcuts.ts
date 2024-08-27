@@ -100,16 +100,21 @@ const hook: ShortcutsHook = {
         triggerInputShape: {
           token: z.object({
             decimals: z.coerce.number(),
-            amount: z.string(),
           }),
           positionAddress: ZodAddressLowerCased,
           amount: z.string(),
         },
-        async onTrigger({ networkId, address, token, positionAddress }) {
+        async onTrigger({
+          networkId,
+          address,
+          token,
+          positionAddress,
+          amount,
+        }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
-          const amountToWithdraw = parseUnits(token.amount, token.decimals)
+          const amountToWithdraw = parseUnits(amount, token.decimals)
 
           const withdrawTx: Transaction = {
             networkId,
