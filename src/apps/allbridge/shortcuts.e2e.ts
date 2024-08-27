@@ -23,10 +23,10 @@ describe('getShortcutDefinitions', () => {
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         token: {
           address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
-          amount: '10',
           decimals: 6,
         },
         positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+        amount: '10',
       })
 
       expect(transactions.length).toEqual(2)
@@ -46,10 +46,10 @@ describe('getShortcutDefinitions', () => {
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         token: {
-          amount: '1',
           decimals: 3,
         },
         positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+        amount: '1',
       })
 
       expect(transactions.length).toEqual(1)
