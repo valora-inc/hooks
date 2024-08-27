@@ -9,9 +9,12 @@ import {
   Transaction,
 } from '../../types/shortcuts'
 import { poolAbi } from './abis/pool'
+import { simulateTransactions } from '../../runtime/simulateTransactions'
 
-// Hardcoding for now
+// Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
+// Padding we add to simulation gas to ensure we specify enough
+const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId) {
@@ -74,13 +77,27 @@ const hook: ShortcutsHook = {
               functionName: 'deposit',
               args: [amountToSupply],
             }),
-            // TODO: consider moving this concern to the runtime
-            // which would simulate the transaction(s) to get these
-            gas: GAS,
-            estimatedGasUse: GAS / 3n,
           }
 
           transactions.push(supplyTx)
+
+          // TODO: consider moving this concern to the runtime
+          try {
+            const simulatedTransactions = await simulateTransactions({
+              transactions,
+              networkId,
+            })
+            const supplySimulatedTx =
+              simulatedTransactions[simulatedTransactions.length - 1]
+
+            supplyTx.gas =
+              BigInt(supplySimulatedTx.gasNeeded) +
+              SIMULATED_DEPOSIT_GAS_PADDING
+            supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
+          } catch (error) {
+            supplyTx.gas = GAS
+            supplyTx.estimatedGasUse = GAS / 3n
+          }
 
           return transactions
         },
