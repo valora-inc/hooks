@@ -86,7 +86,7 @@ const hook: PositionsHook = {
         : [undefined, [undefined, undefined]]
 
     // Note: Instead of calling `getAllUserRewards`, we could use reserveIncentiveData and userIncentivesData to get all user rewards
-    // but it requires some additional calculations to get the accrued rewards (linked to a/v/sToken held) and the unclaimedRewards.
+    // but it requires some additional calculations to get the accrued rewards (linked to a/v/sToken held) on top of the unclaimedRewards to get total rewards.
     // This is for simplicity here.
     // See https://github.com/aave/aave-utilities/blob/446d9af6f14154771c0343538b59e2aeb7b38e47/packages/math-utils/src/formatters/incentive/calculate-all-user-incentives.ts#L31
     const allUserRewards = await client.readContract({
