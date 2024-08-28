@@ -9,6 +9,7 @@ export interface Config {
   POSITION_IDS: string[]
   SHORTCUT_IDS: string[]
   EARN_SUPPORTED_NETWORK_IDS: NetworkId[]
+  SIMULATE_TRANSACTIONS_URL?: string
 }
 
 export function networkIdToRpcUrlTransform(val: string | undefined) {
@@ -40,6 +41,7 @@ export function getConfig(): Config {
       .string()
       .optional()
       .transform(networkIdToRpcUrlTransform),
+    SIMULATE_TRANSACTIONS_URL: z.string().optional(),
   })
 
   const productionSchema = sharedSchema.extend({

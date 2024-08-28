@@ -13,9 +13,14 @@ import { poolV3Abi } from './abis/pool-v3'
 import { aTokenAbi } from './abis/atoken'
 import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
+import { simulateTransactions } from '../../runtime/simulateTransactions'
+import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
+import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
 
-// Hardcoding for now
+// Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
+// Padding we add to simulation gas to ensure we specify enough
+const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
@@ -87,13 +92,27 @@ const hook: ShortcutsHook = {
               functionName: 'supply',
               args: [tokenAddress, amountToSupply, walletAddress, 0],
             }),
-            // TODO: consider moving this concern to the runtime
-            // which would simulate the transaction(s) to get these
-            gas: GAS,
-            estimatedGasUse: GAS / 3n,
           }
 
           transactions.push(supplyTx)
+
+          // TODO: consider moving this concern to the runtime
+          try {
+            const simulatedTransactions = await simulateTransactions({
+              transactions,
+              networkId,
+            })
+            const supplySimulatedTx =
+              simulatedTransactions[simulatedTransactions.length - 1]
+
+            supplyTx.gas =
+              BigInt(supplySimulatedTx.gasNeeded) +
+              SIMULATED_DEPOSIT_GAS_PADDING
+            supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
+          } catch (error) {
+            supplyTx.gas = GAS
+            supplyTx.estimatedGasUse = GAS / 3n
+          }
 
           return transactions
         },
@@ -157,8 +176,22 @@ const hook: ShortcutsHook = {
         triggerInputShape: {
           positionAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ networkId, address, positionAddress }) {
+        async onTrigger({ networkId, address }) {
           const walletAddress = address as Address
+
+          const client = getClient(networkId)
+
+          // Get a/v/sToken for which we can claim rewards
+          const reserveIncentiveData = await client.readContract({
+            address: aaveAddresses.uiIncentiveDataProvider,
+            abi: uiIncentiveDataProviderV3Abi,
+            functionName: 'getReservesIncentivesData',
+            args: [aaveAddresses.poolAddressesProvider],
+          })
+
+          // This builds the list of a/v/sToken address with incentives
+          const assetsWithIncentives =
+            getAaveTokensWithIncentives(reserveIncentiveData)
 
           return [
             {
@@ -168,7 +201,7 @@ const hook: ShortcutsHook = {
               data: encodeFunctionData({
                 abi: incentivesControllerV3Abi,
                 functionName: 'claimAllRewardsToSelf',
-                args: [[positionAddress]], // positionAddress is the a/v/sToken address
+                args: [assetsWithIncentives],
               }),
             },
           ]
