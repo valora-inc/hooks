@@ -19,6 +19,8 @@ export const tokenAmounts = z
   )
   .nonempty()
 
+// enforces the tokens field to be an array of objects with tokenId and amount
+// for all deposit and withdraw shortcuts
 type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
   ? ZodRawShape & { tokens: typeof tokenAmounts }
   : ZodRawShape
