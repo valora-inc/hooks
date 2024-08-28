@@ -26,6 +26,7 @@ import {
 } from './constants'
 import { aTokenAbi } from './abis/atoken'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
+import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 
@@ -97,21 +98,7 @@ const hook: PositionsHook = {
           args: [
             // This builds the list of a/v/sToken address with incentives
             // Because `getAllUserRewards` reverts if we pass an address with no incentives
-            reserveIncentiveData
-              ?.map(({ aIncentiveData, vIncentiveData, sIncentiveData }) => {
-                const assetsWithRewards: Address[] = []
-                if (aIncentiveData.rewardsTokenInformation.length) {
-                  assetsWithRewards.push(aIncentiveData.tokenAddress)
-                }
-                if (vIncentiveData.rewardsTokenInformation.length) {
-                  assetsWithRewards.push(vIncentiveData.tokenAddress)
-                }
-                if (sIncentiveData.rewardsTokenInformation.length) {
-                  assetsWithRewards.push(sIncentiveData.tokenAddress)
-                }
-                return assetsWithRewards
-              })
-              .flat() || [],
+            getAaveTokensWithIncentives(reserveIncentiveData ?? []),
             address as Address,
           ],
         })

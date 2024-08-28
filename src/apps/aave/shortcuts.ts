@@ -14,6 +14,7 @@ import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 import { simulateTransactions } from '../../runtime/simulateTransactions'
 import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
+import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
 
 // Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
@@ -182,21 +183,8 @@ const hook: ShortcutsHook = {
           })
 
           // This builds the list of a/v/sToken address with incentives
-          const assetsWithIncentives = reserveIncentiveData
-            .map(({ aIncentiveData, vIncentiveData, sIncentiveData }) => {
-              const assetsWithRewards: Address[] = []
-              if (aIncentiveData.rewardsTokenInformation.length) {
-                assetsWithRewards.push(aIncentiveData.tokenAddress)
-              }
-              if (vIncentiveData.rewardsTokenInformation.length) {
-                assetsWithRewards.push(vIncentiveData.tokenAddress)
-              }
-              if (sIncentiveData.rewardsTokenInformation.length) {
-                assetsWithRewards.push(sIncentiveData.tokenAddress)
-              }
-              return assetsWithRewards
-            })
-            .flat()
+          const assetsWithIncentives =
+            getAaveTokensWithIncentives(reserveIncentiveData)
 
           return [
             {
