@@ -20,11 +20,14 @@ describe('getShortcutDefinitions', () => {
       const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-        token: {
-          address: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
-          decimals: 6,
-        },
-        amount: '10',
+        tokenAddress: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
+        tokenDecimals: 6,
+        tokens: [
+          {
+            tokenId: `${NetworkId['arbitrum-one']}:0xaf88d065e77c8cc2239327c5edb3a432268e5831`,
+            amount: '10',
+          },
+        ],
       })
 
       expect(transactions.length).toEqual(2)
@@ -42,11 +45,14 @@ describe('getShortcutDefinitions', () => {
       const transactions = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-        token: {
-          address: '0x724dc807b04555b71ed48a6896b6f41593b8c637', // aArbUSDCn
-          decimals: 6,
-        },
-        amount: '10',
+        tokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637', // aArbUSDCn
+        tokenDecimals: 6,
+        tokens: [
+          {
+            tokenId: `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
+            amount: '10',
+          },
+        ],
       })
 
       expect(transactions.length).toEqual(1)

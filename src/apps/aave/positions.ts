@@ -154,16 +154,12 @@ const hook: PositionsHook = {
             availableShortcutIds: ['deposit', 'withdraw'],
             shortcutTriggerArgs: {
               deposit: {
-                token: {
-                  address: reserveData.underlyingAsset.toLowerCase(),
-                  decimals: Number(reserveData.decimals),
-                },
+                tokenAddress: reserveData.underlyingAsset.toLowerCase(),
+                tokenDecimals: Number(reserveData.decimals),
               },
               withdraw: {
-                token: {
-                  address: reserveData.aTokenAddress.toLowerCase(),
-                  decimals: lpTokenDecimals[i],
-                },
+                tokenAddress: reserveData.aTokenAddress.toLowerCase(),
+                tokenDecimals: lpTokenDecimals[i],
               },
             },
             displayProps: {

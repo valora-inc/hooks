@@ -2,6 +2,7 @@ import { Address, encodeFunctionData, parseUnits, erc20Abi } from 'viem'
 import {
   createShortcut,
   ShortcutsHook,
+  tokenAmounts,
   Transaction,
 } from '../../types/shortcuts'
 import { NetworkId } from '../../types/networkId'
@@ -34,25 +35,28 @@ const hook: ShortcutsHook = {
         networkIds: [networkId],
         category: 'deposit',
         triggerInputShape: {
-          token: z.object({
-            // TODO: consider requiring only tokenId and (decimal) amount
-            // Right now it would mean more changes in hooks
-            address: ZodAddressLowerCased,
-            decimals: z.coerce.number(),
-          }),
-          amount: z.string(), // in decimal string
+          tokens: tokenAmounts.length(1),
+          // these two will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
+          tokenAddress: ZodAddressLowerCased,
+          tokenDecimals: z.coerce.number(),
         },
-        async onTrigger({ networkId, address, token, amount }) {
+        async onTrigger({
+          networkId,
+          address,
+          tokens,
+          tokenAddress,
+          tokenDecimals,
+        }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToSupply = parseUnits(amount, token.decimals)
+          const amountToSupply = parseUnits(tokens[0].amount, tokenDecimals)
 
           const client = getClient(networkId)
 
           const approvedAllowanceForSpender = await client.readContract({
-            address: token.address,
+            address: tokenAddress,
             abi: erc20Abi,
             functionName: 'allowance',
             args: [walletAddress, poolContractAddress],
@@ -68,7 +72,7 @@ const hook: ShortcutsHook = {
             const approveTx: Transaction = {
               networkId,
               from: walletAddress,
-              to: token.address,
+              to: tokenAddress,
               data,
             }
             transactions.push(approveTx)
@@ -81,7 +85,7 @@ const hook: ShortcutsHook = {
             data: encodeFunctionData({
               abi: poolV3Abi,
               functionName: 'supply',
-              args: [token.address, amountToSupply, walletAddress, 0],
+              args: [tokenAddress, amountToSupply, walletAddress, 0],
             }),
             // TODO: consider moving this concern to the runtime
             // which would simulate the transaction(s) to get these
@@ -101,26 +105,29 @@ const hook: ShortcutsHook = {
         networkIds: [networkId],
         category: 'withdraw',
         triggerInputShape: {
-          // This is the A token
-          token: z.object({
-            // TODO: consider requiring only tokenId and (decimal) amount
-            // Right now it would mean more changes in hooks
-            address: ZodAddressLowerCased,
-            decimals: z.coerce.number(),
-          }),
-          amount: z.string(), // in decimal string
+          // token must be the A token
+          tokens: tokenAmounts.length(1),
+          // these two will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
+          tokenAddress: ZodAddressLowerCased,
+          tokenDecimals: z.coerce.number(),
         },
-        async onTrigger({ networkId, address, token, amount }) {
+        async onTrigger({
+          networkId,
+          address,
+          tokens,
+          tokenAddress,
+          tokenDecimals,
+        }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToWithdraw = parseUnits(amount, token.decimals)
+          const amountToWithdraw = parseUnits(tokens[0].amount, tokenDecimals)
 
           const client = getClient(networkId)
 
           const underlyingAssetAddress = await client.readContract({
-            address: token.address,
+            address: tokenAddress,
             abi: aTokenAbi,
             functionName: 'UNDERLYING_ASSET_ADDRESS',
           })

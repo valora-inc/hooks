@@ -10,8 +10,17 @@ export interface ShortcutsHook {
   ): Promise<ShortcutDefinition<ShortcutCategory, any>[]>
 }
 
+export const tokenAmounts = z
+  .array(
+    z.object({
+      tokenId: z.string(),
+      amount: z.string(),
+    }),
+  )
+  .nonempty()
+
 type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
-  ? ZodRawShape & { amount: z.ZodString }
+  ? ZodRawShape & { tokens: typeof tokenAmounts }
   : ZodRawShape
 
 export interface ShortcutDefinition<
