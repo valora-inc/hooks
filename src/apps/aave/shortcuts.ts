@@ -13,6 +13,7 @@ import { aTokenAbi } from './abis/atoken'
 import { AAVE_V3_ADDRESSES_BY_NETWORK_ID } from './constants'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 import { simulateTransactions } from '../../runtime/simulateTransactions'
+import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
 
 // Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
@@ -167,8 +168,35 @@ const hook: ShortcutsHook = {
         triggerInputShape: {
           positionAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ networkId, address, positionAddress }) {
+        async onTrigger({ networkId, address }) {
           const walletAddress = address as Address
+
+          const client = getClient(networkId)
+
+          // Get a/v/sToken for which we can claim rewards
+          const reserveIncentiveData = await client.readContract({
+            address: aaveAddresses.uiIncentiveDataProvider,
+            abi: uiIncentiveDataProviderV3Abi,
+            functionName: 'getReservesIncentivesData',
+            args: [aaveAddresses.poolAddressesProvider],
+          })
+
+          // This builds the list of a/v/sToken address with incentives
+          const assetsWithIncentives = reserveIncentiveData
+            .map(({ aIncentiveData, vIncentiveData, sIncentiveData }) => {
+              const assetsWithRewards: Address[] = []
+              if (aIncentiveData.rewardsTokenInformation.length) {
+                assetsWithRewards.push(aIncentiveData.tokenAddress)
+              }
+              if (vIncentiveData.rewardsTokenInformation.length) {
+                assetsWithRewards.push(vIncentiveData.tokenAddress)
+              }
+              if (sIncentiveData.rewardsTokenInformation.length) {
+                assetsWithRewards.push(sIncentiveData.tokenAddress)
+              }
+              return assetsWithRewards
+            })
+            .flat()
 
           return [
             {
@@ -178,7 +206,7 @@ const hook: ShortcutsHook = {
               data: encodeFunctionData({
                 abi: incentivesControllerV3Abi,
                 functionName: 'claimAllRewardsToSelf',
-                args: [[positionAddress]], // positionAddress is the a/v/sToken address
+                args: [assetsWithIncentives],
               }),
             },
           ]
