@@ -115,6 +115,12 @@ const hook: PositionsHook = {
       ],
     })
     const [rewardTokenAddresses, rewardTokenAmounts] = allUserRewards
+    const userRewards = rewardTokenAddresses
+      .map((rewardTokenAddress, i) => ({
+        rewardTokenAddress,
+        rewardTokenAmount: rewardTokenAmounts[i],
+      }))
+      .filter(({ rewardTokenAmount }) => rewardTokenAmount > 0n)
 
     const [totalSupplies, lpTokenDecimals] = await Promise.all([
       Promise.all(
@@ -255,21 +261,32 @@ const hook: PositionsHook = {
         ].filter((x) => !!x)
       }),
       // User rewards
-      rewardTokenAddresses.length
+      userRewards.length
         ? [
             {
               type: 'contract-position-definition',
               networkId,
               address: aaveAddresses.incentivesController.toLowerCase(),
-              tokens: rewardTokenAddresses.map((rewardTokenAddress) => ({
-                address: rewardTokenAddress.toLowerCase(),
+              tokens: userRewards.map((userReward) => ({
+                address: userReward.rewardTokenAddress.toLowerCase(),
                 networkId,
                 category: 'claimable',
               })),
               availableShortcutIds: ['claim-rewards'],
-              balances: rewardTokenAmounts.map((rewardTokenAmount) =>
-                toDecimalNumber(rewardTokenAmount, 18),
-              ),
+              balances: async ({ resolvedTokensByTokenId }) =>
+                userRewards.map((userRewards) => {
+                  const rewardsDecimals =
+                    resolvedTokensByTokenId[
+                      getTokenId({
+                        address: userRewards.rewardTokenAddress,
+                        networkId,
+                      })
+                    ].decimals
+                  return toDecimalNumber(
+                    userRewards.rewardTokenAmount,
+                    rewardsDecimals,
+                  )
+                }),
               displayProps: {
                 title: `Claimable rewards`,
                 description: 'For supplying and borrowing',
