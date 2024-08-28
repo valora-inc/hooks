@@ -89,31 +89,33 @@ const hook: PositionsHook = {
     // but it requires some additional calculations to get the accrued rewards (linked to a/v/sToken held) on top of the unclaimedRewards to get total rewards.
     // This is for simplicity here.
     // See https://github.com/aave/aave-utilities/blob/446d9af6f14154771c0343538b59e2aeb7b38e47/packages/math-utils/src/formatters/incentive/calculate-all-user-incentives.ts#L31
-    const allUserRewards = await client.readContract({
-      address: aaveAddresses.incentivesController,
-      abi: incentivesControllerV3Abi,
-      functionName: 'getAllUserRewards',
-      args: [
-        // This builds the list of a/v/sToken address with incentives
-        // Because `getAllUserRewards` reverts if we pass an address with no incentives
-        reserveIncentiveData
-          ?.map(({ aIncentiveData, vIncentiveData, sIncentiveData }) => {
-            const assetsWithRewards: Address[] = []
-            if (aIncentiveData.rewardsTokenInformation.length) {
-              assetsWithRewards.push(aIncentiveData.tokenAddress)
-            }
-            if (vIncentiveData.rewardsTokenInformation.length) {
-              assetsWithRewards.push(vIncentiveData.tokenAddress)
-            }
-            if (sIncentiveData.rewardsTokenInformation.length) {
-              assetsWithRewards.push(sIncentiveData.tokenAddress)
-            }
-            return assetsWithRewards
-          })
-          .flat() || [],
-        address as Address,
-      ],
-    })
+    const allUserRewards = address
+      ? await client.readContract({
+          address: aaveAddresses.incentivesController,
+          abi: incentivesControllerV3Abi,
+          functionName: 'getAllUserRewards',
+          args: [
+            // This builds the list of a/v/sToken address with incentives
+            // Because `getAllUserRewards` reverts if we pass an address with no incentives
+            reserveIncentiveData
+              ?.map(({ aIncentiveData, vIncentiveData, sIncentiveData }) => {
+                const assetsWithRewards: Address[] = []
+                if (aIncentiveData.rewardsTokenInformation.length) {
+                  assetsWithRewards.push(aIncentiveData.tokenAddress)
+                }
+                if (vIncentiveData.rewardsTokenInformation.length) {
+                  assetsWithRewards.push(vIncentiveData.tokenAddress)
+                }
+                if (sIncentiveData.rewardsTokenInformation.length) {
+                  assetsWithRewards.push(sIncentiveData.tokenAddress)
+                }
+                return assetsWithRewards
+              })
+              .flat() || [],
+            address as Address,
+          ],
+        })
+      : [[], []]
     const [rewardTokenAddresses, rewardTokenAmounts] = allUserRewards
     const userRewards = rewardTokenAddresses
       .map((rewardTokenAddress, i) => ({
