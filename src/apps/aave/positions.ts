@@ -190,6 +190,7 @@ const hook: PositionsHook = {
               dataProps: {
                 manageUrl,
                 termsUrl: AAVE_TERMS_URL,
+                cantSeparateCompoundedInterest: true,
                 contractCreatedAt:
                   AAVE_CONTRACT_CREATED_AT[
                     getTokenId({
