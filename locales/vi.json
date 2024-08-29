@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "Earnings APY",
+    "earningsApr": "Earnings APR"
+  },
+  "earningItems": {
+    "rewards": "Tiền thưởng",
+    "earnings": "Earnings"
+  }
+}
