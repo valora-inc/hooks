@@ -1,10 +1,10 @@
 {
   "yieldRates": {
-    "earningsApy": "Earnings APY",
-    "earningsApr": "Earnings APR"
+    "earningsApy": "Заработок APY",
+    "earningsApr": "Заработок APR"
   },
   "earningItems": {
     "rewards": "Вознаграждения",
-    "earnings": "Earnings"
+    "earnings": "Заработок"
   }
 }
