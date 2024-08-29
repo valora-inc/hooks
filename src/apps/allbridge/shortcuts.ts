@@ -17,7 +17,7 @@ import {
 import { logger } from '../../log'
 
 // Hardcoded fallback if simulation isn't enabled
-const GAS = 1_000_000n
+const DEFAULT_DEPOSIT_GAS = 500_000n
 // Padding we add to simulation gas to ensure we specify enough
 const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
 
@@ -107,8 +107,8 @@ const hook: ShortcutsHook = {
             if (!(error instanceof UnsupportedSimulateRequest)) {
               logger.warn(error, 'Unexpected error during simulateTransactions')
             }
-            supplyTx.gas = GAS
-            supplyTx.estimatedGasUse = GAS / 3n
+            supplyTx.gas = DEFAULT_DEPOSIT_GAS
+            supplyTx.estimatedGasUse = DEFAULT_DEPOSIT_GAS / 3n
           }
 
           return transactions
