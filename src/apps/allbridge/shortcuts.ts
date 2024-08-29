@@ -6,6 +6,7 @@ import { NetworkId } from '../../types/networkId'
 import {
   createShortcut,
   ShortcutsHook,
+  tokenAmounts,
   Transaction,
 } from '../../types/shortcuts'
 import { poolAbi } from './abis/pool'
@@ -28,29 +29,33 @@ const hook: ShortcutsHook = {
         name: 'Deposit',
         description: 'Lend your assets to earn interest',
         networkIds: [networkId],
-        // category: 'deposit',
+        category: 'deposit',
         triggerInputShape: {
-          token: z.object({
-            // TODO: consider requiring only tokenId and (decimal) amount
-            // Right now it would mean more changes in hooks
-            address: ZodAddressLowerCased,
-            decimals: z.coerce.number(),
-            amount: z.string(), // in decimal string
-          }),
+          tokens: tokenAmounts.length(1),
           positionAddress: ZodAddressLowerCased,
+          // these two will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
+          tokenAddress: ZodAddressLowerCased,
+          tokenDecimals: z.coerce.number(),
         },
 
-        async onTrigger({ networkId, address, token, positionAddress }) {
+        async onTrigger({
+          networkId,
+          address,
+          tokens,
+          positionAddress,
+          tokenAddress,
+          tokenDecimals,
+        }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
           // amount in smallest unit
-          const amountToSupply = parseUnits(token.amount, token.decimals)
+          const amountToSupply = parseUnits(tokens[0].amount, tokenDecimals)
 
           const client = getClient(networkId)
 
           const approvedAllowanceForSpender = await client.readContract({
-            address: token.address,
+            address: tokenAddress,
             abi: erc20Abi,
             functionName: 'allowance',
             args: [walletAddress, positionAddress],
@@ -66,7 +71,7 @@ const hook: ShortcutsHook = {
             const approveTx: Transaction = {
               networkId,
               from: walletAddress,
-              to: token.address,
+              to: tokenAddress,
               data,
             }
             transactions.push(approveTx)
@@ -114,18 +119,24 @@ const hook: ShortcutsHook = {
         name: 'Withdraw',
         description: 'Withdraw your assets',
         networkIds: [networkId],
+        category: 'withdraw',
         triggerInputShape: {
-          token: z.object({
-            decimals: z.coerce.number(),
-            amount: z.string(),
-          }),
+          tokens: tokenAmounts.length(1),
           positionAddress: ZodAddressLowerCased,
+          // this will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
+          tokenDecimals: z.coerce.number(),
         },
-        async onTrigger({ networkId, address, token, positionAddress }) {
+        async onTrigger({
+          networkId,
+          address,
+          tokens,
+          positionAddress,
+          tokenDecimals,
+        }) {
           const walletAddress = address as Address
           const transactions: Transaction[] = []
 
-          const amountToWithdraw = parseUnits(token.amount, token.decimals)
+          const amountToWithdraw = parseUnits(tokens[0].amount, tokenDecimals)
 
           const withdrawTx: Transaction = {
             networkId,
