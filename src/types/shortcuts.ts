@@ -1,25 +1,45 @@
 import { z, ZodObject, ZodRawShape } from 'zod'
 import { NetworkId } from './networkId'
 
+export type ShortcutCategory = 'claim' | 'deposit' | 'withdraw'
+
 export interface ShortcutsHook {
   getShortcutDefinitions(
     networkId: NetworkId,
     address?: string,
-  ): Promise<ShortcutDefinition<any>[]>
+  ): Promise<ShortcutDefinition<ShortcutCategory, any>[]>
 }
 
-export interface ShortcutDefinition<TriggerInputShape extends ZodRawShape> {
+export const tokenAmounts = z
+  .array(
+    z.object({
+      tokenId: z.string(),
+      amount: z.string(),
+    }),
+  )
+  .nonempty()
+
+// enforces the tokens field to be an array of objects with tokenId and amount
+// for all deposit and withdraw shortcuts
+type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
+  ? ZodRawShape & { tokens: typeof tokenAmounts }
+  : ZodRawShape
+
+export interface ShortcutDefinition<
+  Category extends ShortcutCategory,
+  InputShape extends TriggerInputShape<Category>,
+> {
   id: string // Example: claim-reward
   name: string // Example: Claim
   description: string // Example: Claim your reward
   networkIds: NetworkId[] // Example: ['celo-mainnet']
-  category?: 'claim' // We'll add more categories later
-  triggerInputShape: TriggerInputShape // Zod object shape of the input for the trigger
+  category: Category
+  triggerInputShape: InputShape
   onTrigger: (
     args: {
       networkId: NetworkId
       address: string
-    } & z.infer<ZodObject<TriggerInputShape>>,
+    } & z.infer<ZodObject<InputShape>>,
   ) => Promise<Transaction[]> // 0, 1 or more transactions to sign by the user
 }
 
@@ -35,8 +55,9 @@ export type Transaction = {
 
 // This is to help TS infer the type of the triggerInputShape
 // so the onTrigger args can be properly typed
-export function createShortcut<TriggerInputShape extends ZodRawShape>(
-  definition: ShortcutDefinition<TriggerInputShape>,
-) {
+export function createShortcut<
+  Category extends ShortcutCategory,
+  InputShape extends TriggerInputShape<Category>,
+>(definition: ShortcutDefinition<Category, InputShape>) {
   return definition
 }

@@ -306,6 +306,7 @@ async function resolveAppTokenPosition(
     balance: toSerializedDecimalNumber(positionTokenInfo.balance),
     supply: toSerializedDecimalNumber(positionTokenInfo.totalSupply),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
+    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
   }
 
   return position
@@ -373,6 +374,7 @@ async function resolveContractPosition(
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
+    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
   }
 
   return position
