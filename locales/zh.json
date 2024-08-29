@@ -1,10 +1,10 @@
 {
   "yieldRates": {
-    "earningsApy": "Earnings APY",
-    "earningsApr": "Earnings APR"
+    "earningsApy": "年收益率",
+    "earningsApr": "年收益率"
   },
   "earningItems": {
     "rewards": "奖励",
-    "earnings": "Earnings"
+    "earnings": "收益"
   }
 }
