@@ -91,7 +91,7 @@ export interface EarnDataProps {
   earningItems: EarningItem[]
   depositTokenId: string
   withdrawTokenId: string
-  rewardPositionIds?: string[]
+  rewardsPositionIds?: string[]
   // We'll add more fields here as needed
 }
 
