@@ -196,7 +196,6 @@ const beefyBaseVaultsPositions = async (
         ? beefyConcentratedContractDefinition(
             networkId,
             vault,
-
             info.find(
               (i) =>
                 i.token0 === vault.depositTokenAddresses[0] &&
@@ -308,8 +307,10 @@ const hook: PositionsHook = {
       return []
     }
 
-    const { vaults, govVaults } = await getBeefyVaults(networkId)
-    const prices = await getBeefyPrices(networkId)
+    const [{ vaults, govVaults }, prices] = await Promise.all([
+      getBeefyVaults(networkId),
+      getBeefyPrices(networkId),
+    ])
 
     return [
       ...(await beefyBaseVaultsPositions(
