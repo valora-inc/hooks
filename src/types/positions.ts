@@ -91,6 +91,7 @@ export interface EarnDataProps {
   earningItems: EarningItem[]
   depositTokenId: string
   withdrawTokenId: string
+  associatedRewardPositions?: string[] // list of position ids
   // We'll add more fields here as needed
 }
 
