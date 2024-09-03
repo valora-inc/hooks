@@ -27,6 +27,7 @@ import {
 import { aTokenAbi } from './abis/atoken'
 import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
+import { getPositionId } from '../../runtime/getPositionId'
 
 const COMPOUND_PERIOD = 365 * 24 * 60 * 60 // 1 year in seconds
 
@@ -139,6 +140,40 @@ const hook: PositionsHook = {
       (NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]
         ? `?marketName=${NETWORK_ID_TO_AAVE_MARKET_NAME[networkId]}`
         : '')
+
+    const rewardsPositionDefinition = userRewards.length
+      ? ({
+          type: 'contract-position-definition',
+          networkId,
+          address: aaveAddresses.incentivesController.toLowerCase(),
+          tokens: userRewards.map((userReward) => ({
+            address: userReward.rewardTokenAddress.toLowerCase(),
+            networkId,
+            category: 'claimable',
+          })),
+          availableShortcutIds: ['claim-rewards'],
+          balances: async ({ resolvedTokensByTokenId }) =>
+            userRewards.map((userRewards) => {
+              const rewardsDecimals =
+                resolvedTokensByTokenId[
+                  getTokenId({
+                    address: userRewards.rewardTokenAddress,
+                    networkId,
+                  })
+                ].decimals
+              return toDecimalNumber(
+                userRewards.rewardTokenAmount,
+                rewardsDecimals,
+              )
+            }),
+          displayProps: {
+            title: `Claimable rewards`,
+            description: 'For supplying and borrowing',
+            imageUrl: AAVE_LOGO,
+          },
+        } satisfies ContractPositionDefinition)
+      : null
+
     return [
       reservesData.flatMap((reserveData, i) => {
         const supplyApy = getApyFromRayApr(reserveData.liquidityRate)
@@ -220,6 +255,9 @@ const hook: PositionsHook = {
                   networkId,
                   address: reserveData.aTokenAddress.toLowerCase(),
                 }),
+                rewardsPositionIds: rewardsPositionDefinition
+                  ? [getPositionId(rewardsPositionDefinition)]
+                  : [],
               },
               pricePerShare: [new BigNumber(1) as DecimalNumber],
             } satisfies AppTokenPositionDefinition),
@@ -261,40 +299,7 @@ const hook: PositionsHook = {
         ].filter((x) => !!x)
       }),
       // User rewards
-      userRewards.length
-        ? [
-            {
-              type: 'contract-position-definition',
-              networkId,
-              address: aaveAddresses.incentivesController.toLowerCase(),
-              tokens: userRewards.map((userReward) => ({
-                address: userReward.rewardTokenAddress.toLowerCase(),
-                networkId,
-                category: 'claimable',
-              })),
-              availableShortcutIds: ['claim-rewards'],
-              balances: async ({ resolvedTokensByTokenId }) =>
-                userRewards.map((userRewards) => {
-                  const rewardsDecimals =
-                    resolvedTokensByTokenId[
-                      getTokenId({
-                        address: userRewards.rewardTokenAddress,
-                        networkId,
-                      })
-                    ].decimals
-                  return toDecimalNumber(
-                    userRewards.rewardTokenAmount,
-                    rewardsDecimals,
-                  )
-                }),
-              displayProps: {
-                title: `Claimable rewards`,
-                description: 'For supplying and borrowing',
-                imageUrl: AAVE_LOGO,
-              },
-            } satisfies ContractPositionDefinition,
-          ]
-        : [],
+      rewardsPositionDefinition ? [rewardsPositionDefinition] : [],
     ].flat()
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
