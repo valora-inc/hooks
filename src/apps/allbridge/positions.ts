@@ -199,7 +199,7 @@ const hook: PositionsHook = {
                 networkId,
                 address: tokenInfo.poolAddress.toLowerCase(),
               }),
-              associatedRewardPositions: rewardPositionDefinition
+              rewardPositionIds: rewardPositionDefinition
                 ? [getPositionId(rewardPositionDefinition)]
                 : [],
             },

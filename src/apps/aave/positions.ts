@@ -255,7 +255,7 @@ const hook: PositionsHook = {
                   networkId,
                   address: reserveData.aTokenAddress.toLowerCase(),
                 }),
-                associatedRewardPositions: rewardsPositionDefinition
+                rewardPositionIds: rewardsPositionDefinition
                   ? [getPositionId(rewardsPositionDefinition)]
                   : [],
               },
