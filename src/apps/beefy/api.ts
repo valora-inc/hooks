@@ -78,9 +78,39 @@ export async function getBeefyVaults(
   }
 }
 
-export async function getBeefyLpsPrices(): Promise<Record<string, number>> {
-  const prices = await got
-    .get(`https://api.beefy.finance/lps`)
-    .json<Record<string, number>>()
-  return prices
+export async function getBeefyPrices(
+  networkId: NetworkId,
+): Promise<Record<string, number | undefined>> {
+  const [lpsPrices, tokenPrices, tokens] = await Promise.all([
+    got.get(`https://api.beefy.finance/lps`).json<Record<string, number | undefined>>(),
+    got.get(`https://api.beefy.finance/prices`).json<Record<string, number | undefined>>(),
+    got
+      .get(
+        `https://api.beefy.finance/tokens/${NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId]}`,
+      )
+      .json<
+        Record<
+          string, // oracleId
+          {
+            // These are the fields we need, but there are more
+            address: string
+            oracle: string // examples: 'lps', 'tokens'
+            oracleId: string
+          }
+        >
+      >(),
+  ])
+
+  // Combine lps prices with token prices
+  return {
+    ...lpsPrices,
+    ...Object.fromEntries(
+      Object.entries(tokens)
+        .filter(([, { oracle }]) => oracle === 'tokens')
+        .map(([, { address, oracleId }]) => [
+          address.toLowerCase(),
+          tokenPrices[oracleId],
+        ]),
+    ),
+  }
 }
