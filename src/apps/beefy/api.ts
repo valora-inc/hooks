@@ -82,8 +82,12 @@ export async function getBeefyPrices(
   networkId: NetworkId,
 ): Promise<Record<string, number | undefined>> {
   const [lpsPrices, tokenPrices, tokens] = await Promise.all([
-    got.get(`https://api.beefy.finance/lps`).json<Record<string, number | undefined>>(),
-    got.get(`https://api.beefy.finance/prices`).json<Record<string, number | undefined>>(),
+    got
+      .get(`https://api.beefy.finance/lps`)
+      .json<Record<string, number | undefined>>(),
+    got
+      .get(`https://api.beefy.finance/prices`)
+      .json<Record<string, number | undefined>>(),
     got
       .get(
         `https://api.beefy.finance/tokens/${NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID[networkId]}`,
