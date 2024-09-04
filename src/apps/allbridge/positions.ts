@@ -144,7 +144,7 @@ const hook: PositionsHook = {
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
               withdraw: {
-                tokenDecimals: tokenInfo.decimals,
+                tokenDecimals: lpTokenDecimals[i],
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
             },
