@@ -1,4 +1,4 @@
-import { Address, encodeFunctionData, parseUnits, erc20Abi, maxInt256, maxUint256 } from 'viem'
+import { Address, encodeFunctionData, parseUnits, erc20Abi, maxUint256 } from 'viem'
 import {
   createShortcut,
   ShortcutsHook,
