@@ -15,6 +15,7 @@ export const tokenAmounts = z
     z.object({
       tokenId: z.string(),
       amount: z.string(),
+      useMax: z.boolean().optional(),
     }),
   )
   .nonempty()
