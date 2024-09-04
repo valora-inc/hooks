@@ -144,7 +144,7 @@ const hook: PositionsHook = {
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
               withdraw: {
-                tokenDecimals: 3, // decimals are for the LP token which has 3 decimals https://celoscan.io/address/0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af
+                tokenDecimals: lpTokenDecimals[i],
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
             },
