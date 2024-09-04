@@ -1,7 +1,7 @@
 {
   "yieldRates": {
-    "earningsApy": "Guadagno APY",
-    "earningsApr": "Guadagno APR"
+    "earningsApy": "Guadagni APY",
+    "earningsApr": "Guadagni APR"
   },
   "earningItems": {
     "rewards": "Ricompense",
