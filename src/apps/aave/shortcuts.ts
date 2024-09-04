@@ -1,4 +1,10 @@
-import { Address, encodeFunctionData, parseUnits, erc20Abi, maxUint256 } from 'viem'
+import {
+  Address,
+  encodeFunctionData,
+  parseUnits,
+  erc20Abi,
+  maxUint256,
+} from 'viem'
 import {
   createShortcut,
   ShortcutsHook,
@@ -142,7 +148,9 @@ const hook: ShortcutsHook = {
 
           // amount in smallest unit
           // useMax Withdraws entire balance https://docs.aave.com/developers/core-contracts/pool#withdraw
-          const amountToWithdraw = tokens[0].useMax ? maxUint256 : parseUnits(tokens[0].amount, tokenDecimals)
+          const amountToWithdraw = tokens[0].useMax
+            ? maxUint256
+            : parseUnits(tokens[0].amount, tokenDecimals)
 
           const client = getClient(networkId)
 
