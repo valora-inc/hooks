@@ -1,7 +1,7 @@
 {
   "yieldRates": {
-    "earningsApy": "Kazanç APY",
-    "earningsApr": "Kazanç APR"
+    "earningsApy": "Kazanç APY'si",
+    "earningsApr": "Kazanç APR'si"
   },
   "earningItems": {
     "rewards": "Ödüller",
