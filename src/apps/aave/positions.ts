@@ -153,8 +153,8 @@ const hook: PositionsHook = {
           })),
           shortcutTriggerArgs: {
             'claim-rewards': {
-              positionAddress: aaveAddresses.incentivesController.toLowerCase()
-            }
+              positionAddress: aaveAddresses.incentivesController.toLowerCase(),
+            },
           },
           availableShortcutIds: ['claim-rewards'],
           balances: async ({ resolvedTokensByTokenId }) =>
