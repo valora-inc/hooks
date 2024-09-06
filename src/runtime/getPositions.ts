@@ -29,6 +29,7 @@ import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'
 import { getConfig } from '../config'
 import { TFunction } from 'i18next'
+import { getPositionId } from './getPositionId'
 
 interface RawTokenInfo {
   address?: string
@@ -185,25 +186,6 @@ function tokenWithUnderlyingBalance<T extends Token>(
       underlyingBalance.toFixed(token.decimals, BigNumber.ROUND_DOWN),
     ),
   } as T
-}
-
-function getPositionId(positionDefinition: PositionDefinition): string {
-  const tokenId = getTokenId({
-    networkId: positionDefinition.networkId,
-    address: positionDefinition.address,
-  })
-  switch (positionDefinition.type) {
-    case 'app-token-definition':
-      return tokenId
-    case 'contract-position-definition':
-      return (
-        tokenId +
-        (positionDefinition.extraId ? `:${positionDefinition.extraId}` : '')
-      )
-    default:
-      const assertNever: never = positionDefinition
-      return assertNever
-  }
 }
 
 function getDisplayProps(

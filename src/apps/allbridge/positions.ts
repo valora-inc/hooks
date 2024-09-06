@@ -23,6 +23,7 @@ import {
   ALLBRIGE_CONTRACT_CREATED_AT,
   NETWORK_ID_TO_ALLBRIDGE_CHAIN,
 } from './constants'
+import { getPositionId } from '../../runtime/getPositionId'
 
 const hook: PositionsHook = {
   getInfo() {
@@ -97,6 +98,35 @@ const hook: PositionsHook = {
 
       const showLpToken = !address || (!!balanceOf && balanceOf > 0)
       const showReward = !!pendingReward && pendingReward > 0
+
+      const rewardPositionDefinition =
+        showReward &&
+        ({
+          type: 'contract-position-definition',
+          networkId,
+          address: tokenInfo.poolAddress.toLowerCase(),
+          extraId: 'supply-incentives',
+          tokens: [
+            {
+              address: tokenInfo.tokenAddress.toLowerCase(),
+              networkId,
+              category: 'claimable',
+            },
+          ],
+          availableShortcutIds: ['claim-rewards'],
+          shortcutTriggerArgs: {
+            'claim-rewards': {
+              positionAddress: tokenInfo.poolAddress.toLowerCase(),
+            },
+          },
+          balances: [toDecimalNumber(pendingReward, tokenInfo.decimals)],
+          displayProps: {
+            title: `${tokenInfo.symbol} supply incentives`,
+            description: 'Rewards for supplying',
+            imageUrl: ALLBRIDGE_LOGO,
+          },
+        } satisfies ContractPositionDefinition)
+
       return [
         showLpToken &&
           ({
@@ -114,7 +144,7 @@ const hook: PositionsHook = {
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
               withdraw: {
-                tokenDecimals: tokenInfo.decimals,
+                tokenDecimals: lpTokenDecimals[i],
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
             },
@@ -169,35 +199,13 @@ const hook: PositionsHook = {
                 networkId,
                 address: tokenInfo.poolAddress.toLowerCase(),
               }),
+              rewardsPositionIds: rewardPositionDefinition
+                ? [getPositionId(rewardPositionDefinition)]
+                : [],
             },
             pricePerShare: [new BigNumber(1) as DecimalNumber],
           } satisfies AppTokenPositionDefinition),
-        showReward &&
-          ({
-            type: 'contract-position-definition',
-            networkId,
-            address: tokenInfo.poolAddress.toLowerCase(),
-            extraId: 'supply-incentives',
-            tokens: [
-              {
-                address: tokenInfo.tokenAddress.toLowerCase(),
-                networkId,
-                category: 'claimable',
-              },
-            ],
-            availableShortcutIds: ['claim-rewards'],
-            shortcutTriggerArgs: {
-              'claim-rewards': {
-                positionAddress: tokenInfo.poolAddress.toLowerCase(),
-              },
-            },
-            balances: [toDecimalNumber(pendingReward, tokenInfo.decimals)],
-            displayProps: {
-              title: `${tokenInfo.symbol} supply incentives`,
-              description: 'Rewards for supplying',
-              imageUrl: ALLBRIDGE_LOGO,
-            },
-          } satisfies ContractPositionDefinition),
+        rewardPositionDefinition,
       ].filter((x) => !!x)
     })
   },
