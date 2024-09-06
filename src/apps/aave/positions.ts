@@ -151,6 +151,11 @@ const hook: PositionsHook = {
             networkId,
             category: 'claimable',
           })),
+          shortcutTriggerArgs: {
+            'claim-rewards': {
+              positionAddress: aaveAddresses.incentivesController.toLowerCase(),
+            },
+          },
           availableShortcutIds: ['claim-rewards'],
           balances: async ({ resolvedTokensByTokenId }) =>
             userRewards.map((userRewards) => {
