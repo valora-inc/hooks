@@ -78,18 +78,20 @@ export interface EarningItem {
   amount: DecimalNumber
   label: string
   tokenId: string
-  subtractFromDeposit?: boolean
+  includedInPoolBalance?: boolean
 }
 
 export interface EarnDataProps {
   contractCreatedAt?: string // ISO string
   manageUrl?: string
   termsUrl?: string
+  cantSeparateCompoundedInterest?: boolean
   tvl?: SerializedDecimalNumber
   yieldRates: YieldRate[]
   earningItems: EarningItem[]
   depositTokenId: string
   withdrawTokenId: string
+  rewardsPositionIds?: string[]
   // We'll add more fields here as needed
 }
 
