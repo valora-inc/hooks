@@ -249,9 +249,10 @@ const hook: ShortcutsHook = {
           return await prepareSwapTransactions({
             networkId,
             swapFromToken,
-            swapToAddress: tokenAddress,
+            swapToTokenAddress: tokenAddress,
             walletAddress,
             simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
+            // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
             postHook: {
               chainType: ChainType.EVM,
               calls: [
@@ -264,6 +265,7 @@ const hook: ShortcutsHook = {
                     tokenAddress,
                     inputPos: 1,
                   },
+                  // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
                   estimatedGas: GAS.toString(),
                 },
@@ -276,6 +278,7 @@ const hook: ShortcutsHook = {
                     tokenAddress,
                     inputPos: 1,
                   },
+                  // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
                   estimatedGas: GAS.toString(),
                 },

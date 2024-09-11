@@ -53,7 +53,7 @@ type GetSwapQuoteResponse = {
 export async function prepareSwapTransactions({
   swapFromToken,
   postHook,
-  swapToAddress,
+  swapToTokenAddress: swapToAddress,
   networkId,
   walletAddress,
   simulatedGasPadding,
@@ -63,7 +63,7 @@ export async function prepareSwapTransactions({
     SquidHook,
     'fundAmount' | 'fundToken' | 'provider' | 'logoURI' | 'calls'
   > & { calls: EvmContractCall[] } // we don't support CosmosCall
-  swapToAddress: Address
+  swapToTokenAddress: Address
   networkId: NetworkId
   walletAddress: Address
   simulatedGasPadding?: bigint[]

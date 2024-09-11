@@ -92,7 +92,7 @@ describe('prepareSwapTransactions', () => {
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
-      swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+      swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       postHook: mockPostHook,
       simulatedGasPadding: [1n, 100n],
     })
@@ -143,7 +143,7 @@ describe('prepareSwapTransactions', () => {
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
-      swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+      swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       postHook: mockPostHook,
     })
 
@@ -202,7 +202,7 @@ describe('prepareSwapTransactions', () => {
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
-      swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+      swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       postHook: mockPostHook,
     })
 
@@ -226,7 +226,7 @@ describe('prepareSwapTransactions', () => {
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
-      swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+      swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       postHook: mockPostHook,
       simulatedGasPadding: [1n, 100n],
     })
@@ -267,7 +267,7 @@ describe('prepareSwapTransactions', () => {
         networkId: NetworkId['arbitrum-one'],
         walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         swapFromToken: mockNativeSwapFromToken,
-        swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+        swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
         postHook: mockPostHook,
       }),
     ).rejects.toThrow('swap quote failed')
@@ -280,7 +280,7 @@ describe('prepareSwapTransactions', () => {
         networkId: NetworkId['arbitrum-one'],
         walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         swapFromToken: mockNativeSwapFromToken,
-        swapToAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
+        swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
         postHook: mockPostHook,
       }),
     ).rejects.toThrow('Unable to get swap quote')
