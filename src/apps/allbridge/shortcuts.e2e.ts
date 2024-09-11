@@ -82,4 +82,32 @@ describe('getShortcutDefinitions', () => {
       expect(transactions.length).toEqual(1)
     })
   })
+
+  describe('swap-deposit.onTrigger', () => {
+    it('should return transactions', async () => {
+      const shortcuts = await hook.getShortcutDefinitions(
+        NetworkId['celo-mainnet'],
+      )
+      const shortcut = shortcuts.find(
+        (shortcut) => shortcut.id === 'swap-deposit',
+      )
+      expect(shortcut).toBeDefined()
+
+      const transactions = await shortcut!.onTrigger({
+        networkId: NetworkId['celo-mainnet'],
+        address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
+        tokenAddress: '0x617f3112bf5397d0467d315cc709ef968d9ba546', // USDT
+        positionAddress: '0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af',
+        swapFromToken: {
+          tokenId: 'celo-mainnet:0x765de816845861e75a25fca122bb6898b8b1282a', // CUSD
+          amount: '1',
+          decimals: 18,
+          address: '0x765de816845861e75a25fca122bb6898b8b1282a',
+          isNative: false,
+        },
+      })
+
+      expect(transactions.length).toEqual(2)
+    })
+  })
 })
