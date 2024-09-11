@@ -10,6 +10,7 @@ export interface Config {
   SHORTCUT_IDS: string[]
   EARN_SUPPORTED_NETWORK_IDS: NetworkId[]
   SIMULATE_TRANSACTIONS_URL?: string
+  GET_SWAP_QUOTE_URL: string
 }
 
 export function networkIdToRpcUrlTransform(val: string | undefined) {
@@ -42,6 +43,7 @@ export function getConfig(): Config {
       .optional()
       .transform(networkIdToRpcUrlTransform),
     SIMULATE_TRANSACTIONS_URL: z.string().optional(),
+    GET_SWAP_QUOTE_URL: z.string(),
   })
 
   const productionSchema = sharedSchema.extend({
@@ -76,6 +78,12 @@ export function getConfig(): Config {
       .transform((val) =>
         val === '' ? ([] as NetworkId[]) : (val.split(',') as NetworkId[]),
       ),
+    SIMULATE_TRANSACTIONS_URL: z
+      .string()
+      .default('https://api.mainnet.valora.xyz/simulateTransactions'),
+    GET_SWAP_QUOTE_URL: z
+      .string()
+      .default('https://api.mainnet.valora.xyz/getSwapQuote'),
   })
 
   return process.env.NODE_ENV === 'production'

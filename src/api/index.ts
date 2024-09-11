@@ -93,6 +93,7 @@ function serializeShortcuts(
 function serializeTransactions(transactions: Transaction[]) {
   return transactions.map((tx) => ({
     ...tx,
+    ...(tx.value !== undefined ? { value: tx.value.toString() } : {}),
     ...(tx.gas !== undefined ? { gas: tx.gas.toString() } : {}),
     ...(tx.estimatedGasUse !== undefined
       ? { estimatedGasUse: tx.estimatedGasUse.toString() }
