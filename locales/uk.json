@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "Прибуток APY",
+    "earningsApr": "Прибуток APR"
+  },
+  "earningItems": {
+    "rewards": "Винагорода",
+    "earnings": "Прибуток"
+  }
+}
