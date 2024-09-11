@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "Годовой доход в процентах",
+    "earningsApr": "Годовая процентная ставка дохода"
+  },
+  "earningItems": {
+    "rewards": "Вознаграждения",
+    "earnings": "Доход"
+  }
+}
