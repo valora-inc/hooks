@@ -53,7 +53,7 @@ type GetSwapQuoteResponse = {
 export async function prepareSwapTransactions({
   swapFromToken,
   postHook,
-  swapToTokenAddress: swapToAddress,
+  swapToTokenAddress,
   networkId,
   walletAddress,
   simulatedGasPadding,
@@ -103,7 +103,7 @@ export async function prepareSwapTransactions({
   const amountToSwap = parseUnits(swapFromToken.amount, swapFromToken.decimals)
 
   const swapParams = {
-    buyToken: swapToAddress,
+    buyToken: swapToTokenAddress,
     buyIsNative: false,
     buyNetworkId: networkId,
     ...(swapFromToken.address && { sellToken: swapFromToken.address }),
