@@ -1,6 +1,6 @@
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
-import { prepareSwapAndDepositTransactions } from './prepareSwapAndDepositTransactions'
+import { prepareSwapTransactions } from './prepareSwapTransactions'
 import { simulateTransactions } from './simulateTransactions'
 import got from 'got'
 import { Address } from 'viem'
@@ -61,7 +61,7 @@ const mockPostHook = {
   description: 'Deposit to pool',
 }
 
-describe('prepareSwapAndDepositTransactions', () => {
+describe('prepareSwapTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.mocked(simulateTransactions).mockResolvedValue(
@@ -88,7 +88,7 @@ describe('prepareSwapAndDepositTransactions', () => {
   })
 
   it('simulates post hook transactions and prepares swap transaction from native token', async () => {
-    const response = await prepareSwapAndDepositTransactions({
+    const response = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
@@ -139,7 +139,7 @@ describe('prepareSwapAndDepositTransactions', () => {
   })
 
   it('simulates post hook transactions and prepares swap transaction from erc20 token', async () => {
-    const response = await prepareSwapAndDepositTransactions({
+    const response = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
@@ -198,7 +198,7 @@ describe('prepareSwapAndDepositTransactions', () => {
   it('skips approve if swap amount is already approved', async () => {
     mockReadContract.mockResolvedValue(1e6)
 
-    const response = await prepareSwapAndDepositTransactions({
+    const response = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
@@ -222,7 +222,7 @@ describe('prepareSwapAndDepositTransactions', () => {
     jest
       .mocked(simulateTransactions)
       .mockRejectedValue(new Error('Failed to simulate'))
-    const response = await prepareSwapAndDepositTransactions({
+    const response = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
@@ -263,7 +263,7 @@ describe('prepareSwapAndDepositTransactions', () => {
   it('throws if getting swap quote fails', async () => {
     mockGotPostJson.mockRejectedValueOnce(new Error('swap quote failed'))
     await expect(
-      prepareSwapAndDepositTransactions({
+      prepareSwapTransactions({
         networkId: NetworkId['arbitrum-one'],
         walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         swapFromToken: mockNativeSwapFromToken,
@@ -276,7 +276,7 @@ describe('prepareSwapAndDepositTransactions', () => {
   it('throws if no swap quote is found in the response', async () => {
     mockGotPostJson.mockResolvedValueOnce({})
     await expect(
-      prepareSwapAndDepositTransactions({
+      prepareSwapTransactions({
         networkId: NetworkId['arbitrum-one'],
         walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         swapFromToken: mockNativeSwapFromToken,
