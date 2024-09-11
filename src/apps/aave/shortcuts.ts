@@ -232,7 +232,7 @@ const hook: ShortcutsHook = {
         },
         async onTrigger({ swapFromToken, tokenAddress, address, networkId }) {
           const walletAddress = address as Address
-          // use a placeholder amount non zero amount so tx simulation can succeed.
+          // use a placeholder non zero amount so tx simulation can succeed.
           // squid postHook will replace this with the actual amount after swap.
           const amount = 1n
           const approveData = encodeFunctionData({
