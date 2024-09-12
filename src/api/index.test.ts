@@ -21,6 +21,7 @@ jest.mocked(getConfig).mockReturnValue({
     NetworkId['celo-mainnet'],
     NetworkId['arbitrum-one'],
   ],
+  GET_SWAP_QUOTE_URL: 'https://valoraapp.com/mock-swap-endpoint',
 })
 import './index' // NOTE: there are side effects of importing this module-- loading config params from the environment in particular. so mocking configs MUST be done before importing.
 import { ZodAddressLowerCased } from '../types/address'

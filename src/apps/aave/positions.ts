@@ -211,7 +211,7 @@ const hook: PositionsHook = {
                   networkId,
                 },
               ],
-              availableShortcutIds: ['deposit', 'withdraw'],
+              availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
               shortcutTriggerArgs: {
                 deposit: {
                   tokenAddress: reserveData.underlyingAsset.toLowerCase(),
@@ -220,6 +220,9 @@ const hook: PositionsHook = {
                 withdraw: {
                   tokenAddress: reserveData.aTokenAddress.toLowerCase(),
                   tokenDecimals: lpTokenDecimals[i],
+                },
+                'swap-deposit': {
+                  tokenAddress: reserveData.underlyingAsset.toLowerCase(),
                 },
               },
               displayProps: {
