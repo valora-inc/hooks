@@ -1,6 +1,7 @@
 import { z, ZodObject, ZodRawShape } from 'zod'
 import { NetworkId } from './networkId'
 import { ZodAddressLowerCased } from './address'
+import { SwapTransaction } from './swaps'
 
 export type ShortcutCategory = 'claim' | 'deposit' | 'withdraw' | 'swap-deposit'
 
@@ -38,6 +39,17 @@ type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
   ? ZodRawShape & { swapFromToken: typeof tokenAmountWithMetadata }
   : ZodRawShape
 
+type TriggerOutputTransactions = {
+  transactions: Transaction[] // 0, 1 or more transactions to sign by the user
+}
+
+export type TriggerOutputShape<Category extends ShortcutCategory> =
+  Category extends 'swap-deposit'
+    ? TriggerOutputTransactions & {
+        dataProps: { swapTransaction: SwapTransaction }
+      }
+    : TriggerOutputTransactions
+
 export interface ShortcutDefinition<
   Category extends ShortcutCategory,
   InputShape extends TriggerInputShape<Category>,
@@ -53,7 +65,7 @@ export interface ShortcutDefinition<
       networkId: NetworkId
       address: string
     } & z.infer<ZodObject<InputShape>>,
-  ) => Promise<Transaction[]> // 0, 1 or more transactions to sign by the user
+  ) => Promise<TriggerOutputShape<Category>>
 }
 
 export type Transaction = {

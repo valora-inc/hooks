@@ -114,7 +114,7 @@ const hook: ShortcutsHook = {
             supplyTx.estimatedGasUse = DEFAULT_DEPOSIT_GAS / 3n
           }
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -154,7 +154,7 @@ const hook: ShortcutsHook = {
 
           transactions.push(withdrawTx)
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -180,7 +180,7 @@ const hook: ShortcutsHook = {
             }),
           }
 
-          return [claimTx]
+          return { transactions: [claimTx] }
         },
       }),
       createShortcut({

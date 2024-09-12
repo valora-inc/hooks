@@ -1,5 +1,6 @@
 import hook from './shortcuts'
 import { NetworkId } from '../../types/networkId'
+import { ShortcutDefinition } from '../../types/shortcuts'
 
 describe('getShortcutDefinitions', () => {
   it('should get the definitions successfully', async () => {
@@ -18,7 +19,7 @@ describe('getShortcutDefinitions', () => {
       const shortcut = shortcuts.find((shortcut) => shortcut.id === 'deposit')
       expect(shortcut).toBeDefined()
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         tokenAddress: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
@@ -45,7 +46,7 @@ describe('getShortcutDefinitions', () => {
       expect(shortcut).toBeDefined()
       expect(shortcuts[1].id).toBe('withdraw')
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         tokens: [
@@ -73,7 +74,7 @@ describe('getShortcutDefinitions', () => {
       expect(shortcut).toBeDefined()
       expect(shortcuts[2].id).toBe('claim-rewards')
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
@@ -92,8 +93,11 @@ describe('getShortcutDefinitions', () => {
         (shortcut) => shortcut.id === 'swap-deposit',
       )
       expect(shortcut).toBeDefined()
+      expect(shortcut!.category).toEqual('swap-deposit')
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions, dataProps } = await (
+        shortcut as ShortcutDefinition<'swap-deposit', any>
+      ).onTrigger({
         networkId: NetworkId['celo-mainnet'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         tokenAddress: '0x617f3112bf5397d0467d315cc709ef968d9ba546', // USDT
@@ -108,6 +112,8 @@ describe('getShortcutDefinitions', () => {
       })
 
       expect(transactions.length).toEqual(2)
+      expect(dataProps).toBeDefined()
+      expect(dataProps.swapTransaction).toBeDefined()
     })
   })
 })

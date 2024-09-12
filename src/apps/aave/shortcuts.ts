@@ -123,7 +123,7 @@ const hook: ShortcutsHook = {
             supplyTx.estimatedGasUse = GAS / 3n
           }
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -176,7 +176,7 @@ const hook: ShortcutsHook = {
 
           transactions.push(withdrawTx)
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -205,18 +205,20 @@ const hook: ShortcutsHook = {
           const assetsWithIncentives =
             getAaveTokensWithIncentives(reserveIncentiveData)
 
-          return [
-            {
-              networkId,
-              from: walletAddress,
-              to: incentivesContractAddress,
-              data: encodeFunctionData({
-                abi: incentivesControllerV3Abi,
-                functionName: 'claimAllRewardsToSelf',
-                args: [assetsWithIncentives],
-              }),
-            },
-          ]
+          return {
+            transactions: [
+              {
+                networkId,
+                from: walletAddress,
+                to: incentivesContractAddress,
+                data: encodeFunctionData({
+                  abi: incentivesControllerV3Abi,
+                  functionName: 'claimAllRewardsToSelf',
+                  args: [assetsWithIncentives],
+                }),
+              },
+            ],
+          }
         },
       }),
       createShortcut({

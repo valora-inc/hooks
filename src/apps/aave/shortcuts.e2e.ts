@@ -1,5 +1,6 @@
 import hook from './shortcuts'
 import { NetworkId } from '../../types/networkId'
+import { ShortcutDefinition } from '../../types/shortcuts'
 
 describe('getShortcutDefinitions', () => {
   it('should get the definitions successfully', async () => {
@@ -17,7 +18,7 @@ describe('getShortcutDefinitions', () => {
       const shortcut = shortcuts.find((shortcut) => shortcut.id === 'deposit')
       expect(shortcut).toBeDefined()
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         tokenAddress: '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // USDC
@@ -42,7 +43,7 @@ describe('getShortcutDefinitions', () => {
       const shortcut = shortcuts.find((shortcut) => shortcut.id === 'withdraw')
       expect(shortcut).toBeDefined()
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         tokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637', // aArbUSDCn
@@ -69,7 +70,7 @@ describe('getShortcutDefinitions', () => {
       )
       expect(shortcut).toBeDefined()
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions } = await shortcut!.onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         positionAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
@@ -88,8 +89,11 @@ describe('getShortcutDefinitions', () => {
         (shortcut) => shortcut.id === 'swap-deposit',
       )
       expect(shortcut).toBeDefined()
+      expect(shortcut!.category).toEqual('swap-deposit')
 
-      const transactions = await shortcut!.onTrigger({
+      const { transactions, dataProps } = await (
+        shortcut as ShortcutDefinition<'swap-deposit', any>
+      ).onTrigger({
         networkId: NetworkId['arbitrum-one'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         swapFromToken: {
@@ -102,6 +106,8 @@ describe('getShortcutDefinitions', () => {
       })
 
       expect(transactions.length).toEqual(1)
+      expect(dataProps).toBeDefined()
+      expect(dataProps.swapTransaction).toBeDefined()
     })
   })
 })
