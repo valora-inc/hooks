@@ -61,6 +61,16 @@ const mockPostHook = {
   description: 'Deposit to pool',
 }
 
+const swapTransaction = {
+  allowanceTarget: '0x4c363649d45d93a39aa2e72cb1beae5e25c63e88',
+  gas: '12345',
+  estimatedGasUse: '12211',
+  to: '0x12345678',
+  from: mockWalletAddress,
+  value: '111',
+  data: '0xswapdata',
+}
+
 describe('prepareSwapTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -74,21 +84,13 @@ describe('prepareSwapTransactions', () => {
       })),
     )
     mockGotPostJson.mockResolvedValue({
-      unvalidatedSwapTransaction: {
-        allowanceTarget: '0x4c363649d45d93a39aa2e72cb1beae5e25c63e88',
-        gas: '12345',
-        estimatedGasUse: '12211',
-        to: '0x12345678',
-        from: mockWalletAddress,
-        value: '111',
-        data: '0xswapdata',
-      },
+      unvalidatedSwapTransaction: swapTransaction,
     })
     mockReadContract.mockResolvedValue(0)
   })
 
   it('simulates post hook transactions and prepares swap transaction from native token', async () => {
-    const response = await prepareSwapTransactions({
+    const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
@@ -97,8 +99,8 @@ describe('prepareSwapTransactions', () => {
       simulatedGasPadding: [1n, 100n],
     })
 
-    expect(response).toHaveLength(1)
-    expect(response[0]).toEqual({
+    expect(transactions).toHaveLength(1)
+    expect(transactions[0]).toEqual({
       networkId: NetworkId['arbitrum-one'],
       from: mockWalletAddress,
       to: '0x12345678',
@@ -107,6 +109,7 @@ describe('prepareSwapTransactions', () => {
       gas: 12345n,
       estimatedGasUse: 12211n,
     })
+    expect(dataProps).toEqual({ swapTransaction })
     expect(got.post).toHaveBeenCalledTimes(1)
     expect(got.post).toHaveBeenCalledWith(
       'https://api.mainnet.valora.xyz/getSwapQuote',
@@ -139,7 +142,7 @@ describe('prepareSwapTransactions', () => {
   })
 
   it('simulates post hook transactions and prepares swap transaction from erc20 token', async () => {
-    const response = await prepareSwapTransactions({
+    const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
@@ -147,14 +150,14 @@ describe('prepareSwapTransactions', () => {
       postHook: mockPostHook,
     })
 
-    expect(response).toHaveLength(2)
-    expect(response[0]).toEqual({
+    expect(transactions).toHaveLength(2)
+    expect(transactions[0]).toEqual({
       networkId: NetworkId['arbitrum-one'],
       from: mockWalletAddress,
       to: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
       data: expect.any(String),
     })
-    expect(response[1]).toEqual({
+    expect(transactions[1]).toEqual({
       networkId: NetworkId['arbitrum-one'],
       from: mockWalletAddress,
       to: '0x12345678',
@@ -163,6 +166,7 @@ describe('prepareSwapTransactions', () => {
       gas: 12345n,
       estimatedGasUse: 12211n,
     })
+    expect(dataProps).toEqual({ swapTransaction })
     expect(got.post).toHaveBeenCalledTimes(1)
     expect(got.post).toHaveBeenCalledWith(
       'https://api.mainnet.valora.xyz/getSwapQuote',
@@ -198,7 +202,7 @@ describe('prepareSwapTransactions', () => {
   it('skips approve if swap amount is already approved', async () => {
     mockReadContract.mockResolvedValue(1e6)
 
-    const response = await prepareSwapTransactions({
+    const { transactions } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockErc20SwapFromToken,
@@ -206,8 +210,8 @@ describe('prepareSwapTransactions', () => {
       postHook: mockPostHook,
     })
 
-    expect(response).toHaveLength(1)
-    expect(response[0]).toEqual({
+    expect(transactions).toHaveLength(1)
+    expect(transactions[0]).toEqual({
       networkId: NetworkId['arbitrum-one'],
       from: mockWalletAddress,
       to: '0x12345678',
@@ -222,7 +226,7 @@ describe('prepareSwapTransactions', () => {
     jest
       .mocked(simulateTransactions)
       .mockRejectedValue(new Error('Failed to simulate'))
-    const response = await prepareSwapTransactions({
+    const { transactions } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       swapFromToken: mockNativeSwapFromToken,
@@ -231,8 +235,8 @@ describe('prepareSwapTransactions', () => {
       simulatedGasPadding: [1n, 100n],
     })
 
-    expect(response).toHaveLength(1)
-    expect(response[0]).toEqual({
+    expect(transactions).toHaveLength(1)
+    expect(transactions[0]).toEqual({
       networkId: NetworkId['arbitrum-one'],
       from: mockWalletAddress,
       to: '0x12345678',

@@ -285,14 +285,18 @@ function createApp() {
         }),
       )
 
-      const transactions = await shortcut.onTrigger({
+      const { transactions, ...triggerOuput } = await shortcut.onTrigger({
         networkId,
         address,
         ...parsedTriggerInput.body,
       })
+
       res.send({
         message: 'OK',
-        data: { transactions: serializeTransactions(transactions) },
+        data: {
+          transactions: serializeTransactions(transactions),
+          ...triggerOuput,
+        },
       })
     }),
   )

@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { tokenAmountWithMetadata, Transaction } from '../types/shortcuts'
+import {
+  tokenAmountWithMetadata,
+  Transaction,
+  TriggerOutputShape,
+} from '../types/shortcuts'
 import { EvmContractCall, Hook as SquidHook } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from 'viem'
@@ -11,30 +15,7 @@ import { logger } from '../log'
 import { getConfig } from '../config'
 import got, { HTTPError } from 'got'
 import { getClient } from '../runtime/client'
-
-interface SwapTransaction {
-  swapType: 'same-chain' // only supporting same-chain swaps for now
-  chainId: number
-  buyAmount: string
-  sellAmount: string
-  buyTokenAddress: string
-  sellTokenAddress: string
-  // be careful -- price means different things when using sellAmount vs buyAmount
-  price: string
-  guaranteedPrice: string
-  appFeePercentageIncludedInPrice: string | undefined
-  /**
-   * In percentage, between 0 and 100
-   */
-  estimatedPriceImpact: string | null
-  gas: string
-  estimatedGasUse: string | null | undefined
-  to: Address
-  value: string
-  data: `0x${string}`
-  from: Address
-  allowanceTarget: Address
-}
+import { SwapTransaction } from '../types/swaps'
 
 type GetSwapQuoteResponse = {
   unvalidatedSwapTransaction?: SwapTransaction
@@ -67,7 +48,7 @@ export async function prepareSwapTransactions({
   networkId: NetworkId
   walletAddress: Address
   simulatedGasPadding?: bigint[]
-}): Promise<Transaction[]> {
+}): Promise<TriggerOutputShape<'swap-deposit'>> {
   let postHookWithSimulatedGas = postHook
 
   try {
@@ -195,6 +176,8 @@ export async function prepareSwapTransactions({
 
   transactions.push(swapTx)
 
-  // TODO(ACT-1354): figure out a way to return swap details
-  return transactions
+  return {
+    transactions,
+    dataProps: { swapTransaction: swapQuote.unvalidatedSwapTransaction },
+  }
 }

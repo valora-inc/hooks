@@ -20,7 +20,7 @@ describe('getShortcutDefinitions', () => {
       )
       const shortcut = shortcuts[0]
 
-      const transactions = await shortcut.onTrigger({
+      const { transactions } = await shortcut.onTrigger({
         networkId: NetworkId['celo-mainnet'],
         address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
         positionAddress: POSITION_ADDRESS,

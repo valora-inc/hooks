@@ -45,14 +45,16 @@ const hook: ShortcutsHook = {
             functionName: request.functionName,
           })
 
-          return [
-            {
-              networkId,
-              from: address,
-              to: positionAddress as Address,
-              data,
-            },
-          ]
+          return {
+            transactions: [
+              {
+                networkId,
+                from: address,
+                to: positionAddress as Address,
+                data,
+              },
+            ],
+          }
         },
       }),
     )
