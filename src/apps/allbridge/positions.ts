@@ -136,7 +136,7 @@ const hook: PositionsHook = {
             tokens: [
               { address: tokenInfo.tokenAddress.toLowerCase(), networkId },
             ],
-            availableShortcutIds: ['deposit', 'withdraw'],
+            availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
             shortcutTriggerArgs: {
               deposit: {
                 tokenAddress: tokenInfo.tokenAddress.toLowerCase(),
@@ -145,6 +145,10 @@ const hook: PositionsHook = {
               },
               withdraw: {
                 tokenDecimals: lpTokenDecimals[i],
+                positionAddress: tokenInfo.poolAddress.toLowerCase(),
+              },
+              'swap-deposit': {
+                tokenAddress: tokenInfo.tokenAddress.toLowerCase(),
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
             },
