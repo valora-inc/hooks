@@ -259,14 +259,16 @@ const TEST_SHORTCUTS: Awaited<ReturnType<typeof getShortcuts>> = [
     },
     async onTrigger({ networkId, address, positionAddress }) {
       // Bogus implementation for testing
-      return [
-        {
-          networkId,
-          from: address,
-          to: positionAddress,
-          data: '0xTEST',
-        },
-      ]
+      return {
+        transactions: [
+          {
+            networkId,
+            from: address,
+            to: positionAddress,
+            data: '0xTEST',
+          },
+        ],
+      }
     },
   },
 ]
