@@ -1,7 +1,7 @@
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { prepareSwapTransactions } from './prepareSwapTransactions'
-import { simulateTransactions } from './simulateTransactions'
+import { simulateTransactions } from '../runtime/simulateTransactions'
 import got from 'got'
 import { Address } from 'viem'
 
@@ -14,8 +14,8 @@ jest.mock('got', () => ({
     json: mockGotPostJson,
   })),
 }))
-jest.mock('./simulateTransactions')
-jest.mock('./client', () => ({
+jest.mock('../runtime/simulateTransactions')
+jest.mock('../runtime/client', () => ({
   getClient: jest.fn(() => ({
     readContract: mockReadContract,
   })),

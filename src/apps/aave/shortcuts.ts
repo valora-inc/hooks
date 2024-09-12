@@ -24,7 +24,7 @@ import { simulateTransactions } from '../../runtime/simulateTransactions'
 import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
 import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
-import { prepareSwapTransactions } from '../../runtime/prepareSwapTransactions'
+import { prepareSwapTransactions } from '../../utils/prepareSwapTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n

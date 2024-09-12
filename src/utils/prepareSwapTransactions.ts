@@ -6,11 +6,11 @@ import { Address, encodeFunctionData, erc20Abi, parseUnits } from 'viem'
 import {
   simulateTransactions,
   UnsupportedSimulateRequest,
-} from './simulateTransactions'
+} from '../runtime/simulateTransactions'
 import { logger } from '../log'
 import { getConfig } from '../config'
 import got, { HTTPError } from 'got'
-import { getClient } from './client'
+import { getClient } from '../runtime/client'
 
 interface SwapTransaction {
   swapType: 'same-chain' // only supporting same-chain swaps for now
