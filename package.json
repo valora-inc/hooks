@@ -48,7 +48,7 @@
     "i18next": "^23.15.1",
     "i18next-fs-backend": "^2.3.2",
     "i18next-http-middleware": "^3.6.0",
-    "viem": "^2.21.5",
+    "viem": "^2.21.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {
