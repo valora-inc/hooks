@@ -52,7 +52,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.13",
     "@types/js-yaml": "^4.0.9",
     "@types/qrcode-terminal": "^0.12.2",
     "@types/shelljs": "^0.8.15",
