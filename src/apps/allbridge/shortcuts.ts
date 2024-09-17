@@ -247,7 +247,7 @@ const hook: ShortcutsHook = {
                   callData: supplyData,
                   payload: {
                     tokenAddress,
-                    inputPos: 1,
+                    inputPos: 0,
                   },
                   // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
