@@ -5,7 +5,7 @@
 [![Codecov](https://img.shields.io/codecov/c/github/valora-inc/hooks)](https://codecov.io/gh/valora-inc/hooks)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/valora-inc/hooks#contributing)
 
-Mobilestack Hooks allows developers to extend an app's functionality (_e.g._, the Valora wallet) by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide the application with additional information and features.
+Mobile Stack Hooks allows developers to extend an app's functionality (_e.g._, the Valora wallet) by writing short programs called "hooks". These hooks are called in response to certain in-app or blockchain events and are used to provide the application with additional information and features.
 
 Check out the [Hooks documentation](https://docs.valora.xyz/hooks/) for more information.
 
