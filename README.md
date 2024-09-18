@@ -1,4 +1,4 @@
-# Mobilestack Hooks
+# Mobile Stack Hooks
 
 [![GitHub License](https://img.shields.io/github/license/valora-inc/hooks?color=blue)](https://github.com/valora-inc/hooks/blob/main/LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/valora-inc/hooks/.github/workflows/workflow.yaml?branch=main)](https://github.com/valora-inc/hooks/actions/workflows/workflow.yaml?query=branch%3Amain)
