@@ -1,4 +1,4 @@
-import got from 'got'
+import got from '../../utils/got'
 import { Address } from 'viem'
 import { NetworkId } from '../../types/networkId'
 

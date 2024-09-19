@@ -13,7 +13,8 @@ import {
 } from '../runtime/simulateTransactions'
 import { logger } from '../log'
 import { getConfig } from '../config'
-import got, { HTTPError } from 'got'
+import got from './got'
+import { HTTPError } from 'got'
 import { getClient } from '../runtime/client'
 import { SwapTransaction } from '../types/swaps'
 

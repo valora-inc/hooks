@@ -10,7 +10,7 @@ import {
 import { toDecimalNumber, toSerializedDecimalNumber } from '../types/numbers'
 import { logger } from '../log'
 import { NetworkId } from '../types/networkId'
-import got from 'got'
+import got from '../utils/got'
 import * as mockTokensInfo from './mockTokensInfo.json'
 import { t } from '../../test/i18next'
 

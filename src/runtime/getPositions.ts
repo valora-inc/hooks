@@ -1,4 +1,4 @@
-import got from 'got'
+import got from '../utils/got'
 import BigNumber from 'bignumber.js'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
