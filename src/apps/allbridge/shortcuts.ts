@@ -192,8 +192,8 @@ const hook: ShortcutsHook = {
         category: 'swap-deposit',
         triggerInputShape: {
           swapFromToken: tokenAmountWithMetadata,
-          // set via shortcutTriggerArgs, the deposit token and position addresses
           enableSwapFee: ZodEnableSwapFee,
+          // set via shortcutTriggerArgs, the deposit token and position addresses
           tokenAddress: ZodAddressLowerCased,
           positionAddress: ZodAddressLowerCased,
         },
