@@ -10,6 +10,7 @@ import {
   ShortcutsHook,
   tokenAmounts,
   tokenAmountWithMetadata,
+  ZodEnableSwapFee,
   Transaction,
 } from '../../types/shortcuts'
 import { NetworkId } from '../../types/networkId'
@@ -229,6 +230,7 @@ const hook: ShortcutsHook = {
         category: 'swap-deposit',
         triggerInputShape: {
           swapFromToken: tokenAmountWithMetadata,
+          enableSwapFee: ZodEnableSwapFee,
           // set via shortcutTriggerArgs, the deposit token's address
           tokenAddress: ZodAddressLowerCased,
         },

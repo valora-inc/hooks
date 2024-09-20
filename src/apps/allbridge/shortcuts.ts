@@ -8,6 +8,7 @@ import {
   ShortcutsHook,
   tokenAmounts,
   tokenAmountWithMetadata,
+  ZodEnableSwapFee,
   Transaction,
 } from '../../types/shortcuts'
 import { poolAbi } from './abis/pool'
@@ -192,6 +193,7 @@ const hook: ShortcutsHook = {
         triggerInputShape: {
           swapFromToken: tokenAmountWithMetadata,
           // set via shortcutTriggerArgs, the deposit token and position addresses
+          enableSwapFee: ZodEnableSwapFee,
           tokenAddress: ZodAddressLowerCased,
           positionAddress: ZodAddressLowerCased,
         },
