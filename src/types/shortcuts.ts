@@ -31,12 +31,7 @@ export const tokenAmountWithMetadata = z.object({
   isNative: z.boolean(),
 })
 
-export const ZodEnableSwapFee = z
-  .string()
-  .toLowerCase()
-  .transform((enable) => enable === 'true')
-  .pipe(z.boolean())
-  .optional()
+export const ZodEnableSwapFee = z.boolean().optional()
 
 // enforces the tokens field to be an array of objects with tokenId and amount
 // for all deposit and withdraw shortcuts
