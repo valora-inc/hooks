@@ -136,7 +136,7 @@ const hook: PositionsHook = {
             tokens: [
               { address: tokenInfo.tokenAddress.toLowerCase(), networkId },
             ],
-            availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
+            availableShortcutIds: ['deposit', 'withdraw'],
             shortcutTriggerArgs: {
               deposit: {
                 tokenAddress: tokenInfo.tokenAddress.toLowerCase(),
