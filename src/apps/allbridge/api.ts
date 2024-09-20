@@ -1,4 +1,4 @@
-import got from 'got'
+import got from '../../utils/got'
 import { NetworkId } from '../../types/networkId'
 import { Address } from 'viem'
 import { LRUCache } from 'lru-cache'

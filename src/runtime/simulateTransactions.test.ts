@@ -1,9 +1,9 @@
 import { NetworkId } from '../types/networkId'
 import { simulateTransactions } from './simulateTransactions'
 import { Transaction } from '../types/shortcuts'
-import got from 'got'
+import got from '../utils/got'
 
-jest.mock('got')
+jest.mock('../utils/got')
 
 describe('simulateTransactions', () => {
   // Doesn't matter what the transactions are

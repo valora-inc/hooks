@@ -2,14 +2,14 @@ import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { prepareSwapTransactions } from './prepareSwapTransactions'
 import { simulateTransactions } from '../runtime/simulateTransactions'
-import got from 'got'
+import got from './got'
 import { Address } from 'viem'
 
 const mockGotPostJson = jest.fn()
 const mockReadContract = jest.fn()
 
-jest.mock('got', () => ({
-  HTTPError: jest.requireActual('got').HTTPError,
+jest.mock('./got', () => ({
+  HTTPError: jest.requireActual('./got').HTTPError,
   post: jest.fn(() => ({
     json: mockGotPostJson,
   })),
