@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "Tỷ suất lợi nhuận hằng năm (APY) từ thu nhập",
+    "earningsApr": "Phần trăm lãi suất hằng năm (APR) từ thu nhập"
+  },
+  "earningItems": {
+    "rewards": "Tiền thưởng",
+    "earnings": "Thu nhập"
+  }
+}
