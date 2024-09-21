@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "年化收益率",
+    "earningsApr": "年化百分比率"
+  },
+  "earningItems": {
+    "rewards": "奖励",
+    "earnings": "收益"
+  }
+}
