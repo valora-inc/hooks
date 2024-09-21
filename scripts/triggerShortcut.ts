@@ -111,7 +111,7 @@ void (async () => {
     transport: http(),
   })
 
-  for (const transaction of result) {
+  for (const transaction of result.transactions) {
     const txHash = await wallet.sendTransaction({
       // from: transaction.from as Address,
       to: transaction.to as Address,

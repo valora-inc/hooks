@@ -1,7 +1,9 @@
 import { z, ZodObject, ZodRawShape } from 'zod'
 import { NetworkId } from './networkId'
+import { ZodAddressLowerCased } from './address'
+import { SwapTransaction } from './swaps'
 
-export type ShortcutCategory = 'claim' | 'deposit' | 'withdraw'
+export type ShortcutCategory = 'claim' | 'deposit' | 'withdraw' | 'swap-deposit'
 
 export interface ShortcutsHook {
   getShortcutDefinitions(
@@ -20,11 +22,38 @@ export const tokenAmounts = z
   )
   .nonempty()
 
+export const tokenAmountWithMetadata = z.object({
+  tokenId: z.string(),
+  amount: z.string(),
+  // these can be inferred from the tokenId, but we need to pass them for now
+  decimals: z.number(),
+  address: ZodAddressLowerCased.optional(),
+  isNative: z.boolean(),
+})
+
+export const ZodEnableSwapFee = z.boolean().optional()
+
 // enforces the tokens field to be an array of objects with tokenId and amount
 // for all deposit and withdraw shortcuts
 type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
   ? ZodRawShape & { tokens: typeof tokenAmounts }
+  : Category extends 'swap-deposit'
+  ? ZodRawShape & {
+      swapFromToken: typeof tokenAmountWithMetadata
+      enableSwapFee: typeof ZodEnableSwapFee
+    }
   : ZodRawShape
+
+type TriggerOutputTransactions = {
+  transactions: Transaction[] // 0, 1 or more transactions to sign by the user
+}
+
+export type TriggerOutputShape<Category extends ShortcutCategory> =
+  Category extends 'swap-deposit'
+    ? TriggerOutputTransactions & {
+        dataProps: { swapTransaction: SwapTransaction }
+      }
+    : TriggerOutputTransactions
 
 export interface ShortcutDefinition<
   Category extends ShortcutCategory,
@@ -41,7 +70,7 @@ export interface ShortcutDefinition<
       networkId: NetworkId
       address: string
     } & z.infer<ZodObject<InputShape>>,
-  ) => Promise<Transaction[]> // 0, 1 or more transactions to sign by the user
+  ) => Promise<TriggerOutputShape<Category>>
 }
 
 export type Transaction = {
@@ -49,6 +78,7 @@ export type Transaction = {
   from: string
   to: string
   data: string
+  value?: BigInt
   // These are needed when returning more than one transaction
   gas?: BigInt // in wei
   estimatedGasUse?: BigInt // in wei

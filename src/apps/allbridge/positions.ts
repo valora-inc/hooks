@@ -147,6 +147,10 @@ const hook: PositionsHook = {
                 tokenDecimals: lpTokenDecimals[i],
                 positionAddress: tokenInfo.poolAddress.toLowerCase(),
               },
+              'swap-deposit': {
+                tokenAddress: tokenInfo.tokenAddress.toLowerCase(),
+                positionAddress: tokenInfo.poolAddress.toLowerCase(),
+              },
             },
             displayProps: {
               title: tokenInfo.symbol,

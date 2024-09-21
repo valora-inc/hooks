@@ -9,6 +9,8 @@ import {
   createShortcut,
   ShortcutsHook,
   tokenAmounts,
+  tokenAmountWithMetadata,
+  ZodEnableSwapFee,
   Transaction,
 } from '../../types/shortcuts'
 import { NetworkId } from '../../types/networkId'
@@ -22,6 +24,8 @@ import { incentivesControllerV3Abi } from './abis/incentives-controller-v3'
 import { simulateTransactions } from '../../runtime/simulateTransactions'
 import { uiIncentiveDataProviderV3Abi } from './abis/ui-incentive-data-provider'
 import { getAaveTokensWithIncentives } from './getAaveTokensWithIncentives'
+import { ChainType, SquidCallType } from '@0xsquid/squid-types'
+import { prepareSwapTransactions } from '../../utils/prepareSwapTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
 const GAS = 1_000_000n
@@ -120,7 +124,7 @@ const hook: ShortcutsHook = {
             supplyTx.estimatedGasUse = GAS / 3n
           }
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -173,7 +177,7 @@ const hook: ShortcutsHook = {
 
           transactions.push(withdrawTx)
 
-          return transactions
+          return { transactions }
         },
       }),
       createShortcut({
@@ -202,18 +206,90 @@ const hook: ShortcutsHook = {
           const assetsWithIncentives =
             getAaveTokensWithIncentives(reserveIncentiveData)
 
-          return [
-            {
-              networkId,
-              from: walletAddress,
-              to: incentivesContractAddress,
-              data: encodeFunctionData({
-                abi: incentivesControllerV3Abi,
-                functionName: 'claimAllRewardsToSelf',
-                args: [assetsWithIncentives],
-              }),
+          return {
+            transactions: [
+              {
+                networkId,
+                from: walletAddress,
+                to: incentivesContractAddress,
+                data: encodeFunctionData({
+                  abi: incentivesControllerV3Abi,
+                  functionName: 'claimAllRewardsToSelf',
+                  args: [assetsWithIncentives],
+                }),
+              },
+            ],
+          }
+        },
+      }),
+      createShortcut({
+        id: 'swap-deposit',
+        name: 'Swap & Deposit',
+        description: 'Swap assets and lend them to earn interest',
+        networkIds: [networkId],
+        category: 'swap-deposit',
+        triggerInputShape: {
+          swapFromToken: tokenAmountWithMetadata,
+          enableSwapFee: ZodEnableSwapFee,
+          // set via shortcutTriggerArgs, the deposit token's address
+          tokenAddress: ZodAddressLowerCased,
+        },
+        async onTrigger({ swapFromToken, tokenAddress, address, networkId }) {
+          const walletAddress = address as Address
+          // use a placeholder non zero amount so tx simulation can succeed.
+          // squid postHook will replace this with the actual amount after swap.
+          const amount = 1n
+          const approveData = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [poolContractAddress, amount],
+          })
+          const supplyData = encodeFunctionData({
+            abi: poolV3Abi,
+            functionName: 'supply',
+            args: [tokenAddress, amount, walletAddress, 0],
+          })
+
+          return await prepareSwapTransactions({
+            networkId,
+            swapFromToken,
+            swapToTokenAddress: tokenAddress,
+            walletAddress,
+            simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
+            // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
+            postHook: {
+              chainType: ChainType.EVM,
+              calls: [
+                {
+                  chainType: ChainType.EVM,
+                  callType: SquidCallType.FULL_TOKEN_BALANCE,
+                  target: tokenAddress,
+                  callData: approveData,
+                  payload: {
+                    tokenAddress,
+                    inputPos: 1,
+                  },
+                  // no native token transfer. this is optional per types, but squid request fails without it
+                  value: '0',
+                  estimatedGas: GAS.toString(),
+                },
+                {
+                  chainType: ChainType.EVM,
+                  callType: SquidCallType.FULL_TOKEN_BALANCE,
+                  target: poolContractAddress,
+                  callData: supplyData,
+                  payload: {
+                    tokenAddress,
+                    inputPos: 1,
+                  },
+                  // no native token transfer. this is optional per types, but squid request fails without it
+                  value: '0',
+                  estimatedGas: GAS.toString(),
+                },
+              ],
+              description: 'Deposit into aave pool',
             },
-          ]
+          })
         },
       }),
     ]

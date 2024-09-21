@@ -1,5 +1,5 @@
 import { Address, erc20Abi } from 'viem'
-import got from 'got'
+import got from '../../utils/got'
 import {
   AppTokenPositionDefinition,
   PositionsHook,

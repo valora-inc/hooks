@@ -93,6 +93,7 @@ function serializeShortcuts(
 function serializeTransactions(transactions: Transaction[]) {
   return transactions.map((tx) => ({
     ...tx,
+    ...(tx.value !== undefined ? { value: tx.value.toString() } : {}),
     ...(tx.gas !== undefined ? { gas: tx.gas.toString() } : {}),
     ...(tx.estimatedGasUse !== undefined
       ? { estimatedGasUse: tx.estimatedGasUse.toString() }
@@ -284,14 +285,18 @@ function createApp() {
         }),
       )
 
-      const transactions = await shortcut.onTrigger({
+      const { transactions, ...triggerOuput } = await shortcut.onTrigger({
         networkId,
         address,
         ...parsedTriggerInput.body,
       })
+
       res.send({
         message: 'OK',
-        data: { transactions: serializeTransactions(transactions) },
+        data: {
+          transactions: serializeTransactions(transactions),
+          ...triggerOuput,
+        },
       })
     }),
   )

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import got from 'got'
+import got from '../../utils/got'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'

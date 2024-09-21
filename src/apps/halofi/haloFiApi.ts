@@ -1,4 +1,4 @@
-import got from 'got'
+import got from '../../utils/got'
 import { celo } from 'viem/chains'
 
 type Game = {
