@@ -97,7 +97,7 @@ export async function prepareSwapTransactions({
     slippagePercentage: '1',
     postHook: postHookWithSimulatedGas,
     userAddress: walletAddress,
-    enableSwapFee,
+    enableAppFee: enableSwapFee,
   }
 
   const url = getConfig().GET_SWAP_QUOTE_URL
