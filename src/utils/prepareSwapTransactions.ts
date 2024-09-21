@@ -39,6 +39,7 @@ export async function prepareSwapTransactions({
   networkId,
   walletAddress,
   simulatedGasPadding,
+  enableSwapFee,
 }: {
   swapFromToken: z.infer<typeof tokenAmountWithMetadata>
   postHook: Omit<
@@ -49,6 +50,7 @@ export async function prepareSwapTransactions({
   networkId: NetworkId
   walletAddress: Address
   simulatedGasPadding?: bigint[]
+  enableSwapFee?: boolean
 }): Promise<TriggerOutputShape<'swap-deposit'>> {
   let postHookWithSimulatedGas = postHook
 
@@ -95,6 +97,7 @@ export async function prepareSwapTransactions({
     slippagePercentage: '1',
     postHook: postHookWithSimulatedGas,
     userAddress: walletAddress,
+    enableAppFee: enableSwapFee,
   }
 
   const url = getConfig().GET_SWAP_QUOTE_URL
