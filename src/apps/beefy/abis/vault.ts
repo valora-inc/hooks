@@ -1,4 +1,4 @@
-export const poolAbi = [
+export const vaultAbi = [
   {
     anonymous: false,
     inputs: [

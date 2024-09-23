@@ -14,10 +14,10 @@ import {
   tokenAmounts,
   Transaction,
 } from '../../types/shortcuts'
-import { poolAbi } from './abis/pool'
+import { vaultAbi } from './abis/vault'
 
 // Hardcoded fallback if simulation isn't enabled
-const DEFAULT_DEPOSIT_GAS = 500_000n
+const DEFAULT_DEPOSIT_GAS = 750_000n
 // Padding we add to simulation gas to ensure we specify enough
 const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
 
@@ -77,18 +77,18 @@ const hook: ShortcutsHook = {
             transactions.push(approveTx)
           }
 
-          const supplyTx: Transaction = {
+          const depositTx: Transaction = {
             networkId,
             from: walletAddress,
             to: positionAddress,
             data: encodeFunctionData({
-              abi: poolAbi,
+              abi: vaultAbi,
               functionName: 'deposit',
               args: [amountToSupply],
             }),
           }
 
-          transactions.push(supplyTx)
+          transactions.push(depositTx)
 
           // TODO: consider moving this concern to the runtime
           try {
@@ -99,16 +99,16 @@ const hook: ShortcutsHook = {
             const supplySimulatedTx =
               simulatedTransactions[simulatedTransactions.length - 1]
 
-            supplyTx.gas =
+            depositTx.gas =
               BigInt(supplySimulatedTx.gasNeeded) +
               SIMULATED_DEPOSIT_GAS_PADDING
-            supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
+            depositTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
           } catch (error) {
             if (!(error instanceof UnsupportedSimulateRequest)) {
               logger.warn(error, 'Unexpected error during simulateTransactions')
             }
-            supplyTx.gas = DEFAULT_DEPOSIT_GAS
-            supplyTx.estimatedGasUse = DEFAULT_DEPOSIT_GAS / 3n
+            depositTx.gas = DEFAULT_DEPOSIT_GAS
+            depositTx.estimatedGasUse = DEFAULT_DEPOSIT_GAS / 3n
           }
 
           return { transactions }
