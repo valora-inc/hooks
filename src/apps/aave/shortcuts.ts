@@ -234,7 +234,13 @@ const hook: ShortcutsHook = {
           // set via shortcutTriggerArgs, the deposit token's address
           tokenAddress: ZodAddressLowerCased,
         },
-        async onTrigger({ swapFromToken, tokenAddress, address, networkId }) {
+        async onTrigger({
+          swapFromToken,
+          tokenAddress,
+          address,
+          networkId,
+          enableSwapFee,
+        }) {
           const walletAddress = address as Address
           // use a placeholder non zero amount so tx simulation can succeed.
           // squid postHook will replace this with the actual amount after swap.
@@ -256,6 +262,7 @@ const hook: ShortcutsHook = {
             swapToTokenAddress: tokenAddress,
             walletAddress,
             simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
+            enableSwapFee,
             // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
             postHook: {
               chainType: ChainType.EVM,
