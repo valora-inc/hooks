@@ -19,7 +19,7 @@ import { vaultAbi } from './abis/vault'
 // Hardcoded fallback if simulation isn't enabled
 const DEFAULT_DEPOSIT_GAS = 750_000n
 // Padding we add to simulation gas to ensure we specify enough
-const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
+const SIMULATED_DEPOSIT_GAS_PADDING = 100_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId) {
