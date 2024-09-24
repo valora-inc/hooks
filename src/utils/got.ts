@@ -27,7 +27,7 @@ const options: ExtendOptions = {
     ],
     afterResponse: [
       (response) => {
-        logger.debug(
+        logger.info(
           {
             response: {
               statusCode: response.statusCode,
