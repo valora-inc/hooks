@@ -114,6 +114,56 @@ const hook: ShortcutsHook = {
           return { transactions }
         },
       }),
+      createShortcut({
+        id: 'withdraw',
+        name: 'Withdraw',
+        description: 'Withdraw your assets',
+        networkIds: [networkId],
+        category: 'withdraw',
+        triggerInputShape: {
+          tokens: tokenAmounts.length(1),
+          positionAddress: ZodAddressLowerCased,
+          tokenDecimals: z.coerce.number(),
+        },
+        async onTrigger({
+          networkId,
+          address,
+          tokens,
+          positionAddress,
+          tokenDecimals,
+        }) {
+          const walletAddress = address as Address
+          const transactions: Transaction[] = []
+
+          const amountToWithdraw = parseUnits(tokens[0].amount, tokenDecimals)
+
+          const withdrawTx: Transaction = tokens[0].useMax
+            ? {
+                networkId,
+                from: walletAddress,
+                to: positionAddress,
+                data: encodeFunctionData({
+                  abi: vaultAbi,
+                  functionName: 'withdrawAll',
+                  args: [],
+                }),
+              }
+            : {
+                networkId,
+                from: walletAddress,
+                to: positionAddress,
+                data: encodeFunctionData({
+                  abi: vaultAbi,
+                  functionName: 'withdraw',
+                  args: [amountToWithdraw],
+                }),
+              }
+
+          transactions.push(withdrawTx)
+
+          return { transactions }
+        },
+      }),
     ]
   },
 }
