@@ -1,6 +1,8 @@
 import got, { ExtendOptions, TimeoutError } from 'got'
 import { logger } from '../log'
 
+const gotLogger = logger.child({ module: 'got', level: 'debug' })
+
 // https://github.com/sindresorhus/got/blob/HEAD/documentation/quick-start.md#options
 const options: ExtendOptions = {
   timeout: {
@@ -10,7 +12,7 @@ const options: ExtendOptions = {
     beforeError: [
       (err) => {
         if (err instanceof TimeoutError) {
-          logger.warn(
+          gotLogger.warn(
             {
               err,
               request: {
@@ -31,7 +33,7 @@ const options: ExtendOptions = {
           response.timings.phases.total &&
           response.timings.phases.total > 5000
         ) {
-          logger.info(
+          gotLogger.debug(
             {
               response: {
                 statusCode: response.statusCode,
