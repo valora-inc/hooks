@@ -27,18 +27,23 @@ const options: ExtendOptions = {
     ],
     afterResponse: [
       (response) => {
-        logger.info(
-          {
-            response: {
-              statusCode: response.statusCode,
-              statusMessage: response.statusMessage,
-              url: response.request.requestUrl,
-              timings: response.timings,
-              method: response.request.options.method,
+        if (
+          response.timings.phases.total &&
+          response.timings.phases.total > 5000
+        ) {
+          logger.info(
+            {
+              response: {
+                statusCode: response.statusCode,
+                statusMessage: response.statusMessage,
+                url: response.requestUrl,
+                timings: response.timings,
+                method: response.request.options.method,
+              },
             },
-          },
-          `Request completed with status ${response.statusCode}`,
-        )
+            `Request to ${response.request.options.method} ${response.requestUrl} took longer than 5s`,
+          )
+        }
         return response
       },
     ],
