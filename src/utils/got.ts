@@ -31,7 +31,7 @@ const options: ExtendOptions = {
       (response) => {
         if (
           response.timings.phases.total &&
-          response.timings.phases.total > 5000
+          response.timings.phases.total > 5 * 1000
         ) {
           gotLogger.debug(
             {
