@@ -122,6 +122,7 @@ const hook: ShortcutsHook = {
         category: 'withdraw',
         triggerInputShape: {
           tokens: tokenAmounts.length(1),
+          // these two will be passed in the shortcutTriggerArgs.
           positionAddress: ZodAddressLowerCased,
           tokenDecimals: z.coerce.number(),
         },
