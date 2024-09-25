@@ -36,8 +36,8 @@ const hook: ShortcutsHook = {
         category: 'deposit',
         triggerInputShape: {
           tokens: tokenAmounts.length(1),
+          // these three will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
           positionAddress: ZodAddressLowerCased,
-          // these two will be passed in the shortcutTriggerArgs. It's a temporary workaround before we can directly extract these info from the tokenId
           tokenAddress: ZodAddressLowerCased,
           tokenDecimals: z.coerce.number(),
         },
@@ -126,6 +126,7 @@ const hook: ShortcutsHook = {
         category: 'withdraw',
         triggerInputShape: {
           tokens: tokenAmounts.length(1),
+          // these two will be passed in the shortcutTriggerArgs.
           positionAddress: ZodAddressLowerCased,
           tokenDecimals: z.coerce.number(),
         },
