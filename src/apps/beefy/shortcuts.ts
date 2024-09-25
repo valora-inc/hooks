@@ -248,20 +248,20 @@ const hook: ShortcutsHook = {
                   estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
                 },
                 {
-                    chainType: ChainType.EVM,
-                    callType: SquidCallType.FULL_TOKEN_BALANCE,
-                    target: positionAddress,
-                    callData: transferData,
-                    payload: {
-                      tokenAddress: positionAddress,
-                      inputPos: 1,
-                    },
-                    // no native token transfer. this is optional per types, but squid request fails without it
-                    value: '0',
-                    estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                  chainType: ChainType.EVM,
+                  callType: SquidCallType.FULL_TOKEN_BALANCE,
+                  target: positionAddress,
+                  callData: transferData,
+                  payload: {
+                    tokenAddress: positionAddress,
+                    inputPos: 1,
                   },
+                  // no native token transfer. this is optional per types, but squid request fails without it
+                  value: '0',
+                  estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                },
               ],
-              description: 'Deposit into aave pool',
+              description: 'Deposit into beefy pool',
             },
           })
         },
