@@ -13,8 +13,12 @@ import {
   createShortcut,
   tokenAmounts,
   Transaction,
+  tokenAmountWithMetadata,
+  ZodEnableSwapFee,
 } from '../../types/shortcuts'
 import { vaultAbi } from './abis/vault'
+import { ChainType, SquidCallType } from '@0xsquid/squid-types'
+import { prepareSwapTransactions } from '../../utils/prepareSwapTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
 const DEFAULT_DEPOSIT_GAS = 750_000n
@@ -162,6 +166,103 @@ const hook: ShortcutsHook = {
           transactions.push(withdrawTx)
 
           return { transactions }
+        },
+      }),
+      createShortcut({
+        id: 'swap-deposit',
+        name: 'Swap & Deposit',
+        description: 'Swap assets and lend them to earn interest',
+        networkIds: [networkId],
+        category: 'swap-deposit',
+        triggerInputShape: {
+          swapFromToken: tokenAmountWithMetadata,
+          enableSwapFee: ZodEnableSwapFee,
+          // set via shortcutTriggerArgs, the deposit token's address
+          tokenAddress: ZodAddressLowerCased,
+          positionAddress: ZodAddressLowerCased,
+        },
+        async onTrigger({
+          positionAddress,
+          swapFromToken,
+          tokenAddress,
+          address,
+          networkId,
+          enableSwapFee,
+        }) {
+          const walletAddress = address as Address
+          // use a placeholder non zero amount so tx simulation can succeed.
+          // squid postHook will replace this with the actual amount after swap.
+          const amount = 1n
+          const approveData = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [positionAddress, amount],
+          })
+          const supplyData = encodeFunctionData({
+            abi: vaultAbi,
+            functionName: 'deposit',
+            args: [amount],
+          })
+          const transferData = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'transfer',
+            args: [walletAddress, amount],
+          })
+
+          return await prepareSwapTransactions({
+            networkId,
+            swapFromToken,
+            swapToTokenAddress: tokenAddress,
+            walletAddress,
+            simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
+            enableSwapFee,
+            // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
+            postHook: {
+              chainType: ChainType.EVM,
+              calls: [
+                {
+                  chainType: ChainType.EVM,
+                  callType: SquidCallType.FULL_TOKEN_BALANCE,
+                  target: tokenAddress,
+                  callData: approveData,
+                  payload: {
+                    tokenAddress,
+                    inputPos: 1,
+                  },
+                  // no native token transfer. this is optional per types, but squid request fails without it
+                  value: '0',
+                  estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                },
+                {
+                  chainType: ChainType.EVM,
+                  callType: SquidCallType.FULL_TOKEN_BALANCE,
+                  target: positionAddress,
+                  callData: supplyData,
+                  payload: {
+                    tokenAddress,
+                    inputPos: 0,
+                  },
+                  // no native token transfer. this is optional per types, but squid request fails without it
+                  value: '0',
+                  estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                },
+                {
+                    chainType: ChainType.EVM,
+                    callType: SquidCallType.FULL_TOKEN_BALANCE,
+                    target: positionAddress,
+                    callData: transferData,
+                    payload: {
+                      tokenAddress: positionAddress,
+                      inputPos: 1,
+                    },
+                    // no native token transfer. this is optional per types, but squid request fails without it
+                    value: '0',
+                    estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                  },
+              ],
+              description: 'Deposit into aave pool',
+            },
+          })
         },
       }),
     ]
