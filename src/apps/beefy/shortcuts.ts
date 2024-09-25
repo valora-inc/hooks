@@ -14,7 +14,7 @@ import {
   tokenAmounts,
   Transaction,
   tokenAmountWithMetadata,
-  ZodEnableSwapFee,
+  ZodEnableAppFee,
 } from '../../types/shortcuts'
 import { vaultAbi } from './abis/vault'
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
@@ -177,7 +177,7 @@ const hook: ShortcutsHook = {
         category: 'swap-deposit',
         triggerInputShape: {
           swapFromToken: tokenAmountWithMetadata,
-          enableSwapFee: ZodEnableSwapFee,
+          enableAppFee: ZodEnableAppFee,
           // set via shortcutTriggerArgs, the deposit token's address
           tokenAddress: ZodAddressLowerCased,
           positionAddress: ZodAddressLowerCased,
@@ -188,7 +188,7 @@ const hook: ShortcutsHook = {
           tokenAddress,
           address,
           networkId,
-          enableSwapFee,
+          enableAppFee,
         }) {
           const walletAddress = address as Address
           // use a placeholder non zero amount so tx simulation can succeed.
@@ -216,7 +216,7 @@ const hook: ShortcutsHook = {
             swapToTokenAddress: tokenAddress,
             walletAddress,
             simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
-            enableSwapFee,
+            enableAppFee,
             // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
             postHook: {
               chainType: ChainType.EVM,
