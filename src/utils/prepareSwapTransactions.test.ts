@@ -14,7 +14,6 @@ jest.mock('./got', () => ({
     json: mockGotPostJson,
   })),
 }))
-jest.mock('../runtime/simulateTransactions')
 jest.mock('../runtime/client', () => ({
   getClient: jest.fn(() => ({
     readContract: mockReadContract,
@@ -74,15 +73,6 @@ const swapTransaction = {
 describe('prepareSwapTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.mocked(simulateTransactions).mockResolvedValue(
-      [995, 2134].map((gas) => ({
-        status: 'success',
-        blockNumber: '1',
-        gasNeeded: gas,
-        gasUsed: gas,
-        gasPrice: '1',
-      })),
-    )
     mockGotPostJson.mockResolvedValue({
       unvalidatedSwapTransaction: swapTransaction,
     })
@@ -127,11 +117,11 @@ describe('prepareSwapTransactions', () => {
             calls: [
               {
                 ...mockPostHook.calls[0],
-                estimatedGas: '996',
+                estimatedGas: '1000',
               },
               {
                 ...mockPostHook.calls[1],
-                estimatedGas: '2234',
+                estimatedGas: '2000',
               },
             ],
           },
@@ -185,11 +175,11 @@ describe('prepareSwapTransactions', () => {
             calls: [
               {
                 ...mockPostHook.calls[0],
-                estimatedGas: '995',
+                estimatedGas: '1000',
               },
               {
                 ...mockPostHook.calls[1],
-                estimatedGas: '2134',
+                estimatedGas: '2000',
               },
             ],
           },
