@@ -1,7 +1,6 @@
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { prepareSwapTransactions } from './prepareSwapTransactions'
-import { simulateTransactions } from '../runtime/simulateTransactions'
 import got from './got'
 import { Address } from 'viem'
 
@@ -79,7 +78,7 @@ describe('prepareSwapTransactions', () => {
     mockReadContract.mockResolvedValue(0)
   })
 
-  it('simulates post hook transactions and prepares swap transaction from native token', async () => {
+  it('prepares swap transaction from native token', async () => {
     const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
@@ -131,7 +130,7 @@ describe('prepareSwapTransactions', () => {
     )
   })
 
-  it('simulates post hook transactions and prepares swap transaction from erc20 token', async () => {
+  it('prepares swap transaction from erc20 token', async () => {
     const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
@@ -212,10 +211,7 @@ describe('prepareSwapTransactions', () => {
     })
   })
 
-  it('uses default gas for postHook if simulation fails', async () => {
-    jest
-      .mocked(simulateTransactions)
-      .mockRejectedValue(new Error('Failed to simulate'))
+  it('uses default gas for postHook', async () => {
     const { transactions } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
