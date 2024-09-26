@@ -52,7 +52,7 @@ const beefyAppTokenDefinition = (
     address: vault.earnedTokenAddress.toLowerCase(),
     tokens: [
       {
-        address: vault.tokenAddress.toLowerCase(),
+        address: vault.tokenAddress?.toLowerCase(),
         networkId,
         fallbackPriceUsd: priceUsd
           ? toSerializedDecimalNumber(priceUsd)
