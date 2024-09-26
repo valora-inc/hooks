@@ -191,21 +191,26 @@ const beefyBaseVaultsPositions = async (
           args: [address, clmVaults.map((vault) => vault.earnContractAddress)],
         })
   return userVaults
-    .map((vault) =>
-      vault.type === 'cowcentrated'
-        ? beefyConcentratedContractDefinition(
-            networkId,
-            vault,
-            info.find(
-              (i) =>
-                i.token0 === vault.depositTokenAddresses[0] &&
-                i.token1 === vault.depositTokenAddresses[1],
-            ),
-            'CLM Vault',
-            prices,
-          )
-        : beefyAppTokenDefinition(networkId, vault, prices),
-    )
+    .map((vault) => {
+      try {
+        return vault.type === 'cowcentrated'
+          ? beefyConcentratedContractDefinition(
+              networkId,
+              vault,
+              info.find(
+                (i) =>
+                  i.token0 === vault.depositTokenAddresses[0] &&
+                  i.token1 === vault.depositTokenAddresses[1],
+              ),
+              'CLM Vault',
+              prices,
+            )
+          : beefyAppTokenDefinition(networkId, vault, prices)
+      } catch (error) {
+        logger.error('Error processing vault', vault, error)
+        return null
+      }
+    })
     .filter((position): position is ContractPositionDefinition => !!position)
 }
 
