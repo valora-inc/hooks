@@ -29,7 +29,7 @@ export interface PositionsHook {
 }
 
 export interface TokenDefinition {
-  address: string
+  address?: string
   networkId: NetworkId
   // Escape hatch for priceUsd in case the token is not in our list of base tokens
   // and it's difficult to decompose the token into base token
@@ -152,7 +152,7 @@ export interface AbstractPosition {
   // Should be unique across all positions
   // And treated as an opaque identifier by consumers
   positionId: string // Example: celo-mainnet:0x...
-  address?: string // Example: 0x...
+  address: string // Example: 0x...
   networkId: NetworkId // Example: celo-mainnet
   appId: string // Example: ubeswap
   appName: string // Example: Ubeswap
