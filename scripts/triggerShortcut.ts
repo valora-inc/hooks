@@ -3,12 +3,27 @@
 import yargs from 'yargs'
 import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
-import { celo } from 'viem/chains'
+import { arbitrum, arbitrumSepolia, base, baseSepolia, celo, celoAlfajores, mainnet, optimism, optimismSepolia, polygon, polygonAmoy, sepolia } from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
 import { NetworkId } from '../src/types/networkId'
 import { z } from 'zod'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
+
+const NETWORK_ID_TO_CHAIN = {
+  [NetworkId['celo-mainnet']]: celo,
+  [NetworkId['celo-alfajores']]: celoAlfajores,
+  [NetworkId['ethereum-mainnet']]: mainnet,
+  [NetworkId['ethereum-sepolia']]: sepolia,
+  [NetworkId['arbitrum-one']]: arbitrum,
+  [NetworkId['arbitrum-sepolia']]: arbitrumSepolia,
+  [NetworkId['base-mainnet']]: base,
+  [NetworkId['base-sepolia']]: baseSepolia,
+  [NetworkId['op-mainnet']]: optimism,
+  [NetworkId['op-sepolia']]: optimismSepolia,
+  [NetworkId['polygon-pos-mainnet']]: polygon,
+  [NetworkId['polygon-pos-amoy']]: polygonAmoy,
+}
 
 const argv = yargs(process.argv.slice(2))
   .parserConfiguration({
@@ -71,6 +86,10 @@ void (async () => {
   // or at least a list of the expected fields
   // This just throws a Zod error if the input is not valid
   const triggerInput = z.object(shortcut.triggerInputShape).parse(argv)
+  // For deposit/withdraw shortcut, tokens field won't parse correctly. Instead, pass it in as
+  // a string and change the above to: {...shortcut.triggerInputShape, tokens: z.string()}
+  // Then below under ...triggerInput, add tokens: JSON.parse(triggerInput.tokens)
+  // Same happens for swap-deposit shortcut, but with swapFromToken field
 
   const triggerArgs = {
     networkId: argv.networkId,
@@ -103,11 +122,11 @@ void (async () => {
 
   const wallet = createWalletClient({
     account,
-    chain: celo,
+    chain: NETWORK_ID_TO_CHAIN[argv.networkId],
     transport: http(),
   })
   const client = createPublicClient({
-    chain: celo,
+    chain: NETWORK_ID_TO_CHAIN[argv.networkId],
     transport: http(),
   })
 
