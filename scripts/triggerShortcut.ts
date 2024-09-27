@@ -3,7 +3,20 @@
 import yargs from 'yargs'
 import { Address, createWalletClient, http, createPublicClient } from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
-import { arbitrum, arbitrumSepolia, base, baseSepolia, celo, celoAlfajores, mainnet, optimism, optimismSepolia, polygon, polygonAmoy, sepolia } from 'viem/chains'
+import {
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  baseSepolia,
+  celo,
+  celoAlfajores,
+  mainnet,
+  optimism,
+  optimismSepolia,
+  polygon,
+  polygonAmoy,
+  sepolia,
+} from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
 import { NetworkId } from '../src/types/networkId'
 import { z } from 'zod'
