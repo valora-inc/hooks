@@ -29,7 +29,7 @@ export interface PositionsHook {
 }
 
 export interface TokenDefinition {
-  address?: string
+  address: string
   networkId: NetworkId
   // Escape hatch for priceUsd in case the token is not in our list of base tokens
   // and it's difficult to decompose the token into base token
