@@ -18,6 +18,7 @@ import {
 } from './abis/beefy-clm-vaults-multicall'
 import { beefyV2AppMulticallAbi } from './abis/beefy-v2-app-multicall'
 import { BaseBeefyVault, GovVault, getBeefyPrices, getBeefyVaults } from './api'
+import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 
@@ -46,13 +47,16 @@ const beefyAppTokenDefinition = (
   prices: BeefyPrices,
 ): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
+  const vaultTokenAddress =
+    vault.tokenAddress?.toLowerCase() ??
+    networkIdToNativeAssetAddress[networkId]
   return {
     type: 'app-token-definition',
     networkId,
     address: vault.earnedTokenAddress.toLowerCase(),
     tokens: [
       {
-        address: vault.tokenAddress?.toLowerCase(),
+        address: vaultTokenAddress,
         networkId,
         fallbackPriceUsd: priceUsd
           ? toSerializedDecimalNumber(priceUsd)
@@ -69,7 +73,7 @@ const beefyAppTokenDefinition = (
     },
     pricePerShare: async ({ tokensByTokenId }) => {
       const tokenId = getTokenId({
-        address: vault.tokenAddress,
+        address: vaultTokenAddress,
         networkId,
       })
       const { decimals } = tokensByTokenId[tokenId]
@@ -276,6 +280,7 @@ const beefyGovVaultsPositions = async (
     functionName: 'getUserClmPools',
     args: [
       address,
+      // @ts-expect-error tokenAddress from beefy response is not always defined
       clmVaults.map(({ userVault }) => userVault.tokenAddress),
       clmVaults.map(({ userVault }) => userVault.earnContractAddress),
     ],
