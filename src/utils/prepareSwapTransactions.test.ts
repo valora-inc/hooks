@@ -1,7 +1,6 @@
 import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { prepareSwapTransactions } from './prepareSwapTransactions'
-import { simulateTransactions } from '../runtime/simulateTransactions'
 import got from './got'
 import { Address } from 'viem'
 
@@ -14,7 +13,6 @@ jest.mock('./got', () => ({
     json: mockGotPostJson,
   })),
 }))
-jest.mock('../runtime/simulateTransactions')
 jest.mock('../runtime/client', () => ({
   getClient: jest.fn(() => ({
     readContract: mockReadContract,
@@ -74,22 +72,13 @@ const swapTransaction = {
 describe('prepareSwapTransactions', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.mocked(simulateTransactions).mockResolvedValue(
-      [995, 2134].map((gas) => ({
-        status: 'success',
-        blockNumber: '1',
-        gasNeeded: gas,
-        gasUsed: gas,
-        gasPrice: '1',
-      })),
-    )
     mockGotPostJson.mockResolvedValue({
       unvalidatedSwapTransaction: swapTransaction,
     })
     mockReadContract.mockResolvedValue(0)
   })
 
-  it('simulates post hook transactions and prepares swap transaction from native token', async () => {
+  it('prepares swap transaction from native token', async () => {
     const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
@@ -127,11 +116,11 @@ describe('prepareSwapTransactions', () => {
             calls: [
               {
                 ...mockPostHook.calls[0],
-                estimatedGas: '996',
+                estimatedGas: '1000',
               },
               {
                 ...mockPostHook.calls[1],
-                estimatedGas: '2234',
+                estimatedGas: '2000',
               },
             ],
           },
@@ -141,7 +130,7 @@ describe('prepareSwapTransactions', () => {
     )
   })
 
-  it('simulates post hook transactions and prepares swap transaction from erc20 token', async () => {
+  it('prepares swap transaction from erc20 token', async () => {
     const { transactions, dataProps } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
@@ -185,11 +174,11 @@ describe('prepareSwapTransactions', () => {
             calls: [
               {
                 ...mockPostHook.calls[0],
-                estimatedGas: '995',
+                estimatedGas: '1000',
               },
               {
                 ...mockPostHook.calls[1],
-                estimatedGas: '2134',
+                estimatedGas: '2000',
               },
             ],
           },
@@ -222,10 +211,7 @@ describe('prepareSwapTransactions', () => {
     })
   })
 
-  it('uses default gas for postHook if simulation fails', async () => {
-    jest
-      .mocked(simulateTransactions)
-      .mockRejectedValue(new Error('Failed to simulate'))
+  it('uses default gas for postHook', async () => {
     const { transactions } = await prepareSwapTransactions({
       networkId: NetworkId['arbitrum-one'],
       walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
