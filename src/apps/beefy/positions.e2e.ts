@@ -28,4 +28,18 @@ describe('getPositionDefinitions', () => {
     })
     expect(positions.length).toBe(0)
   })
+
+  it('should get app token definitions when address is not set', async () => {
+    const positions = await hook.getPositionDefinitions({
+      networkId: NetworkId['op-mainnet'],
+      t,
+    })
+
+    expect(
+      positions.filter((p) => p.type === 'app-token-definition').length,
+    ).toBeGreaterThan(0)
+    expect(
+      positions.filter((p) => p.type === 'contract-position-definition').length,
+    ).toBe(0)
+  })
 })
