@@ -26,6 +26,7 @@ import {
   getTvls,
 } from './api'
 import { TFunction } from 'i18next'
+import { vaultAbi } from './abis/vault'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 type BeefyApys = Awaited<ReturnType<typeof getApys>>
@@ -59,6 +60,7 @@ const beefyAppTokenDefinition = ({
   apys,
   tvls,
   t,
+  earnTokenDecimals,
 }: {
   networkId: NetworkId
   vault: BaseBeefyVault
@@ -66,6 +68,7 @@ const beefyAppTokenDefinition = ({
   apys: BeefyApys
   tvls: BeefyTvls
   t: TFunction
+  earnTokenDecimals: number
 }): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
   const tvl = tvls[vault.id]
@@ -128,6 +131,22 @@ const beefyAppTokenDefinition = ({
       tvl: tvl ? toSerializedDecimalNumber(tvl) : undefined,
       manageUrl: `${BEEFY_VAULT_BASE_URL}${vault.id}`,
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
+    },
+    availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
+    shortcutTriggerArgs: {
+      deposit: {
+        tokenAddress: vault.tokenAddress.toLowerCase(),
+        tokenDecimals: vault.tokenDecimals,
+        positionAddress: vault.earnedTokenAddress.toLowerCase(),
+      },
+      withdraw: {
+        tokenDecimals: earnTokenDecimals,
+        positionAddress: vault.earnedTokenAddress.toLowerCase(),
+      },
+      'swap-deposit': {
+        tokenAddress: vault.tokenAddress.toLowerCase(),
+        positionAddress: vault.earnedTokenAddress.toLowerCase(),
+      },
     },
   }
 }
@@ -246,6 +265,17 @@ const beefyBaseVaultsPositions = async ({
     return []
   }
 
+  const earnTokenDecimals = await Promise.all(
+    userVaults.map((vault) =>
+      client.readContract({
+        address: vault.earnedTokenAddress,
+        abi: vaultAbi,
+        functionName: 'decimals',
+        args: [],
+      }),
+    ),
+  )
+
   const clmVaults = userVaults.filter((vault) => vault.type === 'cowcentrated')
   const info =
     clmVaults.length === 0
@@ -257,7 +287,7 @@ const beefyBaseVaultsPositions = async ({
           args: [address, clmVaults.map((vault) => vault.earnContractAddress)],
         })
   return userVaults
-    .map((vault) => {
+    .map((vault, i) => {
       try {
         return vault.type === 'cowcentrated'
           ? beefyConcentratedContractDefinition(
@@ -271,7 +301,15 @@ const beefyBaseVaultsPositions = async ({
               'CLM Vault',
               prices,
             )
-          : beefyAppTokenDefinition({ networkId, vault, prices, apys, tvls, t })
+          : beefyAppTokenDefinition({
+              networkId,
+              vault,
+              prices,
+              apys,
+              tvls,
+              t,
+              earnTokenDecimals: earnTokenDecimals[i],
+            })
       } catch (error) {
         logger.error('Error processing vault', vault, error)
         return null
