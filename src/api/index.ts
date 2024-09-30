@@ -22,8 +22,8 @@ import {
 import { Transaction } from '../types/shortcuts'
 import { parseRequest } from './parseRequest'
 
-const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
-const LEGACY_EARN_SUPPORTED_POSITION_IDS = new Set([
+const DEFAULT_EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
+const DEFAULT_EARN_SUPPORTED_POSITION_IDS = new Set([
   // Aave USDC
   `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
   `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
@@ -170,6 +170,11 @@ function createApp() {
         .nonempty()
         .or(z.string()) // singleton arrays sometimes serialize as single values
         .optional(),
+      supportedAppIds: z
+        .array(z.string())
+        .nonempty()
+        .or(z.string()) // singleton arrays sometimes serialize as single values
+        .optional(),
     }),
   })
 
@@ -190,7 +195,12 @@ function createApp() {
               ? parsedRequest.query.supportedPools
               : [parsedRequest.query.supportedPools],
           )
-        : LEGACY_EARN_SUPPORTED_POSITION_IDS
+        : DEFAULT_EARN_SUPPORTED_POSITION_IDS
+      const supportedAppIds = parsedRequest.query.supportedAppIds
+        ? Array.isArray(parsedRequest.query.supportedAppIds)
+          ? parsedRequest.query.supportedAppIds
+          : [parsedRequest.query.supportedAppIds]
+        : DEFAULT_EARN_SUPPORTED_APP_IDS
 
       const positions = (
         await Promise.all(
@@ -199,7 +209,7 @@ function createApp() {
               networkId,
               // Earn positions are not user-specific
               address: undefined,
-              appIds: EARN_SUPPORTED_APP_IDS,
+              appIds: supportedAppIds,
               t: req.t,
             }),
           ),

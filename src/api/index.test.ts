@@ -321,7 +321,7 @@ describe('GET /getPositions', () => {
 })
 
 describe('GET /getEarnPositions', () => {
-  it('returns default earn positions for arbitrum when supportedPools not passed in', async () => {
+  it('returns default earn positions for arbitrum when supportedPools and supportedAppIds not passed in', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
@@ -335,7 +335,7 @@ describe('GET /getEarnPositions', () => {
       data: TEST_POSITIONS_ARBITRUM,
     })
   })
-  it('returns expected earn positions for arbitrum when supportedPools is passed in', async () => {
+  it('returns expected earn positions for arbitrum when supportedPools and supportedAppIds are passed in', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
@@ -344,6 +344,7 @@ describe('GET /getEarnPositions', () => {
         supportedPools: [
           'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
         ],
+        supportedAppIds: ['allbridge', 'aave'],
         address: WALLET_ADDRESS,
       })
       .expect(200)
@@ -352,7 +353,7 @@ describe('GET /getEarnPositions', () => {
       data: TEST_POSITIONS_ARBITRUM,
     })
   })
-  it('returns default earn positions for celo when supportedPools not passed in', async () => {
+  it('returns default earn positions for celo when supportedPools and supportedAppIds not passed in', async () => {
     jest.mocked(getPositions).mockResolvedValue(TEST_POSITIONS_CELO_EARN)
     const server = getTestServer('hooks-api')
     const response = await request(server)
@@ -367,7 +368,7 @@ describe('GET /getEarnPositions', () => {
       data: TEST_POSITIONS_CELO_EARN,
     })
   })
-  it('returns expected earn positions for celo when supportedPools is passed in', async () => {
+  it('returns expected earn positions for celo when supportedPools and supportedAppIds are passed in', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
@@ -376,6 +377,7 @@ describe('GET /getEarnPositions', () => {
         supportedPools: [
           `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
         ],
+        supportedAppIds: ['allbridge', 'aave'],
         address: WALLET_ADDRESS,
       })
       .expect(200)
@@ -384,7 +386,7 @@ describe('GET /getEarnPositions', () => {
       data: TEST_POSITIONS_CELO_EARN,
     })
   })
-  it('ignores bad values in supportedPools', async () => {
+  it('does not return pool if ID not in supportedPools', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
