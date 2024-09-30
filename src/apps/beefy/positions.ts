@@ -342,7 +342,9 @@ const beefyGovVaultsPositions = async (
   }
 
   // Avoid a possible runtime error if the userVault.tokenAddress is undefined
-  const filteredClmVaults = clmVaults.filter(({ userVault }) => !!userVault.tokenAddress)
+  const filteredClmVaults = clmVaults.filter(
+    ({ userVault }) => !!userVault.tokenAddress,
+  )
 
   const info = await client.readContract({
     code: beefyClmVaultsMulticallBytecode,
