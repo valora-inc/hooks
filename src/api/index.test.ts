@@ -386,14 +386,14 @@ it('returns expected earn positions for celo when supportedPools is passed in', 
     data: TEST_POSITIONS_CELO_EARN,
   })
 })
-it('returns no earn positions for celo when supportedPools is empty', async () => {
+it('ignores bad values in supportedPools', async () => {
   jest.mocked(getPositions).mockResolvedValue(TEST_POSITIONS_CELO_EARN)
   const server = getTestServer('hooks-api')
   const response = await request(server)
     .get('/getEarnPositions')
     .query({
       networkIds: [NetworkId['celo-mainnet']],
-      supportedPools: [],
+      supportedPools: ['0xbadAddress'],
       address: WALLET_ADDRESS,
     })
     .expect(200)

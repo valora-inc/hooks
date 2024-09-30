@@ -169,7 +169,6 @@ function createApp() {
         .array(
           z
             .string()
-            .regex(/^0x[a-fA-F0-9]{40}$/)
             .transform((val) => val.toLowerCase()),
         )
         .optional(),
