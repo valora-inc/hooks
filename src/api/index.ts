@@ -166,11 +166,9 @@ function createApp() {
         .nonempty()
         .or(z.nativeEnum(NetworkId)), // singleton arrays sometimes serialize as single values
       supportedPools: z
-        .array(
-          z
-            .string()
-            .transform((val) => val.toLowerCase()),
-        )
+        .array(z.string())
+        .nonempty()
+        .or(z.string()) // singleton arrays sometimes serialize as single values
         .optional(),
     }),
   })
@@ -186,9 +184,13 @@ function createApp() {
       const networkIds = getNetworkIds(parsedRequest.query).filter(
         (networkId) => config.EARN_SUPPORTED_NETWORK_IDS.includes(networkId),
       )
-      const supportedPools =
-        new Set(parsedRequest.query.supportedPools) ??
-        LEGACY_EARN_SUPPORTED_POSITION_IDS
+      const supportedPools = parsedRequest.query.supportedPools
+        ? new Set(
+            Array.isArray(parsedRequest.query.supportedPools)
+              ? parsedRequest.query.supportedPools
+              : [parsedRequest.query.supportedPools],
+          )
+        : LEGACY_EARN_SUPPORTED_POSITION_IDS
 
       const positions = (
         await Promise.all(
