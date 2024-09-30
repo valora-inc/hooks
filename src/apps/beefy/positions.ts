@@ -26,6 +26,7 @@ import {
   getTvls,
 } from './api'
 import { TFunction } from 'i18next'
+import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 type BeefyApys = Awaited<ReturnType<typeof getApys>>
@@ -68,6 +69,9 @@ const beefyAppTokenDefinition = ({
   t: TFunction
 }): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
+  const vaultTokenAddress =
+    vault.tokenAddress?.toLowerCase() ??
+    networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
   const apy = apys[vault.id]
   return {
@@ -76,7 +80,7 @@ const beefyAppTokenDefinition = ({
     address: vault.earnedTokenAddress.toLowerCase(),
     tokens: [
       {
-        address: vault.tokenAddress.toLowerCase(),
+        address: vaultTokenAddress,
         networkId,
         fallbackPriceUsd: priceUsd
           ? toSerializedDecimalNumber(priceUsd)
@@ -93,7 +97,7 @@ const beefyAppTokenDefinition = ({
     },
     pricePerShare: async ({ tokensByTokenId }) => {
       const tokenId = getTokenId({
-        address: vault.tokenAddress,
+        address: vaultTokenAddress,
         networkId,
       })
       const { decimals } = tokensByTokenId[tokenId]
@@ -342,14 +346,21 @@ const beefyGovVaultsPositions = async (
   if (clmVaults.length === 0) {
     return []
   }
+
+  // Avoid a possible runtime error if the userVault.tokenAddress is undefined
+  const filteredClmVaults = clmVaults.filter(
+    ({ userVault }) => !!userVault.tokenAddress,
+  )
+
   const info = await client.readContract({
     code: beefyClmVaultsMulticallBytecode,
     abi: beefyClmVaultsMulticallAbi,
     functionName: 'getUserClmPools',
     args: [
       address,
-      clmVaults.map(({ userVault }) => userVault.tokenAddress),
-      clmVaults.map(({ userVault }) => userVault.earnContractAddress),
+      // @ts-expect-error filteredVaults should have tokenAddress defined
+      filteredClmVaults.map(({ userVault }) => userVault.tokenAddress),
+      filteredClmVaults.map(({ userVault }) => userVault.earnContractAddress),
     ],
   })
 
