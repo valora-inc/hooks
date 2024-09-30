@@ -27,6 +27,7 @@ import {
 } from './api'
 import { TFunction } from 'i18next'
 import { vaultAbi } from './abis/vault'
+import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 type BeefyApys = Awaited<ReturnType<typeof getApys>>
@@ -71,6 +72,9 @@ const beefyAppTokenDefinition = ({
   earnTokenDecimals: number
 }): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
+  const vaultTokenAddress =
+    vault.tokenAddress?.toLowerCase() ??
+    networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
   const apy = apys[vault.id]
   return {
@@ -79,7 +83,7 @@ const beefyAppTokenDefinition = ({
     address: vault.earnedTokenAddress.toLowerCase(),
     tokens: [
       {
-        address: vault.tokenAddress.toLowerCase(),
+        address: vaultTokenAddress,
         networkId,
         fallbackPriceUsd: priceUsd
           ? toSerializedDecimalNumber(priceUsd)
@@ -96,7 +100,7 @@ const beefyAppTokenDefinition = ({
     },
     pricePerShare: async ({ tokensByTokenId }) => {
       const tokenId = getTokenId({
-        address: vault.tokenAddress,
+        address: vaultTokenAddress,
         networkId,
       })
       const { decimals } = tokensByTokenId[tokenId]
@@ -227,7 +231,7 @@ const beefyBaseVaultsPositions = async ({
   t,
 }: {
   networkId: NetworkId
-  address: Address
+  address?: Address
   vaults: BaseBeefyVault[]
   multicallAddress: Address
   prices: BeefyPrices
@@ -239,27 +243,33 @@ const beefyBaseVaultsPositions = async ({
 
   const userVaults: (BaseBeefyVault & { balance: bigint })[] = []
 
-  await Promise.all(
-    createBatches(vaults).map(async (batch) => {
-      if (batch.length === 0) {
-        return
-      }
-      const balances = await client.readContract({
-        abi: beefyV2AppMulticallAbi,
-        address: multicallAddress,
-        functionName: 'getTokenBalances',
-        args: [batch.map((vault) => vault.earnContractAddress), address],
-      })
-      for (let i = 0; i < balances.length; i++) {
-        if (balances[i] > 0) {
-          userVaults.push({
-            ...batch[i],
-            balance: balances[i],
-          })
+  if (address) {
+    await Promise.all(
+      createBatches(vaults).map(async (batch) => {
+        if (batch.length === 0) {
+          return
         }
-      }
-    }),
-  )
+        const balances = await client.readContract({
+          abi: beefyV2AppMulticallAbi,
+          address: multicallAddress,
+          functionName: 'getTokenBalances',
+          args: [batch.map((vault) => vault.earnContractAddress), address],
+        })
+        for (let i = 0; i < balances.length; i++) {
+          if (balances[i] > 0) {
+            userVaults.push({
+              ...batch[i],
+              balance: balances[i],
+            })
+          }
+        }
+      }),
+    )
+  } else {
+    userVaults.push(
+      ...vaults.map((vault) => ({ ...vault, balance: BigInt(0) })),
+    )
+  }
 
   if (!userVaults.length) {
     return []
@@ -278,7 +288,7 @@ const beefyBaseVaultsPositions = async ({
 
   const clmVaults = userVaults.filter((vault) => vault.type === 'cowcentrated')
   const info =
-    clmVaults.length === 0
+    clmVaults.length === 0 || !address // earn positions can't include clm vaults for now
       ? []
       : await client.readContract({
           code: beefyClmVaultsMulticallBytecode,
@@ -374,14 +384,21 @@ const beefyGovVaultsPositions = async (
   if (clmVaults.length === 0) {
     return []
   }
+
+  // Avoid a possible runtime error if the userVault.tokenAddress is undefined
+  const filteredClmVaults = clmVaults.filter(
+    ({ userVault }) => !!userVault.tokenAddress,
+  )
+
   const info = await client.readContract({
     code: beefyClmVaultsMulticallBytecode,
     abi: beefyClmVaultsMulticallAbi,
     functionName: 'getUserClmPools',
     args: [
       address,
-      clmVaults.map(({ userVault }) => userVault.tokenAddress),
-      clmVaults.map(({ userVault }) => userVault.earnContractAddress),
+      // @ts-expect-error filteredVaults should have tokenAddress defined
+      filteredClmVaults.map(({ userVault }) => userVault.tokenAddress),
+      filteredClmVaults.map(({ userVault }) => userVault.earnContractAddress),
     ],
   })
 
@@ -426,7 +443,7 @@ const hook: PositionsHook = {
     return [
       ...(await beefyBaseVaultsPositions({
         networkId,
-        address: address as Address,
+        address: address as Address | undefined,
         vaults,
         multicallAddress,
         prices,
@@ -434,14 +451,17 @@ const hook: PositionsHook = {
         tvls,
         t,
       })),
-      ...(await beefyGovVaultsPositions(
-        networkId,
-        address as Address,
-        vaults,
-        govVaults,
-        multicallAddress,
-        prices,
-      )),
+      // no gov vaults for earn positions, so no need to return 0 balances
+      ...(address
+        ? await beefyGovVaultsPositions(
+            networkId,
+            address as Address,
+            vaults,
+            govVaults,
+            multicallAddress,
+            prices,
+          )
+        : []),
     ]
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
