@@ -187,7 +187,9 @@ function createApp() {
       const networkIds = getNetworkIds(parsedRequest.query).filter(
         (networkId) => config.EARN_SUPPORTED_NETWORK_IDS.includes(networkId),
       )
-      const supportedPools = new Set(parsedRequest.query.supportedPools) ?? LEGACY_EARN_SUPPORTED_POSITION_IDS
+      const supportedPools =
+        new Set(parsedRequest.query.supportedPools) ??
+        LEGACY_EARN_SUPPORTED_POSITION_IDS
 
       const positions = (
         await Promise.all(

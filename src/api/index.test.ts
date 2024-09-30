@@ -357,7 +357,9 @@ it('returns expected earn positions for arbitrum when supportedPools is passed i
     .get('/getEarnPositions')
     .query({
       networkIds: [NetworkId['arbitrum-one']],
-      supportedPools:[`${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`],
+      supportedPools: [
+        `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
+      ],
       address: WALLET_ADDRESS,
     })
     .expect(200)
@@ -373,7 +375,9 @@ it('returns expected earn positions for celo when supportedPools is passed in', 
     .get('/getEarnPositions')
     .query({
       networkIds: [NetworkId['celo-mainnet']],
-      supportedPools: [`${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`],
+      supportedPools: [
+        `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
+      ],
       address: WALLET_ADDRESS,
     })
     .expect(200)
