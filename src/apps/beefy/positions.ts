@@ -212,7 +212,7 @@ const beefyBaseVaultsPositions = async ({
   t,
 }: {
   networkId: NetworkId
-  address: Address
+  address?: Address
   vaults: BaseBeefyVault[]
   multicallAddress: Address
   prices: BeefyPrices
@@ -224,27 +224,33 @@ const beefyBaseVaultsPositions = async ({
 
   const userVaults: (BaseBeefyVault & { balance: bigint })[] = []
 
-  await Promise.all(
-    createBatches(vaults).map(async (batch) => {
-      if (batch.length === 0) {
-        return
-      }
-      const balances = await client.readContract({
-        abi: beefyV2AppMulticallAbi,
-        address: multicallAddress,
-        functionName: 'getTokenBalances',
-        args: [batch.map((vault) => vault.earnContractAddress), address],
-      })
-      for (let i = 0; i < balances.length; i++) {
-        if (balances[i] > 0) {
-          userVaults.push({
-            ...batch[i],
-            balance: balances[i],
-          })
+  if (address) {
+    await Promise.all(
+      createBatches(vaults).map(async (batch) => {
+        if (batch.length === 0) {
+          return
         }
-      }
-    }),
-  )
+        const balances = await client.readContract({
+          abi: beefyV2AppMulticallAbi,
+          address: multicallAddress,
+          functionName: 'getTokenBalances',
+          args: [batch.map((vault) => vault.earnContractAddress), address],
+        })
+        for (let i = 0; i < balances.length; i++) {
+          if (balances[i] > 0) {
+            userVaults.push({
+              ...batch[i],
+              balance: balances[i],
+            })
+          }
+        }
+      }),
+    )
+  } else {
+    userVaults.push(
+      ...vaults.map((vault) => ({ ...vault, balance: BigInt(0) })),
+    )
+  }
 
   if (!userVaults.length) {
     return []
@@ -252,7 +258,7 @@ const beefyBaseVaultsPositions = async ({
 
   const clmVaults = userVaults.filter((vault) => vault.type === 'cowcentrated')
   const info =
-    clmVaults.length === 0
+    clmVaults.length === 0 || !address // earn positions can't include clm vaults for now
       ? []
       : await client.readContract({
           code: beefyClmVaultsMulticallBytecode,
@@ -399,7 +405,7 @@ const hook: PositionsHook = {
     return [
       ...(await beefyBaseVaultsPositions({
         networkId,
-        address: address as Address,
+        address: address as Address | undefined,
         vaults,
         multicallAddress,
         prices,
@@ -407,14 +413,17 @@ const hook: PositionsHook = {
         tvls,
         t,
       })),
-      ...(await beefyGovVaultsPositions(
-        networkId,
-        address as Address,
-        vaults,
-        govVaults,
-        multicallAddress,
-        prices,
-      )),
+      // no gov vaults for earn positions, so no need to return 0 balances
+      ...(address
+        ? await beefyGovVaultsPositions(
+            networkId,
+            address as Address,
+            vaults,
+            govVaults,
+            multicallAddress,
+            prices,
+          )
+        : []),
     ]
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {
