@@ -23,7 +23,7 @@ import { Transaction } from '../types/shortcuts'
 import { parseRequest } from './parseRequest'
 
 const EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
-const EARN_SUPPORTED_POSITION_IDS = new Set([
+const LEGACY_EARN_SUPPORTED_POSITION_IDS = new Set([
   // Aave USDC
   `${NetworkId['arbitrum-one']}:0x724dc807b04555b71ed48a6896b6f41593b8c637`,
   `${NetworkId['arbitrum-sepolia']}:0x460b97bd498e1157530aeb3086301d5225b91216`,
@@ -165,6 +165,14 @@ function createApp() {
         .array(z.nativeEnum(NetworkId))
         .nonempty()
         .or(z.nativeEnum(NetworkId)), // singleton arrays sometimes serialize as single values
+      supportedPools: z
+        .array(
+          z
+            .string()
+            .regex(/^0x[a-fA-F0-9]{40}$/)
+            .transform((val) => val.toLowerCase()),
+        )
+        .optional(),
     }),
   })
 
@@ -179,6 +187,7 @@ function createApp() {
       const networkIds = getNetworkIds(parsedRequest.query).filter(
         (networkId) => config.EARN_SUPPORTED_NETWORK_IDS.includes(networkId),
       )
+      const supportedPools = new Set(parsedRequest.query.supportedPools) ?? LEGACY_EARN_SUPPORTED_POSITION_IDS
 
       const positions = (
         await Promise.all(
@@ -196,7 +205,7 @@ function createApp() {
         .flat()
         .filter(
           // For now limit to specific positions
-          (position) => EARN_SUPPORTED_POSITION_IDS.has(position.positionId),
+          (position) => supportedPools.has(position.positionId),
         )
 
       res.send({ message: 'OK', data: positions })
