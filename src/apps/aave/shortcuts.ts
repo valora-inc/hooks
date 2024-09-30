@@ -261,7 +261,6 @@ const hook: ShortcutsHook = {
             swapFromToken,
             swapToTokenAddress: tokenAddress,
             walletAddress,
-            simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
             enableAppFee,
             // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
             postHook: {
