@@ -61,7 +61,6 @@ const beefyAppTokenDefinition = ({
   apys,
   tvls,
   t,
-  earnTokenDecimals,
 }: {
   networkId: NetworkId
   vault: BaseBeefyVault
@@ -69,7 +68,6 @@ const beefyAppTokenDefinition = ({
   apys: BeefyApys
   tvls: BeefyTvls
   t: TFunction
-  earnTokenDecimals: number
 }): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
   const vaultTokenAddress =
@@ -137,20 +135,22 @@ const beefyAppTokenDefinition = ({
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
-    shortcutTriggerArgs: {
-      deposit: {
-        tokenAddress: vault.tokenAddress?.toLowerCase(),
-        tokenDecimals: vault.tokenDecimals,
-        positionAddress: vault.earnedTokenAddress.toLowerCase(),
-      },
-      withdraw: {
-        tokenDecimals: earnTokenDecimals,
-        positionAddress: vault.earnedTokenAddress.toLowerCase(),
-      },
-      'swap-deposit': {
-        tokenAddress: vault.tokenAddress?.toLowerCase(),
-        positionAddress: vault.earnedTokenAddress.toLowerCase(),
-      },
+    shortcutTriggerArgs: ({ tokenInfo }) => {
+      return {
+        deposit: {
+          tokenAddress: vault.tokenAddress?.toLowerCase(),
+          tokenDecimals: vault.tokenDecimals,
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+        withdraw: {
+          tokenDecimals: tokenInfo.decimals,
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+        'swap-deposit': {
+          tokenAddress: vault.tokenAddress?.toLowerCase(),
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+      }
     },
   }
 }
@@ -275,17 +275,6 @@ const beefyBaseVaultsPositions = async ({
     return []
   }
 
-  const earnTokenDecimals = await Promise.all(
-    userVaults.map((vault) =>
-      client.readContract({
-        address: vault.earnedTokenAddress,
-        abi: vaultAbi,
-        functionName: 'decimals',
-        args: [],
-      }),
-    ),
-  )
-
   const clmVaults = userVaults.filter((vault) => vault.type === 'cowcentrated')
   const info =
     clmVaults.length === 0 || !address // earn positions can't include clm vaults for now
@@ -297,7 +286,7 @@ const beefyBaseVaultsPositions = async ({
           args: [address, clmVaults.map((vault) => vault.earnContractAddress)],
         })
   return userVaults
-    .map((vault, i) => {
+    .map((vault) => {
       try {
         return vault.type === 'cowcentrated'
           ? beefyConcentratedContractDefinition(
@@ -318,7 +307,6 @@ const beefyBaseVaultsPositions = async ({
               apys,
               tvls,
               t,
-              earnTokenDecimals: earnTokenDecimals[i],
             })
       } catch (error) {
         logger.error('Error processing vault', vault, error)
