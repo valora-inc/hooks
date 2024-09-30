@@ -340,15 +340,19 @@ const beefyGovVaultsPositions = async (
   if (clmVaults.length === 0) {
     return []
   }
+
+  // Avoid a possible runtime error if the userVault.tokenAddress is undefined
+  const filteredClmVaults = clmVaults.filter(({ userVault }) => !!userVault.tokenAddress)
+
   const info = await client.readContract({
     code: beefyClmVaultsMulticallBytecode,
     abi: beefyClmVaultsMulticallAbi,
     functionName: 'getUserClmPools',
     args: [
       address,
-      // @ts-expect-error tokenAddress from beefy response is not always defined
-      clmVaults.map(({ userVault }) => userVault.tokenAddress),
-      clmVaults.map(({ userVault }) => userVault.earnContractAddress),
+      // @ts-expect-error filteredVaults should have tokenAddress defined
+      filteredClmVaults.map(({ userVault }) => userVault.tokenAddress),
+      filteredClmVaults.map(({ userVault }) => userVault.earnContractAddress),
     ],
   })
 
