@@ -139,7 +139,7 @@ const beefyAppTokenDefinition = ({
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
     shortcutTriggerArgs: {
       deposit: {
-        tokenAddress: vault.tokenAddress.toLowerCase(),
+        tokenAddress: vault.tokenAddress?.toLowerCase(),
         tokenDecimals: vault.tokenDecimals,
         positionAddress: vault.earnedTokenAddress.toLowerCase(),
       },
@@ -148,7 +148,7 @@ const beefyAppTokenDefinition = ({
         positionAddress: vault.earnedTokenAddress.toLowerCase(),
       },
       'swap-deposit': {
-        tokenAddress: vault.tokenAddress.toLowerCase(),
+        tokenAddress: vault.tokenAddress?.toLowerCase(),
         positionAddress: vault.earnedTokenAddress.toLowerCase(),
       },
     },
