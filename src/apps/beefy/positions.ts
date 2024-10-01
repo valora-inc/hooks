@@ -26,7 +26,6 @@ import {
   getTvls,
 } from './api'
 import { TFunction } from 'i18next'
-import { vaultAbi } from './abis/vault'
 import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
@@ -120,10 +119,7 @@ const beefyAppTokenDefinition = ({
               label: t('yieldRates.earningsApy'),
               tokenId: getTokenId({
                 networkId,
-                address: getTokenId({
-                  address: vault.tokenAddress,
-                  networkId,
-                }),
+                address: vault.tokenAddress,
               }),
             },
           ]
@@ -135,7 +131,7 @@ const beefyAppTokenDefinition = ({
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
-    shortcutTriggerArgs: ({ tokenInfo }) => {
+    shortcutTriggerArgs: ({ tokensByTokenId }) => {
       return {
         deposit: {
           tokenAddress: vault.tokenAddress?.toLowerCase(),
@@ -143,7 +139,13 @@ const beefyAppTokenDefinition = ({
           positionAddress: vault.earnedTokenAddress.toLowerCase(),
         },
         withdraw: {
-          tokenDecimals: tokenInfo.decimals,
+          tokenDecimals:
+            tokensByTokenId[
+              getTokenId({
+                address: vault.earnedTokenAddress,
+                networkId,
+              })
+            ].decimals,
           positionAddress: vault.earnedTokenAddress.toLowerCase(),
         },
         'swap-deposit': {

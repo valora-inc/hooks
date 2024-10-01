@@ -16,6 +16,7 @@ import {
   ShortcutTriggerArgs,
   Token,
   TokenInfo,
+  TokensInfo,
   UnknownAppTokenError,
 } from '../types/positions'
 import {
@@ -32,8 +33,6 @@ import { isNative } from './isNative'
 import { getConfig } from '../config'
 import { TFunction } from 'i18next'
 import { getPositionId } from './getPositionId'
-
-type TokensInfo = Record<string, TokenInfo>
 
 type DefinitionsByPositionId = Record<string, AppPositionDefinition | undefined>
 
@@ -196,10 +195,10 @@ function getDataProps(
 
 function getShortcutTriggerArgs(
   positionDefinition: PositionDefinition,
-  tokenInfo: TokenInfo,
+  tokensByTokenId: TokensInfo,
 ): ShortcutTriggerArgs | undefined {
   if (typeof positionDefinition.shortcutTriggerArgs === 'function') {
-    return positionDefinition.shortcutTriggerArgs({ tokenInfo })
+    return positionDefinition.shortcutTriggerArgs({ tokensByTokenId })
   } else {
     return positionDefinition.shortcutTriggerArgs
   }
@@ -249,7 +248,7 @@ async function resolveAppTokenPosition(
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
   const shortcutTriggerArgs =
-    getShortcutTriggerArgs(positionDefinition, positionTokenInfo) ?? {}
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: AppTokenPosition = {
     type: 'app-token',
@@ -294,7 +293,7 @@ async function resolveAppTokenPosition(
 async function resolveContractPosition(
   _address: string | undefined,
   positionDefinition: ContractPositionDefinition & { appId: string },
-  _tokensByAddress: TokensInfo,
+  tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
   appInfo: AppInfo,
 ): Promise<ContractPosition> {
@@ -340,7 +339,7 @@ async function resolveContractPosition(
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
   const shortcutTriggerArgs =
-    getShortcutTriggerArgs(positionDefinition, {} as any) ?? {}
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: ContractPosition = {
     type: 'contract-position',

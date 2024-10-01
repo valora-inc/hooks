@@ -96,7 +96,7 @@ export interface EarnDataProps {
 }
 
 interface ShortcutTriggerArgsContext {
-  tokenInfo: TokenInfo
+  tokensByTokenId: TokensInfo
 }
 
 export type ShortcutTriggerArgs = {
@@ -172,10 +172,7 @@ export interface AbstractPosition {
   dataProps?: DataProps
   tokens: (Token & { category?: TokenCategory })[]
   availableShortcutIds: string[] // Allows to apply shortcuts to positions
-  shortcutTriggerArgs: {
-    // A map of shortcutId to trigger args
-    [shortcutId in string]?: Record<string, any>
-  }
+  shortcutTriggerArgs: ShortcutTriggerArgs
 }
 
 export interface AbstractToken {
@@ -211,6 +208,8 @@ export interface TokenInfo extends Omit<AbstractToken, 'balance'> {
   balance: DecimalNumber
   totalSupply: DecimalNumber
 }
+
+export type TokensInfo = Record<string, TokenInfo>
 
 export type AppTokenPosition = AbstractPosition &
   AbstractToken & {
