@@ -2,7 +2,7 @@ import { NetworkId } from '../types/networkId'
 
 const ETHER_HEX_IDENTIFIER = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' // curve and some other dapps use this address as an identifier for the native asset
 
-const networkIdToNativeAssetAddress: Record<NetworkId, string> = {
+export const networkIdToNativeAssetAddress: Record<NetworkId, string> = {
   [NetworkId['arbitrum-one']]: ETHER_HEX_IDENTIFIER,
   [NetworkId['arbitrum-sepolia']]: ETHER_HEX_IDENTIFIER,
   [NetworkId['op-mainnet']]: ETHER_HEX_IDENTIFIER,
