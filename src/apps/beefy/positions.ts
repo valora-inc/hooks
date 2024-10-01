@@ -122,10 +122,7 @@ const beefyAppTokenDefinition = ({
               label: t('yieldRates.earningsApy'),
               tokenId: getTokenId({
                 networkId,
-                address: getTokenId({
-                  address: vault.tokenAddress,
-                  networkId,
-                }),
+                address: vault.tokenAddress,
               }),
             },
           ]
