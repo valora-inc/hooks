@@ -29,7 +29,6 @@ import { NetworkId } from '../types/networkId'
 import { getClient } from './client'
 import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'
-import { getConfig } from '../config'
 import { TFunction } from 'i18next'
 import { getPositionId } from './getPositionId'
 
@@ -51,9 +50,8 @@ type AppPositionDefinition = PositionDefinition & {
   appId: string
 }
 
-async function getBaseTokensInfo(
+export async function getBaseTokensInfo(
   getTokensInfoUrl: string,
-  networkId: NetworkId,
 ): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
@@ -63,9 +61,6 @@ async function getBaseTokensInfo(
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}
   for (const [tokenId, tokenInfo] of Object.entries(data)) {
-    if (tokenInfo.networkId !== networkId) {
-      continue
-    }
     tokensInfo[tokenId] = {
       ...tokenInfo,
       priceUsd: toSerializedDecimalNumber(tokenInfo.priceUsd ?? 0),
@@ -391,11 +386,13 @@ export async function getPositions({
   address,
   appIds = [],
   t,
+  baseTokensInfo,
 }: {
   networkId: NetworkId
   address: string | undefined
   appIds: string[]
   t: TFunction<'translation', undefined>
+  baseTokensInfo: TokensInfo
 }) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
@@ -421,12 +418,6 @@ export async function getPositions({
   logger.debug(
     { definitions, count: definitions.length },
     'positions definitions',
-  )
-
-  // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo(
-    getConfig().GET_TOKENS_INFO_URL,
-    networkId,
   )
 
   let unlistedBaseTokensInfo: TokensInfo = {}
