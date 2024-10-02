@@ -96,6 +96,15 @@ export interface EarnDataProps {
   // We'll add more fields here as needed
 }
 
+interface ShortcutTriggerArgsContext {
+  tokensByTokenId: TokensInfo
+}
+
+export type ShortcutTriggerArgs = {
+  // A map of shortcutId to trigger args
+  [shortcutId in string]?: Record<string, any>
+}
+
 export interface AbstractPositionDefinition {
   networkId: NetworkId
   address: string
@@ -106,10 +115,9 @@ export interface AbstractPositionDefinition {
   })[]
 
   availableShortcutIds?: string[] // Allows to apply shortcuts to positions
-  shortcutTriggerArgs?: {
-    // A map of shortcutId to trigger args
-    [shortcutId in string]?: Record<string, any>
-  }
+  shortcutTriggerArgs?:
+    | ((context: ShortcutTriggerArgsContext) => ShortcutTriggerArgs)
+    | ShortcutTriggerArgs
 }
 
 export interface PricePerShareContext {
@@ -165,10 +173,7 @@ export interface AbstractPosition {
   dataProps?: DataProps
   tokens: (Token & { category?: TokenCategory })[]
   availableShortcutIds: string[] // Allows to apply shortcuts to positions
-  shortcutTriggerArgs: {
-    // A map of shortcutId to trigger args
-    [shortcutId in string]?: Record<string, any>
-  }
+  shortcutTriggerArgs: ShortcutTriggerArgs
 }
 
 export interface AbstractToken {
@@ -186,6 +191,26 @@ export interface AbstractToken {
 export interface BaseToken extends AbstractToken {
   type: 'base-token'
 }
+
+export interface RawTokenInfo {
+  address?: string
+  name: string
+  symbol: string
+  decimals: number
+  imageUrl: string
+  tokenId: string
+  networkId: NetworkId
+  isNative?: boolean
+  priceUsd?: string
+}
+
+export interface TokenInfo extends Omit<AbstractToken, 'balance'> {
+  imageUrl: string
+  balance: DecimalNumber
+  totalSupply: DecimalNumber
+}
+
+export type TokensInfo = Record<string, TokenInfo>
 
 export type AppTokenPosition = AbstractPosition &
   AbstractToken & {

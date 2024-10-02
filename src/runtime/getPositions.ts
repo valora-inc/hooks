@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
-  AbstractToken,
   AppInfo,
   AppTokenPosition,
   AppTokenPositionDefinition,
@@ -13,7 +12,10 @@ import {
   DisplayProps,
   Position,
   PositionDefinition,
+  ShortcutTriggerArgs,
   Token,
+  TokenInfo,
+  TokensInfo,
   UnknownAppTokenError,
 } from '../types/positions'
 import {
@@ -42,14 +44,6 @@ interface RawTokenInfo {
   isNative?: boolean
   priceUsd?: string
 }
-
-interface TokenInfo extends Omit<AbstractToken, 'balance'> {
-  imageUrl: string
-  balance: DecimalNumber
-  totalSupply: DecimalNumber
-}
-
-type TokensInfo = Record<string, TokenInfo>
 
 type DefinitionsByPositionId = Record<string, AppPositionDefinition | undefined>
 
@@ -210,6 +204,17 @@ function getDataProps(
   }
 }
 
+function getShortcutTriggerArgs(
+  positionDefinition: PositionDefinition,
+  tokensByTokenId: TokensInfo,
+): ShortcutTriggerArgs | undefined {
+  if (typeof positionDefinition.shortcutTriggerArgs === 'function') {
+    return positionDefinition.shortcutTriggerArgs({ tokensByTokenId })
+  } else {
+    return positionDefinition.shortcutTriggerArgs
+  }
+}
+
 async function resolveAppTokenPosition(
   _address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
@@ -253,6 +258,8 @@ async function resolveAppTokenPosition(
     resolvedTokensByTokenId,
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
+  const shortcutTriggerArgs =
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: AppTokenPosition = {
     type: 'app-token',
@@ -288,7 +295,7 @@ async function resolveAppTokenPosition(
     balance: toSerializedDecimalNumber(positionTokenInfo.balance),
     supply: toSerializedDecimalNumber(positionTokenInfo.totalSupply),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
-    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
+    shortcutTriggerArgs,
   }
 
   return position
@@ -297,7 +304,7 @@ async function resolveAppTokenPosition(
 async function resolveContractPosition(
   _address: string | undefined,
   positionDefinition: ContractPositionDefinition & { appId: string },
-  _tokensByAddress: TokensInfo,
+  tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
   appInfo: AppInfo,
 ): Promise<ContractPosition> {
@@ -342,6 +349,8 @@ async function resolveContractPosition(
     resolvedTokensByTokenId,
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
+  const shortcutTriggerArgs =
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: ContractPosition = {
     type: 'contract-position',
@@ -356,7 +365,7 @@ async function resolveContractPosition(
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
-    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
+    shortcutTriggerArgs,
   }
 
   return position
