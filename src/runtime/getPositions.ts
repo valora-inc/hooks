@@ -12,7 +12,6 @@ import {
   DisplayProps,
   Position,
   PositionDefinition,
-  RawTokenInfo,
   ShortcutTriggerArgs,
   Token,
   TokenInfo,
@@ -33,6 +32,18 @@ import { isNative } from './isNative'
 import { getConfig } from '../config'
 import { TFunction } from 'i18next'
 import { getPositionId } from './getPositionId'
+
+interface RawTokenInfo {
+  address?: string
+  name: string
+  symbol: string
+  decimals: number
+  imageUrl: string
+  tokenId: string
+  networkId: NetworkId
+  isNative?: boolean
+  priceUsd?: string
+}
 
 type DefinitionsByPositionId = Record<string, AppPositionDefinition | undefined>
 
