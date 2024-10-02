@@ -12,7 +12,7 @@ import path from 'path'
 import { z } from 'zod'
 import { getConfig } from '../config'
 import { logger } from '../log'
-import { getPositions } from '../runtime/getPositions'
+import { getBaseTokensInfo, getPositions } from '../runtime/getPositions'
 import { getShortcuts } from '../runtime/getShortcuts'
 import {
   LegacyNetwork,
@@ -148,10 +148,19 @@ function createApp() {
       const appIds = config.POSITION_IDS.filter((appId) =>
         returnAavePositions ? true : appId !== 'aave',
       )
+      const baseTokensInfo = await getBaseTokensInfo(
+        getConfig().GET_TOKENS_INFO_URL,
+      )
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
-            getPositions({ networkId, address, appIds, t: req.t }),
+            getPositions({
+              networkId,
+              address,
+              appIds,
+              t: req.t,
+              baseTokensInfo,
+            }),
           ),
         )
       ).flat()
@@ -202,6 +211,10 @@ function createApp() {
           : [parsedRequest.query.supportedAppIds]
         : DEFAULT_EARN_SUPPORTED_APP_IDS
 
+      const baseTokensInfo = await getBaseTokensInfo(
+        getConfig().GET_TOKENS_INFO_URL,
+      )
+
       const positions = (
         await Promise.all(
           networkIds.map((networkId) =>
@@ -211,6 +224,7 @@ function createApp() {
               address: undefined,
               appIds: supportedAppIds,
               t: req.t,
+              baseTokensInfo,
             }),
           ),
         )

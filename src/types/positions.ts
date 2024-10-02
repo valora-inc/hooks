@@ -87,7 +87,7 @@ export interface EarnDataProps {
   manageUrl?: string
   termsUrl?: string
   cantSeparateCompoundedInterest?: boolean
-  tvl?: SerializedDecimalNumber
+  tvl?: SerializedDecimalNumber // In USD
   yieldRates: YieldRate[]
   earningItems: EarningItem[]
   depositTokenId: string

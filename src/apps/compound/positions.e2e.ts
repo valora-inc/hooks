@@ -1,15 +1,23 @@
 import { t } from '../../../test/i18next'
-import { getPositions } from '../../runtime/getPositions'
+import { getConfig } from '../../config'
+import { getBaseTokensInfo, getPositions } from '../../runtime/getPositions'
 import { NetworkId } from '../../types/networkId'
+import { TokensInfo } from '../../types/positions'
 import hook from './positions'
 
 describe('getPositionDefinitions', () => {
+  let baseTokensInfo: TokensInfo = {}
+  beforeAll(async () => {
+    baseTokensInfo = await getBaseTokensInfo(getConfig().GET_TOKENS_INFO_URL)
+  })
+
   it('should get the address definitions successfully for supply & collateral', async () => {
     const positions = await getPositions({
       networkId: NetworkId['op-mainnet'],
       address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       appIds: ['compound'],
       t,
+      baseTokensInfo,
     })
 
     const supplyPosition = positions.find((p) =>
@@ -29,6 +37,7 @@ describe('getPositionDefinitions', () => {
       address: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
       appIds: ['compound'],
       t,
+      baseTokensInfo,
     })
 
     const collateralPosition = positions.find((p) =>
