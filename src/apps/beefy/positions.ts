@@ -93,6 +93,7 @@ const beefyAppTokenDefinition = ({
         description: 'Vault',
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+        manageUrl: BEEFY_VAULT_BASE_URL + vault.id,
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
