@@ -1,7 +1,7 @@
 {
   "yieldRates": {
     "earningsApy": "Rendimiento anual",
-    "earningsApr": "Interés anual"
+    "earningsApr": "Rendimiento anual"
   },
   "earningItems": {
     "rewards": "Recompensas",
