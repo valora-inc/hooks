@@ -18,6 +18,7 @@ import { getUniswapV3PositionDefinitions } from '../uniswap/positions'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import farms from './data/farms.json'
+import { logger } from '../../log'
 
 const client = createPublicClient({
   chain: celo,
@@ -140,7 +141,7 @@ async function getPoolPositionDefinitions(
   address: string,
 ): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
-  const { data } = await got
+  const response = await got
     .post(
       'https://gateway-arbitrum.network.thegraph.com/api/3f1b45f0fd92b4f414a3158b0381f482/subgraphs/id/JWDRLCwj4H945xEkbB6eocBSZcYnibqcJPJ8h9davFi',
       {
@@ -153,6 +154,13 @@ async function getPoolPositionDefinitions(
       },
     )
     .json<any>()
+
+  const data = response.data
+
+  if (!response.data) {
+    logger.warn({ response }, 'Got an invalid response from thegraph endpoint')
+    throw new Error('Failed to get pairs from Ubeswap')
+  }
 
   const pairs: Address[] = (data.user?.liquidityPositions ?? [])
     .filter((position: any) => Number(position.liquidityTokenBalance) > 0)

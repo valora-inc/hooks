@@ -7,10 +7,6 @@ import {
 import { EvmContractCall, Hook as SquidHook } from '@0xsquid/squid-types'
 import { NetworkId } from '../types/networkId'
 import { Address, encodeFunctionData, erc20Abi, parseUnits } from 'viem'
-import {
-  simulateTransactions,
-  UnsupportedSimulateRequest,
-} from '../runtime/simulateTransactions'
 import { logger } from '../log'
 import { getConfig } from '../config'
 import got from './got'
@@ -38,7 +34,7 @@ export async function prepareSwapTransactions({
   swapToTokenAddress,
   networkId,
   walletAddress,
-  simulatedGasPadding,
+  enableAppFee,
 }: {
   swapFromToken: z.infer<typeof tokenAmountWithMetadata>
   postHook: Omit<
@@ -49,39 +45,8 @@ export async function prepareSwapTransactions({
   networkId: NetworkId
   walletAddress: Address
   simulatedGasPadding?: bigint[]
+  enableAppFee?: boolean
 }): Promise<TriggerOutputShape<'swap-deposit'>> {
-  let postHookWithSimulatedGas = postHook
-
-  try {
-    const simulatedTransactions = await simulateTransactions({
-      networkId,
-      transactions: postHook.calls.map((call) => ({
-        networkId,
-        from: walletAddress,
-        to: call.target,
-        data: call.callData,
-      })),
-    })
-
-    postHookWithSimulatedGas = {
-      ...postHook,
-      calls: postHook.calls.map((call, index) => {
-        return {
-          ...call,
-          estimatedGas: (
-            BigInt(simulatedTransactions[index].gasNeeded) +
-            (simulatedGasPadding?.[index] ?? 0n)
-          ).toString(),
-        }
-      }),
-    }
-  } catch (error) {
-    if (!(error instanceof UnsupportedSimulateRequest)) {
-      logger.warn(error, 'Unexpected error during simulateTransactions')
-    }
-    // use default already set in the postHook, no changes needed
-  }
-
   const amountToSwap = parseUnits(swapFromToken.amount, swapFromToken.decimals)
 
   const swapParams = {
@@ -93,8 +58,9 @@ export async function prepareSwapTransactions({
     sellNetworkId: networkId,
     sellAmount: amountToSwap.toString(),
     slippagePercentage: '1',
-    postHook: postHookWithSimulatedGas,
+    postHook,
     userAddress: walletAddress,
+    enableAppFee,
   }
 
   const url = getConfig().GET_SWAP_QUOTE_URL

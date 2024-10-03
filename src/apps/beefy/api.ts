@@ -7,7 +7,7 @@ export type BeefyVault = {
   name: string
   type: string // cowcentrated, gov
   token: string
-  tokenAddress: Address
+  tokenAddress: Address | undefined
   tokenDecimals: number
   tokenProviderId: string
   earnedToken: string
@@ -23,6 +23,7 @@ export type BeefyVault = {
   isGovVault: boolean
   oracle: string
   oracleId: string
+  createdAt: number
 }
 
 export type BaseBeefyVault = BeefyVault & {
@@ -54,6 +55,23 @@ export const NETWORK_ID_TO_BEEFY_BLOCKCHAIN_ID: Record<
   [NetworkId['op-sepolia']]: null,
   [NetworkId['polygon-pos-amoy']]: null,
   [NetworkId['base-sepolia']]: null,
+}
+
+const NETWORK_ID_TO_CHAIN_ID: {
+  [networkId in NetworkId]: number
+} = {
+  [NetworkId['ethereum-mainnet']]: 1,
+  [NetworkId['arbitrum-one']]: 42161,
+  [NetworkId['op-mainnet']]: 10,
+  [NetworkId['celo-mainnet']]: 42220,
+  [NetworkId['polygon-pos-mainnet']]: 137,
+  [NetworkId['base-mainnet']]: 8453,
+  [NetworkId['ethereum-sepolia']]: 11155111,
+  [NetworkId['arbitrum-sepolia']]: 421614,
+  [NetworkId['op-sepolia']]: 11155420,
+  [NetworkId['celo-alfajores']]: 44787,
+  [NetworkId['polygon-pos-amoy']]: 80002,
+  [NetworkId['base-sepolia']]: 84532,
 }
 
 export async function getBeefyVaults(
@@ -117,4 +135,19 @@ export async function getBeefyPrices(
         ]),
     ),
   }
+}
+
+export async function getApys() {
+  return got
+    .get(`https://api.beefy.finance/apy/`)
+    .json<Record<string, number | undefined>>()
+}
+
+export async function getTvls(
+  networkId: NetworkId,
+): Promise<Record<string, number | undefined>> {
+  const tvlResponse = await got
+    .get(`https://api.beefy.finance/tvl/`)
+    .json<Record<number, Record<string, number | undefined>>>()
+  return tvlResponse[NETWORK_ID_TO_CHAIN_ID[networkId]] ?? {}
 }

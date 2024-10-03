@@ -31,7 +31,7 @@ export const tokenAmountWithMetadata = z.object({
   isNative: z.boolean(),
 })
 
-export const ZodEnableSwapFee = z.boolean().optional()
+export const ZodEnableAppFee = z.boolean().optional()
 
 // enforces the tokens field to be an array of objects with tokenId and amount
 // for all deposit and withdraw shortcuts
@@ -40,7 +40,7 @@ type TriggerInputShape<Category> = Category extends 'deposit' | 'withdraw'
   : Category extends 'swap-deposit'
   ? ZodRawShape & {
       swapFromToken: typeof tokenAmountWithMetadata
-      enableSwapFee: typeof ZodEnableSwapFee
+      enableAppFee: typeof ZodEnableAppFee
     }
   : ZodRawShape
 

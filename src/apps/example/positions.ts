@@ -75,6 +75,8 @@ const hook: PositionsHook = {
           title: 'Example position',
           description: 'See the code!',
           imageUrl: DEFAULT_IMG_URL,
+          // This optional param should point to a url where the user can view and/or manage the position
+          manageUrl: 'https://example.com/?pool-id',
         },
       },
     ]
