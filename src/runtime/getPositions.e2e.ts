@@ -25,9 +25,7 @@ describe('getPositions', () => {
     },
   )
 
-  it.each([
-    [NetworkId['ethereum-mainnet'], 'curve'],
-  ])(
+  it.each([[NetworkId['ethereum-mainnet'], 'curve']])(
     'should get the address positions successfully for a specific app for networkId %s',
     async (networkId: NetworkId, appId: string) => {
       const positions = await getPositions({
