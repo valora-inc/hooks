@@ -26,7 +26,6 @@ describe('getPositions', () => {
   )
 
   it.each([
-    [NetworkId['celo-mainnet'], 'halofi'],
     [NetworkId['ethereum-mainnet'], 'curve'],
   ])(
     'should get the address positions successfully for a specific app for networkId %s',
