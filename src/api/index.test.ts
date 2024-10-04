@@ -43,7 +43,7 @@ const TEST_POSITIONS_CELO: Position[] = [
       title: 'G$ / cUSD',
       description: 'Pool',
       imageUrl: '',
-      manageUrl: undefined,
+      manageUrl: ''
     },
     tokenId: 'celo-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
@@ -95,7 +95,7 @@ const TEST_POSITIONS_ETHEREUM: Position[] = [
       title: 'UNI / USDC',
       description: 'Pool',
       imageUrl: '',
-      manageUrl: undefined,
+      manageUrl: ''
     },
     tokenId: 'ethereum-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
