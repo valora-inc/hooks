@@ -135,7 +135,7 @@ async function getVaultPositionDefinitions(
             description: 'Strategy',
             imageUrl:
               'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/stake-dao.png',
-            manageUrl: undefined,
+            manageUrl: 'https://www.stakedao.org/yield',
           }
         },
         balances: async () => {
