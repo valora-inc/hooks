@@ -251,7 +251,7 @@ async function getFarmPositionDefinitions(
             title: poolToken.displayProps.title,
             description: 'Farm',
             imageUrl: poolToken.displayProps.imageUrl,
-            manageUrl: undefined,
+            manageUrl: 'https://app.ubeswap.org/#/earn',
           }
         },
         availableShortcutIds: ['claim-reward'],
