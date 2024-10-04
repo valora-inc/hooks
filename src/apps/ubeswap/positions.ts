@@ -89,6 +89,7 @@ async function getPoolPositionDefinition(
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
         imageUrl: UBESWAP_LOGO,
+        manageUrl: undefined,
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
@@ -250,6 +251,7 @@ async function getFarmPositionDefinitions(
             title: poolToken.displayProps.title,
             description: 'Farm',
             imageUrl: poolToken.displayProps.imageUrl,
+            manageUrl: undefined,
           }
         },
         availableShortcutIds: ['claim-reward'],

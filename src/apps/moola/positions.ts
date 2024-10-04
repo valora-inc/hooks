@@ -28,6 +28,7 @@ function getAppTokenPositionDefinition(
       title: debtTokenDefinition.title,
       description: debtTokenDefinition.description,
       imageUrl: debtTokenDefinition.imageUrl, // Provide an image URL for the debt token
+      manageUrl: undefined,
     },
     pricePerShare: [new BigNumber(-1) as DecimalNumber],
   }

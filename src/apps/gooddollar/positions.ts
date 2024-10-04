@@ -108,6 +108,7 @@ const hook: PositionsHook = {
             )}`,
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/gooddollar.png',
+        manageUrl: undefined,
       },
       balances: [toDecimalNumber(claimAmount, G$_DECIMALS)],
     }

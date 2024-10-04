@@ -43,6 +43,7 @@ const TEST_POSITIONS_CELO: Position[] = [
       title: 'G$ / cUSD',
       description: 'Pool',
       imageUrl: '',
+      manageUrl: undefined
     },
     tokenId: 'celo-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
@@ -94,6 +95,7 @@ const TEST_POSITIONS_ETHEREUM: Position[] = [
       title: 'UNI / USDC',
       description: 'Pool',
       imageUrl: '',
+      manageUrl: undefined
     },
     tokenId: 'ethereum-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
@@ -147,6 +149,7 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
       description: 'Supplied (APY: 7.42%)',
       imageUrl:
         'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png',
+      manageUrl: undefined
     },
     dataProps: {
       yieldRates: [
@@ -199,6 +202,7 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
       description: 'Supplied (APR: 2.61%)',
       imageUrl:
         'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/allbridgecore.png',
+      manageUrl: undefined
     },
     dataProps: {
       yieldRates: [

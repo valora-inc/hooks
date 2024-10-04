@@ -92,6 +92,7 @@ const hook: PositionsHook = {
               2,
             )} unvested)`,
             imageUrl,
+            manageUrl: undefined,
           },
         }
       }),

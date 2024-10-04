@@ -124,6 +124,7 @@ const hook: PositionsHook = {
             title: `${tokenInfo.symbol} supply incentives`,
             description: 'Rewards for supplying',
             imageUrl: ALLBRIDGE_LOGO,
+            manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,
           },
         } satisfies ContractPositionDefinition)
 
@@ -156,6 +157,7 @@ const hook: PositionsHook = {
               title: tokenInfo.symbol,
               description: `Supplied (APR: ${apr.toFixed(2)}%)`,
               imageUrl: ALLBRIDGE_LOGO,
+              manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,
             },
             dataProps: {
               manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,

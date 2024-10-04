@@ -58,7 +58,7 @@ export interface DisplayProps {
   title: string // Example: CELO / cUSD
   description: string // Example: Pool
   imageUrl: string // Example: https://...
-  manageUrl?: string // Example: https://<PoolSpecificUrl>
+  manageUrl: string | undefined // Example: https://<PoolSpecificUrl>
 }
 
 export interface DataPropsContext {
