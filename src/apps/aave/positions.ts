@@ -175,7 +175,7 @@ const hook: PositionsHook = {
             title: `Claimable rewards`,
             description: 'For supplying and borrowing',
             imageUrl: AAVE_LOGO,
-            manageUrl
+            manageUrl,
           },
         } satisfies ContractPositionDefinition)
       : null
