@@ -28,7 +28,7 @@ function getAppTokenPositionDefinition(
       title: debtTokenDefinition.title,
       description: debtTokenDefinition.description,
       imageUrl: debtTokenDefinition.imageUrl, // Provide an image URL for the debt token
-      manageUrl: undefined,
+      manageUrl: 'https://app.moola.market',
     },
     pricePerShare: [new BigNumber(-1) as DecimalNumber],
   }
