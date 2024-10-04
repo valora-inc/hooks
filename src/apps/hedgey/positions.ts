@@ -92,7 +92,7 @@ const hook: PositionsHook = {
               2,
             )} unvested)`,
             imageUrl,
-            manageUrl: undefined,
+            manageUrl: 'https://app.hedgey.finance',
           },
         }
       }),
