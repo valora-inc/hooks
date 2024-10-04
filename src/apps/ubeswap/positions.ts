@@ -89,7 +89,7 @@ async function getPoolPositionDefinition(
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
         imageUrl: UBESWAP_LOGO,
-        manageUrl: undefined,
+        manageUrl: 'https://app.ubeswap.org/#/pool',
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
