@@ -103,7 +103,9 @@ void (async () => {
   // TODO: consider showing a user friendly prompt to fill in the trigger input
   // or at least a list of the expected fields
   // This just throws a Zod error if the input is not valid
-  const triggerInput = z.object(shortcut.triggerInputShape).parse(JSON.parse(argv.triggerInputShape))
+  const triggerInput = z
+    .object(shortcut.triggerInputShape)
+    .parse(JSON.parse(argv.triggerInputShape))
 
   const triggerArgs = {
     networkId: argv.networkId,
