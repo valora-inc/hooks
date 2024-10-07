@@ -43,7 +43,7 @@ const argv = yargs(process.argv.slice(2))
     'parse-numbers': false, // prevents 0x{string} from being parsed as a number
   })
   .usage(
-    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> [<triggerInput>...]',
+    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> --triggerInputShape <triggerInputShape> [--mnemonic <mnemonic>] [--derivationPath <derivationPath>]',
   )
   .env('')
   .options({
@@ -70,6 +70,11 @@ const argv = yargs(process.argv.slice(2))
       describe: 'Shortcut ID to trigger',
       type: 'string',
       demandOption: true,
+    },
+    triggerInputShape: {
+      describe: 'triggerInputShape for the shortcut',
+      type: 'string',
+      default: '{}',
     },
     mnemonic: {
       describe: 'Mnemonic to use to sign the shortcut transaction(s)',
@@ -98,11 +103,7 @@ void (async () => {
   // TODO: consider showing a user friendly prompt to fill in the trigger input
   // or at least a list of the expected fields
   // This just throws a Zod error if the input is not valid
-  const triggerInput = z.object(shortcut.triggerInputShape).parse(argv)
-  // For deposit/withdraw shortcut, tokens field won't parse correctly. Instead, pass it in as
-  // a string and change the above to: {...shortcut.triggerInputShape, tokens: z.string()}
-  // Then below under ...triggerInput, add tokens: JSON.parse(triggerInput.tokens)
-  // Same happens for swap-deposit shortcut, but with swapFromToken field
+  const triggerInput = z.object(shortcut.triggerInputShape).parse(JSON.parse(argv.triggerInputShape))
 
   const triggerArgs = {
     networkId: argv.networkId,
