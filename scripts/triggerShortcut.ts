@@ -1,7 +1,13 @@
 // Helper script to trigger a shortcut
 /* eslint-disable no-console */
 import yargs from 'yargs'
-import { Address, createWalletClient, http, createPublicClient, Chain } from 'viem'
+import {
+  Address,
+  createWalletClient,
+  http,
+  createPublicClient,
+  Chain,
+} from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
 import {
   arbitrum,
@@ -72,7 +78,8 @@ const argv = yargs(process.argv.slice(2))
       demandOption: true,
     },
     triggerInputShape: {
-      describe: 'JSON for the triggerInput of shortcut. It should respect the triggerInputShape of the shortcut.',
+      describe:
+        'JSON for the triggerInput of shortcut. It should respect the triggerInputShape of the shortcut.',
       type: 'string',
       default: '{}',
     },
