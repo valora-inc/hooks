@@ -59,6 +59,15 @@ const UNI_V3_ADDRESSES_BY_NETWORK_ID: {
   [NetworkId['base-sepolia']]: undefined,
 }
 
+const UNISWAP_NETWORK_NAME: Partial<Record<NetworkId, string>> = {
+  [NetworkId['ethereum-mainnet']]: 'ethereum',
+  [NetworkId['op-mainnet']]: 'optimism',
+  [NetworkId['polygon-pos-mainnet']]: 'polygon',
+  [NetworkId['base-mainnet']]: 'base',
+  [NetworkId['arbitrum-one']]: 'arbitrum',
+  [NetworkId['celo-mainnet']]: 'celo',
+}
+
 export async function getUniswapV3PositionDefinitions(
   networkId: NetworkId,
   address: Address,
@@ -110,6 +119,9 @@ export async function getUniswapV3PositionDefinitions(
           }`,
           description: 'Pool',
           imageUrl,
+          manageUrl: UNISWAP_NETWORK_NAME[networkId]
+            ? `https://app.uniswap.org/explore/pools/${UNISWAP_NETWORK_NAME[networkId]}/${pool.poolAddress}`
+            : undefined,
         }),
         balances: async ({ resolvedTokensByTokenId }) => {
           const token0Decimals =

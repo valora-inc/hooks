@@ -175,6 +175,7 @@ const hook: PositionsHook = {
             title: `Claimable rewards`,
             description: 'For supplying and borrowing',
             imageUrl: AAVE_LOGO,
+            manageUrl,
           },
         } satisfies ContractPositionDefinition)
       : null
@@ -229,6 +230,7 @@ const hook: PositionsHook = {
                 title: reserveData.symbol,
                 description: `Supplied (APY: ${supplyApy.toFixed(2)}%)`,
                 imageUrl: AAVE_LOGO,
+                manageUrl,
               },
               dataProps: {
                 manageUrl,
@@ -282,6 +284,7 @@ const hook: PositionsHook = {
                   2,
                 )}%)`,
                 imageUrl: AAVE_LOGO,
+                manageUrl,
               },
               // TODO: update runtime so we can specify a negative balance for debt
               // instead of using a negative pricePerShare
@@ -300,6 +303,7 @@ const hook: PositionsHook = {
                   2,
                 )}%)`,
                 imageUrl: AAVE_LOGO,
+                manageUrl,
               },
               // TODO: similar as comment above for variable debt
               pricePerShare: [new BigNumber(-1) as DecimalNumber],

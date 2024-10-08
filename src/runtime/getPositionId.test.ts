@@ -20,6 +20,7 @@ describe('getPositionId', () => {
           description: '',
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+          manageUrl: undefined,
         },
         pricePerShare: async () => {
           return [toDecimalNumber(5n, 1)]
@@ -45,6 +46,7 @@ describe('getPositionId', () => {
           description: '',
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+          manageUrl: undefined,
         },
         balances: async () => {
           return [toDecimalNumber(10n, 18)]
@@ -71,6 +73,7 @@ describe('getPositionId', () => {
           description: '',
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+          manageUrl: undefined,
         },
         balances: async () => {
           return [toDecimalNumber(10n, 18)]

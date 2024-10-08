@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 import { Address, ContractFunctionExecutionError } from 'viem'
 import { erc20Abi } from '../abis/erc-20'
 import {
-  AbstractToken,
   AppInfo,
   AppTokenPosition,
   AppTokenPositionDefinition,
@@ -13,7 +12,10 @@ import {
   DisplayProps,
   Position,
   PositionDefinition,
+  ShortcutTriggerArgs,
   Token,
+  TokenInfo,
+  TokensInfo,
   UnknownAppTokenError,
 } from '../types/positions'
 import {
@@ -27,7 +29,6 @@ import { NetworkId } from '../types/networkId'
 import { getClient } from './client'
 import { getTokenId } from './getTokenId'
 import { isNative } from './isNative'
-import { getConfig } from '../config'
 import { TFunction } from 'i18next'
 import { getPositionId } from './getPositionId'
 
@@ -43,23 +44,14 @@ interface RawTokenInfo {
   priceUsd?: string
 }
 
-interface TokenInfo extends Omit<AbstractToken, 'balance'> {
-  imageUrl: string
-  balance: DecimalNumber
-  totalSupply: DecimalNumber
-}
-
-type TokensInfo = Record<string, TokenInfo>
-
 type DefinitionsByPositionId = Record<string, AppPositionDefinition | undefined>
 
 type AppPositionDefinition = PositionDefinition & {
   appId: string
 }
 
-async function getBaseTokensInfo(
+export async function getBaseTokensInfo(
   getTokensInfoUrl: string,
-  networkId: NetworkId,
 ): Promise<TokensInfo> {
   // Get base tokens
   const data = await got
@@ -69,9 +61,6 @@ async function getBaseTokensInfo(
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}
   for (const [tokenId, tokenInfo] of Object.entries(data)) {
-    if (tokenInfo.networkId !== networkId) {
-      continue
-    }
     tokensInfo[tokenId] = {
       ...tokenInfo,
       priceUsd: toSerializedDecimalNumber(tokenInfo.priceUsd ?? 0),
@@ -210,6 +199,17 @@ function getDataProps(
   }
 }
 
+function getShortcutTriggerArgs(
+  positionDefinition: PositionDefinition,
+  tokensByTokenId: TokensInfo,
+): ShortcutTriggerArgs | undefined {
+  if (typeof positionDefinition.shortcutTriggerArgs === 'function') {
+    return positionDefinition.shortcutTriggerArgs({ tokensByTokenId })
+  } else {
+    return positionDefinition.shortcutTriggerArgs
+  }
+}
+
 async function resolveAppTokenPosition(
   _address: string | undefined,
   positionDefinition: AppTokenPositionDefinition & { appId: string },
@@ -253,6 +253,8 @@ async function resolveAppTokenPosition(
     resolvedTokensByTokenId,
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
+  const shortcutTriggerArgs =
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: AppTokenPosition = {
     type: 'app-token',
@@ -288,7 +290,7 @@ async function resolveAppTokenPosition(
     balance: toSerializedDecimalNumber(positionTokenInfo.balance),
     supply: toSerializedDecimalNumber(positionTokenInfo.totalSupply),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
-    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
+    shortcutTriggerArgs,
   }
 
   return position
@@ -297,7 +299,7 @@ async function resolveAppTokenPosition(
 async function resolveContractPosition(
   _address: string | undefined,
   positionDefinition: ContractPositionDefinition & { appId: string },
-  _tokensByAddress: TokensInfo,
+  tokensByTokenId: TokensInfo,
   resolvedTokensByTokenId: Record<string, Omit<Token, 'balance'>>,
   appInfo: AppInfo,
 ): Promise<ContractPosition> {
@@ -342,6 +344,8 @@ async function resolveContractPosition(
     resolvedTokensByTokenId,
   )
   const dataProps = getDataProps(positionDefinition, resolvedTokensByTokenId)
+  const shortcutTriggerArgs =
+    getShortcutTriggerArgs(positionDefinition, tokensByTokenId) ?? {}
 
   const position: ContractPosition = {
     type: 'contract-position',
@@ -356,7 +360,7 @@ async function resolveContractPosition(
     tokens: tokens,
     balanceUsd: toSerializedDecimalNumber(balanceUsd),
     availableShortcutIds: positionDefinition.availableShortcutIds ?? [],
-    shortcutTriggerArgs: positionDefinition.shortcutTriggerArgs ?? {},
+    shortcutTriggerArgs,
   }
 
   return position
@@ -382,11 +386,13 @@ export async function getPositions({
   address,
   appIds = [],
   t,
+  baseTokensInfo,
 }: {
   networkId: NetworkId
   address: string | undefined
   appIds: string[]
   t: TFunction<'translation', undefined>
+  baseTokensInfo: TokensInfo
 }) {
   const hooksByAppId = await getHooks(appIds, 'positions')
 
@@ -412,12 +418,6 @@ export async function getPositions({
   logger.debug(
     { definitions, count: definitions.length },
     'positions definitions',
-  )
-
-  // Get the base tokens info
-  const baseTokensInfo = await getBaseTokensInfo(
-    getConfig().GET_TOKENS_INFO_URL,
-    networkId,
   )
 
   let unlistedBaseTokensInfo: TokensInfo = {}

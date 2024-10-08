@@ -92,6 +92,7 @@ const hook: PositionsHook = {
 
     return allbridgeTokenInfo.flatMap((tokenInfo, i) => {
       const apr = new BigNumber(tokenInfo.apr7d).toNumber() * 100
+      const manageUrl = `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`
 
       const balanceOf = balances[i]
       const pendingReward = rewards[i]
@@ -124,6 +125,7 @@ const hook: PositionsHook = {
             title: `${tokenInfo.symbol} supply incentives`,
             description: 'Rewards for supplying',
             imageUrl: ALLBRIDGE_LOGO,
+            manageUrl,
           },
         } satisfies ContractPositionDefinition)
 
@@ -156,9 +158,10 @@ const hook: PositionsHook = {
               title: tokenInfo.symbol,
               description: `Supplied (APR: ${apr.toFixed(2)}%)`,
               imageUrl: ALLBRIDGE_LOGO,
+              manageUrl,
             },
             dataProps: {
-              manageUrl: `${ALLBRIDGE_POOLS_BASE_URL}?chain=${NETWORK_ID_TO_ALLBRIDGE_CHAIN[networkId]}`,
+              manageUrl,
               termsUrl: ALLBRIDGE_TERMS_URL,
               contractCreatedAt:
                 ALLBRIGE_CONTRACT_CREATED_AT[

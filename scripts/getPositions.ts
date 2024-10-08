@@ -3,9 +3,10 @@
 import yargs from 'yargs'
 import BigNumber from 'bignumber.js'
 import { Token } from '../src/types/positions'
-import { getPositions } from '../src/runtime/getPositions'
+import { getPositions, getBaseTokensInfo } from '../src/runtime/getPositions'
 import { NetworkId } from '../src/types/networkId'
 import { t } from '../test/i18next'
+import { getConfig } from '../src/config'
 
 const argv = yargs(process.argv.slice(2))
   .usage('Usage: $0 --address <address>')
@@ -50,11 +51,15 @@ function breakdownToken(token: Token): string {
 }
 
 void (async () => {
+  const baseTokensInfo = await getBaseTokensInfo(
+    getConfig().GET_TOKENS_INFO_URL,
+  )
   const positions = await getPositions({
     networkId: argv.networkId,
     address: argv.address,
     appIds: argv.apps,
     t,
+    baseTokensInfo,
   })
   console.log('positions', JSON.stringify(positions, null, ' '))
 
