@@ -26,8 +26,8 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   [NetworkId['celo-alfajores']]: undefined,
   [NetworkId['ethereum-mainnet']]: {
     poolAddressesProvider: AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3Ethereum.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3Ethereum.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0x194324C9Af7f56E22F1614dD82E18621cb9238E7', // todo: use AaveV3Ethereum.UI_POOL_DATA_PROVIDER when it is updated in the address book
+    uiIncentiveDataProvider: '0x5a40cDe2b76Da2beD545efB3ae15708eE56aAF9c', // todo: use AaveV3Ethereum.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Ethereum.POOL,
   },
@@ -40,8 +40,8 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   },
   [NetworkId['arbitrum-one']]: {
     poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3Arbitrum.UI_POOL_DATA_PROVIDER when it is updated in the address book. Their UI hardcoded this address as well https://github.com/aave/interface/commit/e483c947f4a8b7cd3f44c0e4b50345825f8880e1#diff-ff65d10d56069997014d5d6b327eafd74417201ffa8ce8a219e132427710d8a2R414
-    uiIncentiveDataProvider: '0xE92cd6164CE7DC68e740765BC1f2a091B6CBc3e4',
+    uiPoolDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3Arbitrum.UI_POOL_DATA_PROVIDER when it is updated in the address book
+    uiIncentiveDataProvider: '0xE92cd6164CE7DC68e740765BC1f2a091B6CBc3e4', // todo: use AaveV3Arbitrum.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Arbitrum.POOL,
   },
@@ -61,23 +61,23 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   },
   [NetworkId['op-sepolia']]: {
     poolAddressesProvider: AaveV3OptimismSepolia.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3OptimismSepolia.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3OptimismSepolia.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0x86b0521f92a554057e54B93098BA2A6Aaa2F4ACB', // todo: use AaveV3OptimismSepolia.UI_POOL_DATA_PROVIDER when it is updated in the address book
+    uiIncentiveDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3OptimismSepolia.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3OptimismSepolia.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3OptimismSepolia.POOL,
   },
   [NetworkId['polygon-pos-mainnet']]: {
     poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3Polygon.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3Polygon.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0xE92cd6164CE7DC68e740765BC1f2a091B6CBc3e4', // todo: use AaveV3Polygon.UI_POOL_DATA_PROVIDER when it is updated in the address book
+    uiIncentiveDataProvider: '0x5c5228aC8BC1528482514aF3e27E692495148717', // todo: use AaveV3Polygon.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Polygon.POOL,
   },
   [NetworkId['polygon-pos-amoy']]: undefined,
   [NetworkId['base-mainnet']]: {
     poolAddressesProvider: AaveV3Base.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3Base.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3Base.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0xE92cd6164CE7DC68e740765BC1f2a091B6CBc3e4', // todo: use AaveV3Base.UI_POOL_DATA_PROVIDER when it is updated in the address book
+    uiIncentiveDataProvider: '0x5c5228aC8BC1528482514aF3e27E692495148717', // todo: use AaveV3Base.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3Base.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Base.POOL,
   },
