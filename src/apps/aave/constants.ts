@@ -9,11 +9,8 @@ import {
   AaveV3OptimismSepolia,
   AaveV3Polygon,
   AaveV3Base,
-  AaveV3BaseSepolia,
 } from '@bgd-labs/aave-address-book'
 
-// See https://github.com/bgd-labs/aave-address-book/tree/fbb590953db44d62a756d4639cb77ea58afb299c/src/ts
-// and https://docs.aave.com/developers/deployed-contracts/v3-mainnet
 export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   NetworkId,
   | {
