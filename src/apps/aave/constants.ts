@@ -40,8 +40,8 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   },
   [NetworkId['arbitrum-one']]: {
     poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3Arbitrum.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3Arbitrum.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3Arbitrum.UI_POOL_DATA_PROVIDER when it is updated in the address book. Their UI hardcoded this address as well https://github.com/aave/interface/commit/e483c947f4a8b7cd3f44c0e4b50345825f8880e1#diff-ff65d10d56069997014d5d6b327eafd74417201ffa8ce8a219e132427710d8a2R414
+    uiIncentiveDataProvider: '0xE92cd6164CE7DC68e740765BC1f2a091B6CBc3e4',
     incentivesController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Arbitrum.POOL,
   },
