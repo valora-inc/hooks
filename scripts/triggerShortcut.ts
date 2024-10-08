@@ -77,7 +77,7 @@ const argv = yargs(process.argv.slice(2))
       type: 'string',
       demandOption: true,
     },
-    triggerInputShape: {
+    triggerInput: {
       describe:
         'JSON for the triggerInput of shortcut. It should respect the triggerInputShape of the shortcut.',
       type: 'string',
@@ -112,7 +112,7 @@ void (async () => {
   // This just throws a Zod error if the input is not valid
   const triggerInput = z
     .object(shortcut.triggerInputShape)
-    .parse(JSON.parse(argv.triggerInputShape))
+    .parse(JSON.parse(argv.triggerInput))
 
   const triggerArgs = {
     networkId: argv.networkId,
