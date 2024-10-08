@@ -1,6 +1,7 @@
-import got from 'got'
+import got from '../../utils/got'
 import { NetworkId } from '../../types/networkId'
 import { Address } from 'viem'
+import { LRUCache } from 'lru-cache'
 
 type SupportedAllbridgeChainSymbols =
   | 'ETH'
@@ -78,14 +79,30 @@ interface NetworkInfo {
   txCostAmount: TxCostAmount
 }
 
+const cache = new LRUCache({
+  max: 1,
+  // In milliseconds
+  ttl: 10 * 60 * 1000,
+})
+
+const TOKEN_INFO_RESPONSE_KEY =
+  'https://core.api.allbridgecoreapi.net/token-info'
+
 export async function getAllbridgeTokenInfo({
   networkId,
 }: {
   networkId: NetworkId
 }): Promise<NetworkInfo | undefined> {
-  const allbridgeTokensInfoResponse: AllbridgeApiResponse = await got
-    .get('https://core.api.allbridgecoreapi.net/token-info')
-    .json()
+  let allbridgeTokensInfoResponse = cache.get(
+    TOKEN_INFO_RESPONSE_KEY,
+  ) as AllbridgeApiResponse
+  if (!allbridgeTokensInfoResponse) {
+    allbridgeTokensInfoResponse = await got
+      .get('https://core.api.allbridgecoreapi.net/token-info')
+      .json()
+    cache.set(TOKEN_INFO_RESPONSE_KEY, allbridgeTokensInfoResponse)
+  }
+
   const allbridgeBlockchain =
     NETWORK_ID_TO_ALLBRIDGE_BLOCKCHAIN_SYMBOL[networkId]
   return allbridgeBlockchain

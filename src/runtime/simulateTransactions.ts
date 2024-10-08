@@ -1,4 +1,5 @@
-import got, { RequestError } from 'got'
+import { RequestError } from 'got'
+import got from '../utils/got'
 import { NetworkId } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
 import { getConfig } from '../config'

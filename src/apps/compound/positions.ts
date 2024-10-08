@@ -14,6 +14,14 @@ import {
   compoundMulticallBytecode,
 } from './abis/compound-multicall'
 
+const COMPOUND_NETWORK_NAME: Partial<Record<NetworkId, string>> = {
+  [NetworkId['ethereum-mainnet']]: 'mainnet',
+  [NetworkId['op-mainnet']]: 'op',
+  [NetworkId['polygon-pos-mainnet']]: 'polygon',
+  [NetworkId['base-mainnet']]: 'basemainnet',
+  [NetworkId['arbitrum-one']]: 'arb',
+}
+
 // Data from https://docs.compound.finance/
 const MARKETS: { networkId: NetworkId; address: Address }[] = [
   {
@@ -144,6 +152,9 @@ const hook: PositionsHook = {
                 description: `${baseTokenDescription.symbol} Market`,
                 imageUrl:
                   'https://raw.githubusercontent.com/valora-inc/hooks/main/src/apps/compound/assets/compound.png',
+                manageUrl: COMPOUND_NETWORK_NAME[networkId]
+                  ? `https://app.compound.finance/markets/${baseTokenDescription.symbol}-${COMPOUND_NETWORK_NAME[networkId]}`
+                  : undefined,
               }
             },
             balances: async ({ resolvedTokensByTokenId }) => {

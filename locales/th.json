@@ -1,0 +1,10 @@
+{
+  "yieldRates": {
+    "earningsApy": "รายได้ APY",
+    "earningsApr": "รายได้ APR"
+  },
+  "earningItems": {
+    "rewards": "ผลตอบแทน",
+    "earnings": "รายได้"
+  }
+}

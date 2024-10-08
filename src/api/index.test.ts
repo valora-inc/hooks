@@ -43,6 +43,7 @@ const TEST_POSITIONS_CELO: Position[] = [
       title: 'G$ / cUSD',
       description: 'Pool',
       imageUrl: '',
+      manageUrl: '',
     },
     tokenId: 'celo-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
@@ -94,6 +95,7 @@ const TEST_POSITIONS_ETHEREUM: Position[] = [
       title: 'UNI / USDC',
       description: 'Pool',
       imageUrl: '',
+      manageUrl: '',
     },
     tokenId: 'ethereum-mainnet:0x31f9dee850b4284b81b52b25a3194f2fc8ff18cf',
     tokens: [
@@ -147,6 +149,7 @@ const TEST_POSITIONS_ARBITRUM: Position[] = [
       description: 'Supplied (APY: 7.42%)',
       imageUrl:
         'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/aave.png',
+      manageUrl: undefined,
     },
     dataProps: {
       yieldRates: [
@@ -199,6 +202,7 @@ const TEST_POSITIONS_CELO_EARN: Position[] = [
       description: 'Supplied (APR: 2.61%)',
       imageUrl:
         'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/allbridgecore.png',
+      manageUrl: undefined,
     },
     dataProps: {
       yieldRates: [
@@ -321,7 +325,7 @@ describe('GET /getPositions', () => {
 })
 
 describe('GET /getEarnPositions', () => {
-  it('returns earn positions for arbitrum', async () => {
+  it('returns default earn positions for arbitrum when supportedPools and supportedAppIds not passed in', async () => {
     const server = getTestServer('hooks-api')
     const response = await request(server)
       .get('/getEarnPositions')
@@ -335,7 +339,25 @@ describe('GET /getEarnPositions', () => {
       data: TEST_POSITIONS_ARBITRUM,
     })
   })
-  it('returns earn positions for celo', async () => {
+  it('returns expected earn positions for arbitrum when supportedPools and supportedAppIds are passed in', async () => {
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .get('/getEarnPositions')
+      .query({
+        networkIds: [NetworkId['arbitrum-one']],
+        supportedPools: [
+          'arbitrum-one:0x724dc807b04555b71ed48a6896b6f41593b8c637',
+        ],
+        supportedAppIds: ['allbridge', 'aave'],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+    expect(response.body).toEqual({
+      message: 'OK',
+      data: TEST_POSITIONS_ARBITRUM,
+    })
+  })
+  it('returns default earn positions for celo when supportedPools and supportedAppIds not passed in', async () => {
     jest.mocked(getPositions).mockResolvedValue(TEST_POSITIONS_CELO_EARN)
     const server = getTestServer('hooks-api')
     const response = await request(server)
@@ -348,6 +370,39 @@ describe('GET /getEarnPositions', () => {
     expect(response.body).toEqual({
       message: 'OK',
       data: TEST_POSITIONS_CELO_EARN,
+    })
+  })
+  it('returns expected earn positions for celo when supportedPools and supportedAppIds are passed in', async () => {
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .get('/getEarnPositions')
+      .query({
+        networkIds: [NetworkId['celo-mainnet']],
+        supportedPools: [
+          `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
+        ],
+        supportedAppIds: ['allbridge', 'aave'],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+    expect(response.body).toEqual({
+      message: 'OK',
+      data: TEST_POSITIONS_CELO_EARN,
+    })
+  })
+  it('does not return pool if ID not in supportedPools', async () => {
+    const server = getTestServer('hooks-api')
+    const response = await request(server)
+      .get('/getEarnPositions')
+      .query({
+        networkIds: [NetworkId['celo-mainnet']],
+        supportedPools: ['0xbadAddress'],
+        address: WALLET_ADDRESS,
+      })
+      .expect(200)
+    expect(response.body).toEqual({
+      message: 'OK',
+      data: [],
     })
   })
 })

@@ -61,6 +61,7 @@ const hook: PositionsHook = {
           description: 'Challenge',
           imageUrl:
             'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/halofi.png',
+          manageUrl: undefined,
         },
         balances: async ({ resolvedTokensByTokenId }) => {
           const depositToken =

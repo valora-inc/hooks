@@ -115,6 +115,7 @@ const hook: PositionsHook = {
         description: '', // TODO
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+        manageUrl: undefined,
       },
       balances: async () => {
         return [toDecimalNumber(totalCelo, CELO_DECIMALS)]

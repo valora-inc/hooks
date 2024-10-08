@@ -1,4 +1,4 @@
-import got from 'got'
+import got from '../../utils/got'
 import { hedgeyContractNames } from './config'
 
 interface Nft {

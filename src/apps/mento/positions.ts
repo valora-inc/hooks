@@ -74,6 +74,7 @@ async function getVeMentoPositionDefinition(
       )}`,
       imageUrl:
         'https://raw.githubusercontent.com/valora-inc/hooks/main/src/apps/mento/assets/veMENTO.png',
+      manageUrl: undefined,
     },
     balances: async ({ resolvedTokensByTokenId }) => {
       const token =

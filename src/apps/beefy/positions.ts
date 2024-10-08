@@ -17,9 +17,20 @@ import {
   beefyClmVaultsMulticallBytecode,
 } from './abis/beefy-clm-vaults-multicall'
 import { beefyV2AppMulticallAbi } from './abis/beefy-v2-app-multicall'
-import { BaseBeefyVault, GovVault, getBeefyPrices, getBeefyVaults } from './api'
+import {
+  BaseBeefyVault,
+  GovVault,
+  getApys,
+  getBeefyPrices,
+  getBeefyVaults,
+  getTvls,
+} from './api'
+import { TFunction } from 'i18next'
+import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
+type BeefyApys = Awaited<ReturnType<typeof getApys>>
+type BeefyTvls = Awaited<ReturnType<typeof getTvls>>
 
 // Fetched addresses from https://github.com/beefyfinance/beefy-v2/blob/main/src/config/config.tsx
 const BEEFY_MULTICALL_ADDRESS: {
@@ -40,19 +51,36 @@ const BEEFY_MULTICALL_ADDRESS: {
   [NetworkId['base-sepolia']]: undefined,
 }
 
-const beefyAppTokenDefinition = (
-  networkId: NetworkId,
-  vault: BaseBeefyVault,
-  prices: BeefyPrices,
-): AppTokenPositionDefinition => {
+const BEEFY_VAULT_BASE_URL = 'https://app.beefy.com/vault/'
+
+const beefyAppTokenDefinition = ({
+  networkId,
+  vault,
+  prices,
+  apys,
+  tvls,
+  t,
+}: {
+  networkId: NetworkId
+  vault: BaseBeefyVault
+  prices: BeefyPrices
+  apys: BeefyApys
+  tvls: BeefyTvls
+  t: TFunction
+}): AppTokenPositionDefinition => {
   const priceUsd = prices[vault.id]
+  const vaultTokenAddress =
+    vault.tokenAddress?.toLowerCase() ??
+    networkIdToNativeAssetAddress[networkId]
+  const tvl = tvls[vault.id]
+  const apy = apys[vault.id]
   return {
     type: 'app-token-definition',
     networkId,
     address: vault.earnedTokenAddress.toLowerCase(),
     tokens: [
       {
-        address: vault.tokenAddress.toLowerCase(),
+        address: vaultTokenAddress,
         networkId,
         fallbackPriceUsd: priceUsd
           ? toSerializedDecimalNumber(priceUsd)
@@ -65,15 +93,67 @@ const beefyAppTokenDefinition = (
         description: 'Vault',
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+        manageUrl: BEEFY_VAULT_BASE_URL + vault.id,
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
       const tokenId = getTokenId({
-        address: vault.tokenAddress,
+        address: vaultTokenAddress,
         networkId,
       })
       const { decimals } = tokensByTokenId[tokenId]
       return [toDecimalNumber(BigInt(vault.pricePerFullShare), decimals)]
+    },
+    dataProps: {
+      depositTokenId: getTokenId({
+        address: vault.tokenAddress,
+        networkId,
+      }),
+      withdrawTokenId: getTokenId({
+        address: vault.earnedTokenAddress,
+        networkId,
+      }),
+      yieldRates: apy
+        ? [
+            {
+              percentage: apy * 100,
+              label: t('yieldRates.earningsApy'),
+              tokenId: getTokenId({
+                networkId,
+                address: vault.tokenAddress,
+              }),
+            },
+          ]
+        : [],
+      earningItems: [],
+      cantSeparateCompoundedInterest: true,
+      tvl: tvl ? toSerializedDecimalNumber(tvl) : undefined,
+      manageUrl: `${BEEFY_VAULT_BASE_URL}${vault.id}`,
+      contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
+    },
+    availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
+    shortcutTriggerArgs: ({ tokensByTokenId }) => {
+      return {
+        deposit: {
+          tokenAddress: vault.tokenAddress?.toLowerCase(),
+          tokenDecimals: vault.tokenDecimals,
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+        withdraw: {
+          tokenDecimals:
+            tokensByTokenId[
+              getTokenId({
+                address: vault.earnedTokenAddress,
+                networkId,
+              })
+            ].decimals,
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+        'swap-deposit': {
+          tokenAddress: vault.tokenAddress?.toLowerCase(),
+          positionAddress: vault.earnedTokenAddress.toLowerCase(),
+        },
+      }
     },
   }
 }
@@ -118,6 +198,7 @@ const beefyConcentratedContractDefinition = (
         description,
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+        manageUrl: BEEFY_VAULT_BASE_URL + vault.id,
       }
     },
     balances: async ({ resolvedTokensByTokenId }) => {
@@ -143,38 +224,56 @@ const beefyConcentratedContractDefinition = (
   }
 }
 
-const beefyBaseVaultsPositions = async (
-  networkId: NetworkId,
-  address: Address,
-  vaults: BaseBeefyVault[],
-  multicallAddress: Address,
-  prices: BeefyPrices,
-) => {
+const beefyBaseVaultsPositions = async ({
+  networkId,
+  address,
+  vaults,
+  multicallAddress,
+  prices,
+  apys,
+  tvls,
+  t,
+}: {
+  networkId: NetworkId
+  address?: Address
+  vaults: BaseBeefyVault[]
+  multicallAddress: Address
+  prices: BeefyPrices
+  apys: BeefyApys
+  tvls: BeefyPrices
+  t: TFunction
+}) => {
   const client = getClient(networkId)
 
   const userVaults: (BaseBeefyVault & { balance: bigint })[] = []
 
-  await Promise.all(
-    createBatches(vaults).map(async (batch) => {
-      if (batch.length === 0) {
-        return
-      }
-      const balances = await client.readContract({
-        abi: beefyV2AppMulticallAbi,
-        address: multicallAddress,
-        functionName: 'getTokenBalances',
-        args: [batch.map((vault) => vault.earnContractAddress), address],
-      })
-      for (let i = 0; i < balances.length; i++) {
-        if (balances[i] > 0) {
-          userVaults.push({
-            ...batch[i],
-            balance: balances[i],
-          })
+  if (address) {
+    await Promise.all(
+      createBatches(vaults).map(async (batch) => {
+        if (batch.length === 0) {
+          return
         }
-      }
-    }),
-  )
+        const balances = await client.readContract({
+          abi: beefyV2AppMulticallAbi,
+          address: multicallAddress,
+          functionName: 'getTokenBalances',
+          args: [batch.map((vault) => vault.earnContractAddress), address],
+        })
+        for (let i = 0; i < balances.length; i++) {
+          if (balances[i] > 0) {
+            userVaults.push({
+              ...batch[i],
+              balance: balances[i],
+            })
+          }
+        }
+      }),
+    )
+  } else {
+    userVaults.push(
+      ...vaults.map((vault) => ({ ...vault, balance: BigInt(0) })),
+    )
+  }
 
   if (!userVaults.length) {
     return []
@@ -182,7 +281,7 @@ const beefyBaseVaultsPositions = async (
 
   const clmVaults = userVaults.filter((vault) => vault.type === 'cowcentrated')
   const info =
-    clmVaults.length === 0
+    clmVaults.length === 0 || !address // earn positions can't include clm vaults for now
       ? []
       : await client.readContract({
           code: beefyClmVaultsMulticallBytecode,
@@ -191,21 +290,33 @@ const beefyBaseVaultsPositions = async (
           args: [address, clmVaults.map((vault) => vault.earnContractAddress)],
         })
   return userVaults
-    .map((vault) =>
-      vault.type === 'cowcentrated'
-        ? beefyConcentratedContractDefinition(
-            networkId,
-            vault,
-            info.find(
-              (i) =>
-                i.token0 === vault.depositTokenAddresses[0] &&
-                i.token1 === vault.depositTokenAddresses[1],
-            ),
-            'CLM Vault',
-            prices,
-          )
-        : beefyAppTokenDefinition(networkId, vault, prices),
-    )
+    .map((vault) => {
+      try {
+        return vault.type === 'cowcentrated'
+          ? beefyConcentratedContractDefinition(
+              networkId,
+              vault,
+              info.find(
+                (i) =>
+                  i.token0 === vault.depositTokenAddresses[0] &&
+                  i.token1 === vault.depositTokenAddresses[1],
+              ),
+              'CLM Vault',
+              prices,
+            )
+          : beefyAppTokenDefinition({
+              networkId,
+              vault,
+              prices,
+              apys,
+              tvls,
+              t,
+            })
+      } catch (error) {
+        logger.error('Error processing vault', vault, error)
+        return null
+      }
+    })
     .filter((position): position is ContractPositionDefinition => !!position)
 }
 
@@ -265,14 +376,21 @@ const beefyGovVaultsPositions = async (
   if (clmVaults.length === 0) {
     return []
   }
+
+  // Avoid a possible runtime error if the userVault.tokenAddress is undefined
+  const filteredClmVaults = clmVaults.filter(
+    ({ userVault }) => !!userVault.tokenAddress,
+  )
+
   const info = await client.readContract({
     code: beefyClmVaultsMulticallBytecode,
     abi: beefyClmVaultsMulticallAbi,
     functionName: 'getUserClmPools',
     args: [
       address,
-      clmVaults.map(({ userVault }) => userVault.tokenAddress),
-      clmVaults.map(({ userVault }) => userVault.earnContractAddress),
+      // @ts-expect-error filteredVaults should have tokenAddress defined
+      filteredClmVaults.map(({ userVault }) => userVault.tokenAddress),
+      filteredClmVaults.map(({ userVault }) => userVault.earnContractAddress),
     ],
   })
 
@@ -301,33 +419,41 @@ const hook: PositionsHook = {
       description: 'Beefy vaults',
     }
   },
-  async getPositionDefinitions({ networkId, address }) {
+  async getPositionDefinitions({ networkId, address, t }) {
     const multicallAddress = BEEFY_MULTICALL_ADDRESS[networkId]
     if (!multicallAddress) {
       return []
     }
 
-    const [{ vaults, govVaults }, prices] = await Promise.all([
+    const [{ vaults, govVaults }, prices, apys, tvls] = await Promise.all([
       getBeefyVaults(networkId),
       getBeefyPrices(networkId),
+      getApys(),
+      getTvls(networkId),
     ])
 
     return [
-      ...(await beefyBaseVaultsPositions(
+      ...(await beefyBaseVaultsPositions({
         networkId,
-        address as Address,
+        address: address as Address | undefined,
         vaults,
         multicallAddress,
         prices,
-      )),
-      ...(await beefyGovVaultsPositions(
-        networkId,
-        address as Address,
-        vaults,
-        govVaults,
-        multicallAddress,
-        prices,
-      )),
+        apys,
+        tvls,
+        t,
+      })),
+      // no gov vaults for earn positions, so no need to return 0 balances
+      ...(address
+        ? await beefyGovVaultsPositions(
+            networkId,
+            address as Address,
+            vaults,
+            govVaults,
+            multicallAddress,
+            prices,
+          )
+        : []),
     ]
   },
   async getAppTokenDefinition({ networkId, address }: TokenDefinition) {

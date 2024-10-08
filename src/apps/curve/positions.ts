@@ -1,5 +1,5 @@
 import { Address, erc20Abi } from 'viem'
-import got from 'got'
+import got from '../../utils/got'
 import {
   AppTokenPositionDefinition,
   PositionsHook,
@@ -37,6 +37,11 @@ interface CurveApiResponse {
         symbol: symbol
         isBasePoolLpToken: boolean
       }[]
+      poolUrls: {
+        swap: string[]
+        deposit: string[]
+        withdraw: string[]
+      }
       usdTotal: number
     }[]
   }
@@ -149,6 +154,7 @@ async function getPoolPositionDefinition(
         description: 'Pool',
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/curve.png',
+        manageUrl: pool.poolUrls.withdraw[0],
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {

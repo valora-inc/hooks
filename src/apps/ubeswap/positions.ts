@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import got from 'got'
+import got from '../../utils/got'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
 import { erc20Abi } from '../../abis/erc-20'
@@ -18,6 +18,7 @@ import { getUniswapV3PositionDefinitions } from '../uniswap/positions'
 import { stakingRewardsAbi } from './abis/staking-rewards'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
 import farms from './data/farms.json'
+import { logger } from '../../log'
 
 const client = createPublicClient({
   chain: celo,
@@ -88,6 +89,7 @@ async function getPoolPositionDefinition(
         title: `${token0.symbol} / ${token1.symbol}`,
         description: 'Pool',
         imageUrl: UBESWAP_LOGO,
+        manageUrl: 'https://app.ubeswap.org/#/pool',
       }
     },
     pricePerShare: async ({ tokensByTokenId }) => {
@@ -140,7 +142,7 @@ async function getPoolPositionDefinitions(
   address: string,
 ): Promise<PositionDefinition[]> {
   // Get the pairs from Ubeswap via The Graph
-  const { data } = await got
+  const response = await got
     .post(
       'https://gateway-arbitrum.network.thegraph.com/api/3f1b45f0fd92b4f414a3158b0381f482/subgraphs/id/JWDRLCwj4H945xEkbB6eocBSZcYnibqcJPJ8h9davFi',
       {
@@ -153,6 +155,13 @@ async function getPoolPositionDefinitions(
       },
     )
     .json<any>()
+
+  const data = response.data
+
+  if (!response.data) {
+    logger.warn({ response }, 'Got an invalid response from thegraph endpoint')
+    throw new Error('Failed to get pairs from Ubeswap')
+  }
 
   const pairs: Address[] = (data.user?.liquidityPositions ?? [])
     .filter((position: any) => Number(position.liquidityTokenBalance) > 0)
@@ -242,6 +251,7 @@ async function getFarmPositionDefinitions(
             title: poolToken.displayProps.title,
             description: 'Farm',
             imageUrl: poolToken.displayProps.imageUrl,
+            manageUrl: 'https://app.ubeswap.org/#/earn',
           }
         },
         availableShortcutIds: ['claim-reward'],
