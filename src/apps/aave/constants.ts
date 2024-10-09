@@ -54,15 +54,15 @@ export const AAVE_V3_ADDRESSES_BY_NETWORK_ID: Record<
   },
   [NetworkId['op-mainnet']]: {
     poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: AaveV3Optimism.UI_POOL_DATA_PROVIDER,
-    uiIncentiveDataProvider: AaveV3Optimism.UI_INCENTIVE_DATA_PROVIDER,
+    uiPoolDataProvider: '0x86b0521f92a554057e54B93098BA2A6Aaa2F4ACB', // todo: use AaveV3Optimism.UI_POOL_DATA_PROVIDER, when it is updated in the address book
+    uiIncentiveDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3Optimism.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
     incentivesController: AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3Optimism.POOL,
   },
   [NetworkId['op-sepolia']]: {
     poolAddressesProvider: AaveV3OptimismSepolia.POOL_ADDRESSES_PROVIDER,
-    uiPoolDataProvider: '0x86b0521f92a554057e54B93098BA2A6Aaa2F4ACB', // todo: use AaveV3OptimismSepolia.UI_POOL_DATA_PROVIDER when it is updated in the address book
-    uiIncentiveDataProvider: '0xc0179321f0825c3e0F59Fe7Ca4E40557b97797a3', // todo: use AaveV3OptimismSepolia.UI_INCENTIVE_DATA_PROVIDER when it is updated in the address book
+    uiPoolDataProvider: AaveV3OptimismSepolia.UI_POOL_DATA_PROVIDER,
+    uiIncentiveDataProvider: AaveV3OptimismSepolia.UI_INCENTIVE_DATA_PROVIDER,
     incentivesController: AaveV3OptimismSepolia.DEFAULT_INCENTIVES_CONTROLLER,
     pool: AaveV3OptimismSepolia.POOL,
   },
