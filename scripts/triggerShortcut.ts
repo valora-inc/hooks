@@ -1,21 +1,55 @@
 // Helper script to trigger a shortcut
 /* eslint-disable no-console */
 import yargs from 'yargs'
-import { Address, createWalletClient, http, createPublicClient } from 'viem'
+import {
+  Address,
+  createWalletClient,
+  http,
+  createPublicClient,
+  Chain,
+} from 'viem'
 import { mnemonicToAccount } from 'viem/accounts'
-import { celo } from 'viem/chains'
+import {
+  arbitrum,
+  arbitrumSepolia,
+  base,
+  baseSepolia,
+  celo,
+  celoAlfajores,
+  mainnet,
+  optimism,
+  optimismSepolia,
+  polygon,
+  polygonAmoy,
+  sepolia,
+} from 'viem/chains'
 import { getShortcuts } from '../src/runtime/getShortcuts'
 import { NetworkId } from '../src/types/networkId'
 import { z } from 'zod'
 
 const CELO_DERIVATION_PATH = "m/44'/52752'/0'/0/0"
 
+const NETWORK_ID_TO_CHAIN: Record<NetworkId, Chain> = {
+  [NetworkId['celo-mainnet']]: celo,
+  [NetworkId['celo-alfajores']]: celoAlfajores,
+  [NetworkId['ethereum-mainnet']]: mainnet,
+  [NetworkId['ethereum-sepolia']]: sepolia,
+  [NetworkId['arbitrum-one']]: arbitrum,
+  [NetworkId['arbitrum-sepolia']]: arbitrumSepolia,
+  [NetworkId['base-mainnet']]: base,
+  [NetworkId['base-sepolia']]: baseSepolia,
+  [NetworkId['op-mainnet']]: optimism,
+  [NetworkId['op-sepolia']]: optimismSepolia,
+  [NetworkId['polygon-pos-mainnet']]: polygon,
+  [NetworkId['polygon-pos-amoy']]: polygonAmoy,
+}
+
 const argv = yargs(process.argv.slice(2))
   .parserConfiguration({
     'parse-numbers': false, // prevents 0x{string} from being parsed as a number
   })
   .usage(
-    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> [<triggerInput>...]',
+    'Usage: $0 --network <network> --address <address> --app <appId> --shortcut <shortcutId> --triggerInputShape <triggerInputShape> [--mnemonic <mnemonic>] [--derivationPath <derivationPath>]',
   )
   .env('')
   .options({
@@ -42,6 +76,12 @@ const argv = yargs(process.argv.slice(2))
       describe: 'Shortcut ID to trigger',
       type: 'string',
       demandOption: true,
+    },
+    triggerInput: {
+      describe:
+        'JSON for the triggerInput of shortcut. It should respect the triggerInputShape of the shortcut.',
+      type: 'string',
+      default: '{}',
     },
     mnemonic: {
       describe: 'Mnemonic to use to sign the shortcut transaction(s)',
@@ -70,7 +110,9 @@ void (async () => {
   // TODO: consider showing a user friendly prompt to fill in the trigger input
   // or at least a list of the expected fields
   // This just throws a Zod error if the input is not valid
-  const triggerInput = z.object(shortcut.triggerInputShape).parse(argv)
+  const triggerInput = z
+    .object(shortcut.triggerInputShape)
+    .parse(JSON.parse(argv.triggerInput))
 
   const triggerArgs = {
     networkId: argv.networkId,
@@ -103,11 +145,11 @@ void (async () => {
 
   const wallet = createWalletClient({
     account,
-    chain: celo,
+    chain: NETWORK_ID_TO_CHAIN[argv.networkId],
     transport: http(),
   })
   const client = createPublicClient({
-    chain: celo,
+    chain: NETWORK_ID_TO_CHAIN[argv.networkId],
     transport: http(),
   })
 
