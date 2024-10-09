@@ -82,6 +82,11 @@ export interface EarningItem {
   includedInPoolBalance?: boolean
 }
 
+export enum ClaimType {
+  Earnings = 'earnings',
+  Rewards = 'rewards',
+}
+
 export interface EarnDataProps {
   contractCreatedAt?: string // ISO string
   manageUrl?: string
@@ -93,6 +98,8 @@ export interface EarnDataProps {
   depositTokenId: string
   withdrawTokenId: string
   rewardsPositionIds?: string[]
+  claimType?: ClaimType
+  withdrawalIncludesClaim?: boolean
   // We'll add more fields here as needed
 }
 
