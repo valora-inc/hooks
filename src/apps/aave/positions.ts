@@ -4,6 +4,7 @@ import {
   UnknownAppTokenError,
   TokenDefinition,
   ContractPositionDefinition,
+  ClaimType,
 } from '../../types/positions'
 import { Address } from 'viem'
 import {
@@ -229,6 +230,7 @@ const hook: PositionsHook = {
               },
               dataProps: {
                 manageUrl,
+                claimType: ClaimType.Rewards,
                 termsUrl: AAVE_TERMS_URL,
                 cantSeparateCompoundedInterest: true,
                 contractCreatedAt:

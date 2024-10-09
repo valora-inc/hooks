@@ -4,6 +4,7 @@ import {
   UnknownAppTokenError,
   TokenDefinition,
   ContractPositionDefinition,
+  ClaimType,
 } from '../../types/positions'
 import { Address } from 'viem'
 import {
@@ -162,6 +163,8 @@ const hook: PositionsHook = {
             },
             dataProps: {
               manageUrl,
+              claimType: ClaimType.Earnings,
+              withdrawalIncludesClaim: true,
               termsUrl: ALLBRIDGE_TERMS_URL,
               contractCreatedAt:
                 ALLBRIGE_CONTRACT_CREATED_AT[
