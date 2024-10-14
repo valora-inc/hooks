@@ -4,6 +4,7 @@ import {
   UnknownAppTokenError,
   TokenDefinition,
   ContractPositionDefinition,
+  ClaimType,
 } from '../../types/positions'
 import { Address } from 'viem'
 import {
@@ -175,6 +176,7 @@ const hook: PositionsHook = {
             title: `Claimable rewards`,
             description: 'For supplying and borrowing',
             imageUrl: AAVE_LOGO,
+            manageUrl,
           },
         } satisfies ContractPositionDefinition)
       : null
@@ -185,9 +187,6 @@ const hook: PositionsHook = {
         const variableBorrowApy = getApyFromRayApr(
           reserveData.variableBorrowRate,
         )
-        const stableBorrowApy = getApyFromRayApr(
-          userReserveData?.[i].stableBorrowRate || reserveData.stableBorrowRate,
-        )
 
         // Include a token if the user has a balance
         // or if no user data is available (when querying all positions)
@@ -195,8 +194,6 @@ const hook: PositionsHook = {
           !userReserveData || userReserveData[i].scaledATokenBalance > 0n
         const useVariableDebt =
           !userReserveData || userReserveData[i].scaledVariableDebt > 0n
-        const useStableDebt =
-          !userReserveData || userReserveData[i].principalStableDebt > 0n
 
         return [
           // AToken
@@ -229,9 +226,11 @@ const hook: PositionsHook = {
                 title: reserveData.symbol,
                 description: `Supplied (APY: ${supplyApy.toFixed(2)}%)`,
                 imageUrl: AAVE_LOGO,
+                manageUrl,
               },
               dataProps: {
                 manageUrl,
+                claimType: ClaimType.Rewards,
                 termsUrl: AAVE_TERMS_URL,
                 cantSeparateCompoundedInterest: true,
                 contractCreatedAt:
@@ -282,26 +281,10 @@ const hook: PositionsHook = {
                   2,
                 )}%)`,
                 imageUrl: AAVE_LOGO,
+                manageUrl,
               },
               // TODO: update runtime so we can specify a negative balance for debt
               // instead of using a negative pricePerShare
-              pricePerShare: [new BigNumber(-1) as DecimalNumber],
-            } satisfies AppTokenPositionDefinition),
-          // Stable debt token
-          useStableDebt &&
-            ({
-              type: 'app-token-definition',
-              networkId,
-              address: reserveData.stableDebtTokenAddress.toLowerCase(),
-              tokens: [{ address: reserveData.underlyingAsset, networkId }],
-              displayProps: {
-                title: `${reserveData.symbol} debt`,
-                description: `Borrowed stable (APY: ${stableBorrowApy.toFixed(
-                  2,
-                )}%)`,
-                imageUrl: AAVE_LOGO,
-              },
-              // TODO: similar as comment above for variable debt
               pricePerShare: [new BigNumber(-1) as DecimalNumber],
             } satisfies AppTokenPositionDefinition),
         ].filter((x) => !!x)

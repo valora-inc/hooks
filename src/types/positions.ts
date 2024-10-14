@@ -58,7 +58,7 @@ export interface DisplayProps {
   title: string // Example: CELO / cUSD
   description: string // Example: Pool
   imageUrl: string // Example: https://...
-  manageUrl?: string // Example: https://<PoolSpecificUrl>
+  manageUrl: string | undefined // Example: https://<PoolSpecificUrl>
 }
 
 export interface DataPropsContext {
@@ -82,6 +82,11 @@ export interface EarningItem {
   includedInPoolBalance?: boolean
 }
 
+export enum ClaimType {
+  Earnings = 'earnings',
+  Rewards = 'rewards',
+}
+
 export interface EarnDataProps {
   contractCreatedAt?: string // ISO string
   manageUrl?: string
@@ -93,6 +98,8 @@ export interface EarnDataProps {
   depositTokenId: string
   withdrawTokenId: string
   rewardsPositionIds?: string[]
+  claimType?: ClaimType
+  withdrawalIncludesClaim?: boolean
   // We'll add more fields here as needed
 }
 

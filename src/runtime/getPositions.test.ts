@@ -58,6 +58,7 @@ const lockedCeloTestHook: PositionsHook = {
         description: '',
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+        manageUrl: undefined,
       },
       balances: async () => {
         return [toDecimalNumber(10n, 18)]
@@ -136,6 +137,7 @@ describe(getPositions, () => {
             description: '',
             imageUrl:
               'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png',
+            manageUrl: undefined,
           },
           pricePerShare: async () => {
             return [toDecimalNumber(5n, 1)]
@@ -198,6 +200,7 @@ describe(getPositions, () => {
               title: 'Beefy crvUSD/​WBTC/​WETH Vault',
               description: 'Vault',
               imageUrl: '',
+              manageUrl: undefined,
             },
           },
         ]
@@ -277,6 +280,7 @@ describe(getPositions, () => {
             title: 'Test position',
             description: '',
             imageUrl: '',
+            manageUrl: undefined,
           },
           balances: async () => {
             return [toDecimalNumber(10n, 18)]

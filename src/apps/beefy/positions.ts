@@ -6,6 +6,7 @@ import { NetworkId } from '../../types/networkId'
 import { toDecimalNumber, toSerializedDecimalNumber } from '../../types/numbers'
 import {
   AppTokenPositionDefinition,
+  ClaimType,
   ContractPositionDefinition,
   PositionsHook,
   TokenDefinition,
@@ -130,6 +131,7 @@ const beefyAppTokenDefinition = ({
       tvl: tvl ? toSerializedDecimalNumber(tvl) : undefined,
       manageUrl: `${BEEFY_VAULT_BASE_URL}${vault.id}`,
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
+      claimType: ClaimType.Rewards,
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
     shortcutTriggerArgs: ({ tokensByTokenId }) => {
@@ -198,6 +200,7 @@ const beefyConcentratedContractDefinition = (
         description,
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/beefy.png',
+        manageUrl: BEEFY_VAULT_BASE_URL + vault.id,
       }
     },
     balances: async ({ resolvedTokensByTokenId }) => {
