@@ -74,7 +74,7 @@ const beefyAppTokenDefinition = ({
     vault.tokenAddress?.toLowerCase() ??
     networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
-  const apy = apyBreakdown[vault.id].totalApy
+  const apy = apyBreakdown[vault.id].totalApy ?? 0
   return {
     type: 'app-token-definition',
     networkId,
@@ -187,7 +187,7 @@ function getDailyYieldRatePercentage(
   if (Object.keys(apyBreakdown).some((key) => components.includes(key))) {
     for (const component of components) {
       const apr = apyBreakdown[component]
-      if (apr) {
+      if (apr && !isNaN(Number(apr))) {
         totalDaily += apr / 365
       }
     }
