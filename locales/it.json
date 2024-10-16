@@ -6,5 +6,38 @@
   "earningItems": {
     "rewards": "Ricompense",
     "earnings": "Guadagni"
+  },
+  "beefyRisks": {
+    "Categry-Beefy": "Beefy",
+    "Categry-Asset": "Patrimonio",
+    "Categry-Platform": "Piattaforma",
+    "Complexity-Low-Titl": "Strategia a bassa complessità",
+    "Complexity-Mid-Titl": "Strategia di media complessità",
+    "Complexity-Hi-Titl": "Strategia ad alta complessità",
+    "Testd-Battle-Titl": "La strategia è collaudata",
+    "Testd-New-Titl": "La strategia è nuova",
+    "Testd-Experimtl-Titl": "La strategia è sperimentale",
+    "IL-None-Titl": "IL previsto molto basso o nullo",
+    "IL-Low-Titl": "Basso livello di IL previsto",
+    "IL-High-Titl": "Alto IL previsto",
+    "IL-AlgoStable-Titl": "Algoritmo stabile, rischio IL polarizzato",
+    "OverCollatAlgoStable-Titl": "Stablecoin algoritmica sovracollateralizzata",
+    "PartialCollatAlgoStable-Titl": "Stablecoin algoritmiche parzialmente collateralizzate",
+    "Liquidt-High-Titl": "Elevata liquidità degli asset",
+    "Liquidt-Low-Titl": "Bassa liquidità degli asset",
+    "MktCap-Large-Titl": "Attività ad alta capitalizzazione di mercato e a minore volatilità",
+    "MktCap-Mid-Titl": "Attività a media capitalizzazione di mercato, a volatilità media",
+    "MktCap-Small-Titl": "Attività a piccola capitalizzazione di mercato e ad alta volatilità",
+    "MktCap-Micro-Titl": "Micro capitalizzazione di mercato, asset a volatilità estrema",
+    "Concentrated-Titl": "Concentrazione dell'offerta di asset",
+    "Platfrm-Establshd-Titl": "Piattaforma con un track record noto",
+    "Platfrm-New-Titl": "Piattaforma con un track record minimo o nullo",
+    "Platfrm-AuditNo-Titl": "Nessuna verifica stabilita",
+    "Platfrm-Audit-Titl": "Piattaforma verificata da un revisore di fiducia",
+    "Platfrm-Verified-Titl": "I contratti del progetto sono verificati",
+    "Platfrm-VerifiedNo-Titl": "Contratti di progetto non pubblici (non verificato)",
+    "Platfrm-Timelock-Titl": "Funzioni pericolose bloccate a tempo",
+    "Platfrm-TimelockShort-Titl": "Funzioni pericolose bloccate a tempo con un breve ritardo",
+    "Platfrm-TimelockNo-Titl": "Funzione pericolosa non bloccata dal tempo"
   }
 }
