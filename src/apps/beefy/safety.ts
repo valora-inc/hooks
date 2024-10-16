@@ -68,6 +68,7 @@ export function getSafety(
       const { category, title, score } = RISKS[risk]
       return {
         // from https://github.com/beefyfinance/beefy-v2/blob/3690e105c4bb98afcf06f9c3e385d13cc23af5cd/src/features/vault/components/SafetyCard/SafetyCard.tsx#L39
+        // score represents the level of the risk, higher is worse
         isPositive: score <= 0,
         title: t(`beefyRisks.${title}`),
         category: t(`beefyRisks.${category}`),
