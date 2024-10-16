@@ -6,5 +6,38 @@
   "earningItems": {
     "rewards": "奖励",
     "earnings": "收益"
+  },
+  "beefyRisks": {
+    "Categry-Beefy": "Beefy",
+    "Categry-Asset": "资产",
+    "Categry-Platform": "平台",
+    "Complexity-Low-Titl": "低复杂性战略",
+    "Complexity-Mid-Titl": "中等复杂性战略",
+    "Complexity-Hi-Titl": "高复杂性战略",
+    "Testd-Battle-Titl": "战略久经考验",
+    "Testd-New-Titl": "战略是新的",
+    "Testd-Experimtl-Titl": "战略是实验性的",
+    "IL-None-Titl": "预期 IL 很低或为零",
+    "IL-Low-Titl": "预期 IL 低",
+    "IL-High-Titl": "高预期 IL",
+    "IL-AlgoStable-Titl": "算法稳定，极化的 IL 风险",
+    "OverCollatAlgoStable-Titl": "超额抵押算法稳定币",
+    "PartialCollatAlgoStable-Titl": "部分抵押算法稳定币",
+    "Liquidt-High-Titl": "资产流动性高",
+    "Liquidt-Low-Titl": "资产流动性低",
+    "MktCap-Large-Titl": "高市值、低波动资产",
+    "MktCap-Mid-Titl": "中等市值、平均波动率资产",
+    "MktCap-Small-Titl": "小市值、高波动性资产",
+    "MktCap-Micro-Titl": "小市值、极端波动资产",
+    "Concentrated-Titl": "资产供应集中",
+    "Platfrm-Establshd-Titl": "具有知名记录的平台",
+    "Platfrm-New-Titl": "几乎没有业绩记录的平台",
+    "Platfrm-AuditNo-Titl": "无既定审计",
+    "Platfrm-Audit-Titl": "由值得信赖的审查员对平台进行审核",
+    "Platfrm-Verified-Titl": "核实项目合同",
+    "Platfrm-VerifiedNo-Titl": "非公开项目合同（未经核实）",
+    "Platfrm-Timelock-Titl": "定时锁定的危险功能",
+    "Platfrm-TimelockShort-Titl": "短时延时锁定危险功能",
+    "Platfrm-TimelockNo-Titl": "未锁定时间的危险功能"
   }
 }
