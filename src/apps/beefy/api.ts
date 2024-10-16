@@ -6,6 +6,7 @@ export type BeefyVault = {
   id: string
   name: string
   type: string // cowcentrated, gov
+  subType?: string
   token: string
   tokenAddress: Address | undefined
   tokenDecimals: number
@@ -137,10 +138,10 @@ export async function getBeefyPrices(
   }
 }
 
-export async function getApys() {
+export async function getApyBreakdown() {
   return got
-    .get(`https://api.beefy.finance/apy/`)
-    .json<Record<string, number | undefined>>()
+    .get(`https://api.beefy.finance/apy/breakdown/`)
+    .json<Record<string, Record<string, number>>>()
 }
 
 export async function getTvls(

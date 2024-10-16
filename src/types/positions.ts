@@ -104,13 +104,14 @@ export interface EarnDataProps {
   termsUrl?: string
   cantSeparateCompoundedInterest?: boolean
   tvl?: SerializedDecimalNumber // In USD
-  yieldRates: YieldRate[]
+  yieldRates: YieldRate[] // List of components of yield for a pool that, summed up, give the total yield rate
   earningItems: EarningItem[]
   depositTokenId: string
   withdrawTokenId: string
   rewardsPositionIds?: string[]
   claimType?: ClaimType
   withdrawalIncludesClaim?: boolean
+  dailyYieldRatePercentage?: number // The daily yield rate percentage
   safety?: Safety
   // We'll add more fields here as needed
 }
