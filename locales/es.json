@@ -6,5 +6,38 @@
   "earningItems": {
     "rewards": "Recompensas",
     "earnings": "Ganancias"
+  },
+  "beefyRisks": {
+    "Categry-Beefy": "Carnoso",
+    "Categry-Asset": "Activo",
+    "Categry-Platform": "Plataforma",
+    "Complexity-Low-Titl": "Estrategia de baja complejidad",
+    "Complexity-Mid-Titl": "Estrategia de complejidad media",
+    "Complexity-Hi-Titl": "Estrategia de alta complejidad",
+    "Testd-Battle-Titl": "La estrategia está probada en batalla",
+    "Testd-New-Titl": "La estrategia es nueva",
+    "Testd-Experimtl-Titl": "La estrategia es experimental",
+    "IL-None-Titl": "IL esperada muy baja o nula",
+    "IL-Low-Titl": "Baja IL esperada",
+    "IL-High-Titl": "IL alta esperada",
+    "IL-AlgoStable-Titl": "Algoritmo estable, riesgo de IL polarizado",
+    "OverCollatAlgoStable-Titl": "Establecoin algorítmica sobrecolateralizada",
+    "PartialCollatAlgoStable-Titl": "stablecoin algorítmico parcialmente colateralizado",
+    "Liquidt-High-Titl": "Elevada liquidez de los activos",
+    "Liquidt-Low-Titl": "Baja liquidez de los activos",
+    "MktCap-Large-Titl": "Activo de alta capitalización bursátil y menor volatilidad",
+    "MktCap-Mid-Titl": "Activo de capitalización media, volatilidad media",
+    "MktCap-Small-Titl": "Activo de pequeña capitalización y alta volatilidad",
+    "MktCap-Micro-Titl": "Microcapitalización del mercado, activo de volatilidad extrema",
+    "Concentrated-Titl": "Concentración de la oferta de activos",
+    "Platfrm-Establshd-Titl": "Plataforma con trayectoria conocida",
+    "Platfrm-New-Titl": "Plataforma con poca o ninguna trayectoria",
+    "Platfrm-AuditNo-Titl": "No hay auditoría establecida",
+    "Platfrm-Audit-Titl": "Plataforma auditada por revisor de confianza",
+    "Platfrm-Verified-Titl": "Se verifican los contratos de los proyectos",
+    "Platfrm-VerifiedNo-Titl": "Contratos de proyectos no públicos (sin verificar)",
+    "Platfrm-Timelock-Titl": "Funciones peligrosas bloqueadas temporalmente",
+    "Platfrm-TimelockShort-Titl": "Funciones peligrosas temporizadas con breve retardo",
+    "Platfrm-TimelockNo-Titl": "Función peligrosa no temporizada"
   }
 }
