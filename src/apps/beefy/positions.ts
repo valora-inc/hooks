@@ -74,7 +74,7 @@ const beefyAppTokenDefinition = ({
     vault.tokenAddress?.toLowerCase() ??
     networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
-  const apy = apyBreakdown[vault.id].totalApy ?? 0
+  const apy = apyBreakdown[vault.id].totalApy || 0
   return {
     type: 'app-token-definition',
     networkId,
@@ -196,8 +196,8 @@ function getDailyYieldRatePercentage(
     totalDaily = _yearlyToDaily(apyBreakdown.totalApy)
   }
 
-  // Presence of rewardPoolApr indicates new api calc that has correct totals
-  // [Old gov pools had their apr in the vaultApr field]
+  // At some point the Beefy team decided to change this 'rewardPoolApr' on this specific vault type to be a soft-boost
+  // instead of being calculated as regular APR, so to be backwards compatible they subtract it from the total daily APR
   if (vault.type === 'gov' && vault.subType === 'cowcentrated') {
     // anything in 'rewardPoolApr' (i.e. not in 'rewardPoolTradingApr') is considered a soft-boost on the pool
     const additionalApr = apyBreakdown.rewardPoolApr || 0
@@ -211,13 +211,13 @@ function getDailyYieldRatePercentage(
 }
 
 const _yearlyToDaily = (apy: number) => {
-  const g = Math.pow(10, Math.log10(apy + 1) / 365) - 1
+  const dailyApy = Math.pow(10, Math.log10(apy + 1) / 365) - 1
 
-  if (isNaN(g)) {
+  if (isNaN(dailyApy)) {
     return 0
   }
 
-  return g
+  return dailyApy
 }
 
 // CLM = Cowcentrated Liquidity Manager: https://docs.beefy.finance/beefy-products/clm
