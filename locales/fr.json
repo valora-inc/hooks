@@ -6,5 +6,38 @@
   "earningItems": {
     "rewards": "Récompenses",
     "earnings": "Gains"
+  },
+  "beefyRisks": {
+    "Categry-Beefy": "Beefy",
+    "Categry-Asset": "Actif",
+    "Categry-Platform": "Plateforme",
+    "Complexity-Low-Titl": "Stratégie peu complexe",
+    "Complexity-Mid-Titl": "Stratégie de complexité moyenne",
+    "Complexity-Hi-Titl": "Stratégie très complexe",
+    "Testd-Battle-Titl": "La stratégie est à l'épreuve du combat",
+    "Testd-New-Titl": "La stratégie est nouvelle",
+    "Testd-Experimtl-Titl": "La stratégie est expérimentale",
+    "IL-None-Titl": "IL très faible ou nulle attendue",
+    "IL-Low-Titl": "Faible VA attendue",
+    "IL-High-Titl": "Haute attente d'IL",
+    "IL-AlgoStable-Titl": "Algorithme stable, risque de VA polarisée",
+    "OverCollatAlgoStable-Titl": "Surcollatéralisation algorithmique stablecoin",
+    "PartialCollatAlgoStable-Titl": "Stablecoin algorithmique partiellement collatéralisé",
+    "Liquidt-High-Titl": "Liquidité élevée des actifs",
+    "Liquidt-Low-Titl": "Faible liquidité des actifs",
+    "MktCap-Large-Titl": "Capitalisation boursière élevée, actif à faible volatilité",
+    "MktCap-Mid-Titl": "Capitalisation boursière moyenne, actif à volatilité moyenne.",
+    "MktCap-Small-Titl": "Petite capitalisation boursière, actif à forte volatilité.",
+    "MktCap-Micro-Titl": "Micro capitalisation boursière, actif à volatilité extrême",
+    "Concentrated-Titl": "L'offre d'actifs est concentrée",
+    "Platfrm-Establshd-Titl": "Plateforme dont les résultats sont connus",
+    "Platfrm-New-Titl": "Plateforme avec peu ou pas d'antécédents",
+    "Platfrm-AuditNo-Titl": "Pas d'audit établi",
+    "Platfrm-Audit-Titl": "Plateforme auditée par un réviseur de confiance",
+    "Platfrm-Verified-Titl": "Les contrats de projet sont vérifiés",
+    "Platfrm-VerifiedNo-Titl": "Contrats de projet non publics (non vérifié)",
+    "Platfrm-Timelock-Titl": "Fonctions dangereuses bloquées dans le temps",
+    "Platfrm-TimelockShort-Titl": "Les fonctions dangereuses sont bloquées par un court délai.",
+    "Platfrm-TimelockNo-Titl": "La fonction dangereuse n'est pas verrouillée"
   }
 }
