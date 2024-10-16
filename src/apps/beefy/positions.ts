@@ -28,6 +28,7 @@ import {
 } from './api'
 import { TFunction } from 'i18next'
 import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
+import { getSafety } from './safety'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 type BeefyApys = Awaited<ReturnType<typeof getApys>>
@@ -132,6 +133,7 @@ const beefyAppTokenDefinition = ({
       manageUrl: `${BEEFY_VAULT_BASE_URL}${vault.id}`,
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
       claimType: ClaimType.Rewards,
+      safety: getSafety(vault, t),
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
     shortcutTriggerArgs: ({ tokensByTokenId }) => {
