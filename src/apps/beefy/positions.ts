@@ -200,6 +200,7 @@ function getDailyYieldRatePercentage(
   // instead of being calculated as regular APR, so to be backwards compatible they subtract it from the total daily APR
   if (vault.type === 'gov' && vault.subType === 'cowcentrated') {
     // anything in 'rewardPoolApr' (i.e. not in 'rewardPoolTradingApr') is considered a soft-boost on the pool
+    // and is should not be counted towards the daily yield rate
     const additionalApr = apyBreakdown.rewardPoolApr || 0
     totalDaily -= additionalApr / 365
   }

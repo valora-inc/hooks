@@ -6,7 +6,7 @@ export type BeefyVault = {
   id: string
   name: string
   type: string // cowcentrated, gov
-  subType: string
+  subType?: string
   token: string
   tokenAddress: Address | undefined
   tokenDecimals: number
