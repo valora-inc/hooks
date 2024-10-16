@@ -21,7 +21,7 @@ import { beefyV2AppMulticallAbi } from './abis/beefy-v2-app-multicall'
 import {
   BaseBeefyVault,
   GovVault,
-  getApys,
+  getApyBreakdown,
   getBeefyPrices,
   getBeefyVaults,
   getTvls,
@@ -30,7 +30,7 @@ import { TFunction } from 'i18next'
 import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
-type BeefyApys = Awaited<ReturnType<typeof getApys>>
+type BeefyApyBreakdown = Awaited<ReturnType<typeof getApyBreakdown>>
 type BeefyTvls = Awaited<ReturnType<typeof getTvls>>
 
 // Fetched addresses from https://github.com/beefyfinance/beefy-v2/blob/main/src/config/config.tsx
@@ -58,14 +58,14 @@ const beefyAppTokenDefinition = ({
   networkId,
   vault,
   prices,
-  apys,
+  apyBreakdown,
   tvls,
   t,
 }: {
   networkId: NetworkId
   vault: BaseBeefyVault
   prices: BeefyPrices
-  apys: BeefyApys
+  apyBreakdown: BeefyApyBreakdown
   tvls: BeefyTvls
   t: TFunction
 }): AppTokenPositionDefinition => {
@@ -74,7 +74,7 @@ const beefyAppTokenDefinition = ({
     vault.tokenAddress?.toLowerCase() ??
     networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
-  const apy = apys[vault.id]
+  const apy = apyBreakdown[vault.id].totalApy || 0
   return {
     type: 'app-token-definition',
     networkId,
@@ -132,6 +132,10 @@ const beefyAppTokenDefinition = ({
       manageUrl: `${BEEFY_VAULT_BASE_URL}${vault.id}`,
       contractCreatedAt: new Date(vault.createdAt * 1000).toISOString(),
       claimType: ClaimType.Rewards,
+      dailyYieldRatePercentage: getDailyYieldRatePercentage(
+        apyBreakdown[vault.id],
+        vault,
+      ),
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
     shortcutTriggerArgs: ({ tokensByTokenId }) => {
@@ -158,6 +162,63 @@ const beefyAppTokenDefinition = ({
       }
     },
   }
+}
+
+// Based on https://github.com/beefyfinance/beefy-v2/blob/4413697f3d3cb5e090d8bb6958b621a673f0d739/src/features/data/actions/apy.ts#L46
+function getDailyYieldRatePercentage(
+  apyBreakdown: BeefyApyBreakdown[string],
+  vault: BaseBeefyVault,
+) {
+  // https://github.com/beefyfinance/beefy-v2/blob/4413697f3d3cb5e090d8bb6958b621a673f0d739/src/helpers/apy.ts#L103
+  const components = [
+    'vaultApr',
+    'clmApr',
+    'tradingApr',
+    'merklApr',
+    'stellaSwapApr',
+    'liquidStakingApr',
+    'composablePoolApr',
+    'rewardPoolApr',
+    'rewardPoolTradingApr',
+  ]
+
+  let totalDaily = 0
+  // Calculate the total daily apy from components
+  if (Object.keys(apyBreakdown).some((key) => components.includes(key))) {
+    for (const component of components) {
+      const apr = apyBreakdown[component]
+      if (apr && !isNaN(Number(apr))) {
+        totalDaily += apr / 365
+      }
+    }
+  } else {
+    // "uncompound" apy to get daily apr
+    totalDaily = _yearlyToDaily(apyBreakdown.totalApy)
+  }
+
+  // At some point the Beefy team decided to change this 'rewardPoolApr' on this specific vault type to be a soft-boost
+  // instead of being calculated as regular APR, so to be backwards compatible they subtract it from the total daily APR
+  if (vault.type === 'gov' && vault.subType === 'cowcentrated') {
+    // anything in 'rewardPoolApr' (i.e. not in 'rewardPoolTradingApr') is considered a soft-boost on the pool
+    // and is should not be counted towards the daily yield rate
+    const additionalApr = apyBreakdown.rewardPoolApr || 0
+    totalDaily -= additionalApr / 365
+  }
+
+  // TODO: handle merkl campaigns which are off-chain rewards
+  // https://github.com/beefyfinance/beefy-v2/blob/4413697f3d3cb5e090d8bb6958b621a673f0d739/src/features/data/actions/apy.ts#L132
+
+  return totalDaily * 100
+}
+
+const _yearlyToDaily = (apy: number) => {
+  const dailyApy = Math.pow(10, Math.log10(apy + 1) / 365) - 1
+
+  if (isNaN(dailyApy)) {
+    return 0
+  }
+
+  return dailyApy
 }
 
 // CLM = Cowcentrated Liquidity Manager: https://docs.beefy.finance/beefy-products/clm
@@ -232,7 +293,7 @@ const beefyBaseVaultsPositions = async ({
   vaults,
   multicallAddress,
   prices,
-  apys,
+  apyBreakdown,
   tvls,
   t,
 }: {
@@ -241,7 +302,7 @@ const beefyBaseVaultsPositions = async ({
   vaults: BaseBeefyVault[]
   multicallAddress: Address
   prices: BeefyPrices
-  apys: BeefyApys
+  apyBreakdown: BeefyApyBreakdown
   tvls: BeefyPrices
   t: TFunction
 }) => {
@@ -310,7 +371,7 @@ const beefyBaseVaultsPositions = async ({
               networkId,
               vault,
               prices,
-              apys,
+              apyBreakdown,
               tvls,
               t,
             })
@@ -427,12 +488,13 @@ const hook: PositionsHook = {
       return []
     }
 
-    const [{ vaults, govVaults }, prices, apys, tvls] = await Promise.all([
-      getBeefyVaults(networkId),
-      getBeefyPrices(networkId),
-      getApys(),
-      getTvls(networkId),
-    ])
+    const [{ vaults, govVaults }, prices, apyBreakdown, tvls] =
+      await Promise.all([
+        getBeefyVaults(networkId),
+        getBeefyPrices(networkId),
+        getApyBreakdown(),
+        getTvls(networkId),
+      ])
 
     return [
       ...(await beefyBaseVaultsPositions({
@@ -441,7 +503,7 @@ const hook: PositionsHook = {
         vaults,
         multicallAddress,
         prices,
-        apys,
+        apyBreakdown,
         tvls,
         t,
       })),
