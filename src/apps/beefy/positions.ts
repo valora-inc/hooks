@@ -28,6 +28,7 @@ import {
 } from './api'
 import { TFunction } from 'i18next'
 import { networkIdToNativeAssetAddress } from '../../runtime/isNative'
+import { getSafety } from './safety'
 
 type BeefyPrices = Awaited<ReturnType<typeof getBeefyPrices>>
 type BeefyApyBreakdown = Awaited<ReturnType<typeof getApyBreakdown>>
@@ -136,6 +137,7 @@ const beefyAppTokenDefinition = ({
         apyBreakdown[vault.id],
         vault,
       ),
+      safety: getSafety(vault, t),
     },
     availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
     shortcutTriggerArgs: ({ tokensByTokenId }) => {

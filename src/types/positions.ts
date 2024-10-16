@@ -87,6 +87,17 @@ export enum ClaimType {
   Rewards = 'rewards',
 }
 
+export interface SafetyRisk {
+  isPositive: boolean
+  title: string
+  category: string
+}
+
+export interface Safety {
+  level: 'low' | 'medium' | 'high'
+  risks: SafetyRisk[]
+}
+
 export interface EarnDataProps {
   contractCreatedAt?: string // ISO string
   manageUrl?: string
@@ -101,6 +112,7 @@ export interface EarnDataProps {
   claimType?: ClaimType
   withdrawalIncludesClaim?: boolean
   dailyYieldRatePercentage?: number // The daily yield rate percentage
+  safety?: Safety
   // We'll add more fields here as needed
 }
 
