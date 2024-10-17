@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Extend Valora using Hooks
 
-> If you're want to start coding, see check out the [Live
+> If you want to start coding, check out the [Live
 > Preview](live-preview) and the [example application](https://github.com/valora-inc/hooks/blob/master/src/apps/example)
 > with hook implementations.
 
