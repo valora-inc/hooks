@@ -10,12 +10,12 @@ A user's Valora wallet invokes position hooks when determining the types, quanti
 
 ## Principle
 
-A position pricing hook's main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
+A position pricing hook's main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and is not needed by hooks authors.
 
 Terms:
 
 - **Base Tokens**: base assets which have a token to represent them (ERC20, ERC721, etc). Examples: CELO, cUSD, cEUR, UBE, MOO, etc.
-- **App Tokens**: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked position.
+- **App Tokens**: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked positions.
 - **Contract Positions**: things that are not represented by a token (example: locked CELO, farming positions, claimable tokens).
 
 For example, a position hook detects that a user owns a position in a liquidity pool. It then provides information about the pool's assets and the user's share of the pool's assets.
@@ -63,7 +63,7 @@ It receives the following arguments:
 
 It should return an array of [`PositionDefinition`](https://github.com/valora-inc/hooks/blob/main/src/types/positions.ts) objects.
 
-The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
+The `PositionDefinition` is either an `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
 #### App Token Position Definition
 
