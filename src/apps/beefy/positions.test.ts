@@ -12,11 +12,6 @@ const apyBreakdownWithIncorrectComponents = {
   totalApy: 0.5,
 }
 
-const apyBreakdownWithRewardPoolApr = {
-  ...apyBreakdownWithCorrectComponents,
-  rewardPoolApr: 0.4,
-}
-
 const vault: BaseBeefyVault = {
   type: 'gov',
   subType: 'cowcentrated',
@@ -39,7 +34,21 @@ describe('getDailyYieldRatePercentage', () => {
   })
   it('should not include rewardPoolApr in the daily yield rate percentage for gov cowcentrated vault', () => {
     const dailyYieldRatePercentage = getDailyYieldRatePercentage(
-      apyBreakdownWithRewardPoolApr,
+      { ...apyBreakdownWithCorrectComponents, rewardPoolApr: 0.4 },
+      vault,
+    )
+    expect(dailyYieldRatePercentage).toBeCloseTo(0.164)
+  })
+  it('should return 0 if totalApy is undefined and no components', () => {
+    const dailyYieldRatePercentage = getDailyYieldRatePercentage({}, vault)
+    expect(dailyYieldRatePercentage).toBe(0)
+  })
+  it('should ignore components that are NaN', () => {
+    const dailyYieldRatePercentage = getDailyYieldRatePercentage(
+      {
+        ...apyBreakdownWithCorrectComponents,
+        merklApr: NaN,
+      },
       vault,
     )
     expect(dailyYieldRatePercentage).toBeCloseTo(0.164)
