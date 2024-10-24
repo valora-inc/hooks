@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@0xsquid/squid-types": "^0.1.113",
-    "@bgd-labs/aave-address-book": "^4.1.0",
+    "@bgd-labs/aave-address-book": "^4.2.0",
     "@google-cloud/functions-framework": "^3.4.2",
     "@valora/http-handler": "^0.0.1",
     "@valora/logging": "^1.3.18",
