@@ -141,7 +141,7 @@ export async function getBeefyPrices(
 export async function getApyBreakdown() {
   return got
     .get(`https://api.beefy.finance/apy/breakdown/`)
-    .json<Record<string, Record<string, number>>>()
+    .json<Record<string, Record<string, number> | undefined>>()
 }
 
 export async function getTvls(
