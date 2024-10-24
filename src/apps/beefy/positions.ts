@@ -75,7 +75,7 @@ const beefyAppTokenDefinition = ({
     vault.tokenAddress?.toLowerCase() ??
     networkIdToNativeAssetAddress[networkId]
   const tvl = tvls[vault.id]
-  const apy = apyBreakdown[vault.id].totalApy || 0
+  const apy = apyBreakdown[vault.id]?.totalApy ?? 0
   return {
     type: 'app-token-definition',
     networkId,
@@ -171,6 +171,10 @@ export function getDailyYieldRatePercentage(
   apyBreakdown: BeefyApyBreakdown[string],
   vault: BaseBeefyVault,
 ) {
+  if (!apyBreakdown) {
+    return 0
+  }
+
   // https://github.com/beefyfinance/beefy-v2/blob/4413697f3d3cb5e090d8bb6958b621a673f0d739/src/helpers/apy.ts#L103
   const components = [
     'vaultApr',
@@ -203,7 +207,7 @@ export function getDailyYieldRatePercentage(
   if (vault.type === 'gov' && vault.subType === 'cowcentrated') {
     // anything in 'rewardPoolApr' (i.e. not in 'rewardPoolTradingApr') is considered a soft-boost on the pool
     // and is should not be counted towards the daily yield rate
-    const additionalApr = apyBreakdown.rewardPoolApr || 0
+    const additionalApr = apyBreakdown.rewardPoolApr ?? 0
     totalDaily -= additionalApr / 365
   }
 
@@ -377,8 +381,8 @@ const beefyBaseVaultsPositions = async ({
               tvls,
               t,
             })
-      } catch (error) {
-        logger.error('Error processing vault', vault, error)
+      } catch (err) {
+        logger.error({ err, vault }, 'Error processing vault')
         return null
       }
     })
