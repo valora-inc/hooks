@@ -167,7 +167,7 @@ const beefyAppTokenDefinition = ({
 }
 
 // Based on https://github.com/beefyfinance/beefy-v2/blob/4413697f3d3cb5e090d8bb6958b621a673f0d739/src/features/data/actions/apy.ts#L46
-function getDailyYieldRatePercentage(
+export function getDailyYieldRatePercentage(
   apyBreakdown: BeefyApyBreakdown[string],
   vault: BaseBeefyVault,
 ) {
