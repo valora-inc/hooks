@@ -79,10 +79,10 @@ const hook: PositionsHook = {
         allowFailure: false,
       })
 
-    // If the user is not verified or is new, they don't have a position
+    // If the user is new, they don't have a position
     // Note: existing users need to re-verify after some time
     // in that case, they will have a position but we will tell them to re-verify
-    if (!isVerified && !isNotNewUser) {
+    if (!isNotNewUser) {
       return []
     }
 
