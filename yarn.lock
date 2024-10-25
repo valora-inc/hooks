@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@^0.1.112":
-  version "0.1.112"
-  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.112.tgz#90fc2733bb8cb6abdc00e6cb649d41005d2e275b"
-  integrity sha512-mwiUXX3up/ovbPj7micj3yvUu5AQ6Pczs68TEfZX2tmwsbAitGt1xla/4lgudJRiAk6cpaUtIAENLp5QiOyY6w==
+"@0xsquid/squid-types@^0.1.113":
+  version "0.1.113"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.113.tgz#d958fe663cb622f44b680ef636deeb927ae8c6b8"
+  integrity sha512-F+3Dr/MkiZdemrugn1ljRWTK6pOwYxiu8nn03ctQgQYYqcqjz+l7o6Ozm+VkNIdlLhgKmLlzJ0M1fGMiNKzjNg==
   dependencies:
     "@axelar-network/axelarjs-sdk" "^0.16.1"
     "@ethersproject/providers" "^5.7.2"
@@ -369,7 +369,7 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@bgd-labs/aave-address-book@^4.1.0":
+"@bgd-labs/aave-address-book@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@bgd-labs/aave-address-book/-/aave-address-book-4.2.0.tgz#768b069a264491c381647679f8daf761e69200d3"
   integrity sha512-FBMeAySqu4oBfefJpuNR9KVy0qvL+hr/N05BiqHhI+uma0EleGl1SvHo3mtb0Faqjq71krEXRYAdwGer5F7o9g==
@@ -4117,10 +4117,10 @@ i18next-http-middleware@^3.6.0:
   resolved "https://registry.yarnpkg.com/i18next-http-middleware/-/i18next-http-middleware-3.6.0.tgz#4781751fac03e951a74a8c9f95f6bb5bc680fbdd"
   integrity sha512-pLyTOC8Dzj83byN0s4hd/i/Ewg6T36YjMrc+Zfnqz2Ca0G5ab9IPvPR8xZqr6TS0s/ZtPs2MZucDkWgqoRmNXA==
 
-i18next@^23.16.0:
-  version "23.16.0"
-  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.16.0.tgz#6127b49a30c19ba5caf0de8aeb3e15df60f7f01e"
-  integrity sha512-Ni3CG6c14teOogY19YNRl+kYaE/Rb59khy0VyHVn4uOZ97E2E/Yziyi6r3C3s9+wacjdLZiq/LLYyx+Cgd+FCw==
+i18next@^23.16.2:
+  version "23.16.3"
+  resolved "https://registry.yarnpkg.com/i18next/-/i18next-23.16.3.tgz#1b58b2ce2890eed0fb2817c7103182a9cd92a3f1"
+  integrity sha512-e8q9gFyjrou5v/hBXgRwtWVK7Gp5So19Kf42spJlijGDfkin5abYFHlblonmD2GFYcsf9XIT7MpVuveJq/VCcA==
   dependencies:
     "@babel/runtime" "^7.23.2"
 
