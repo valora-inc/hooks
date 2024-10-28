@@ -79,8 +79,10 @@ const hook: PositionsHook = {
         allowFailure: false,
       })
 
-    // If the user is new, they don't have a position
-    if (!isNotNewUser) {
+    // If the user is not verified and is new, they don't have a position
+    // Note: existing users need to re-verify after some time
+    // in that case, they will have a position but we will tell them to re-verify
+    if (!isVerified && !isNotNewUser) {
       return []
     }
 
@@ -102,8 +104,7 @@ const hook: PositionsHook = {
       displayProps: {
         title: 'Daily UBI',
         description: !isVerified
-          ? // Note: existing users need to re-verify after some time
-            'Re-verify on the dapp to claim'
+          ? 'Re-verify on the dapp to claim'
           : claimAmount > 0n
           ? 'Claim now'
           : // Claim in X hours
