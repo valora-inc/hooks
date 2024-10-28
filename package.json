@@ -46,7 +46,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "got": "^11.8.6",
-    "i18next": "^23.16.2",
+    "i18next": "^23.16.4",
     "i18next-fs-backend": "^2.3.2",
     "i18next-http-middleware": "^3.6.0",
     "lru-cache": "^11.0.1",
@@ -54,7 +54,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.13",
+    "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.9",
     "@types/qrcode-terminal": "^0.12.2",
     "@types/shelljs": "^0.8.15",
@@ -67,7 +67,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^27.9.0",
-    "eslint-plugin-react": "^7.37.1",
+    "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-native": "^4.1.0",
     "internal-ip": "^6.2.0",
