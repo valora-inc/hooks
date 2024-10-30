@@ -1,5 +1,22 @@
+import { TFunction } from 'i18next'
 import { BaseBeefyVault } from './api'
-import { getDailyYieldRatePercentage } from './positions'
+import hook, { getDailyYieldRatePercentage } from './positions'
+
+const mockT = ((x: string) => x) as TFunction
+
+const mockReadContract = jest.fn()
+jest.mock('../runtime/client', () => ({
+    getClient: jest.fn(() => ({
+      readContract: mockReadContract,
+    })),
+  }))
+
+jest.mock('./api.ts')
+
+const mockBeefyVaults = []
+const mockBeefyPrices = {}
+const mockApyBreakdown = {}
+const mockTvls = {}
 
 const apyBreakdownWithCorrectComponents = {
   vaultApr: 0.1,
@@ -53,4 +70,20 @@ describe('getDailyYieldRatePercentage', () => {
     )
     expect(dailyYieldRatePercentage).toBeCloseTo(0.164)
   })
+})
+
+describe('hook', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+  it('should return the correct hook info', () => {
+    expect(hook.getInfo()).toEqual({
+      id: 'beefy',
+      name: 'Beefy',
+      description: 'Beefy vaults',
+    })
+  })
+  it('should return expected positions when getPositionDefinitions is called with supported networkId and address', async () => {})
+  it('should return expected positions when getPositionDefinitions is called with supported networkId and no address', async () => {})
+  it('should return an empty array when getPositionDefinitions is called with an unsupported networkId', async () => {})
 })
