@@ -1,22 +1,101 @@
 import { TFunction } from 'i18next'
-import { BaseBeefyVault } from './api'
+import {
+  BaseBeefyVault,
+  getApyBreakdown,
+  getBeefyPrices,
+  getBeefyVaults,
+  getTvls,
+} from './api'
 import hook, { getDailyYieldRatePercentage } from './positions'
+import { NetworkId } from '../../types/networkId'
+import BigNumber from 'bignumber.js'
+import { Address } from 'viem'
 
 const mockT = ((x: string) => x) as TFunction
 
 const mockReadContract = jest.fn()
 jest.mock('../runtime/client', () => ({
-    getClient: jest.fn(() => ({
-      readContract: mockReadContract,
-    })),
-  }))
+  getClient: jest.fn(() => ({
+    readContract: mockReadContract,
+  })),
+}))
 
 jest.mock('./api.ts')
 
-const mockBeefyVaults = []
-const mockBeefyPrices = {}
-const mockApyBreakdown = {}
-const mockTvls = {}
+const mockBeefyVault1: BaseBeefyVault = {
+  id: 'vault1',
+  name: 'Vault 1',
+  type: 'auto',
+  subType: 'concentrated',
+  token: 'vault1Token',
+  tokenAddress: '0x123456789' as Address,
+  tokenDecimals: 8,
+  tokenProviderId: '',
+  earnedToken: '',
+  earnContractAddress: '' as Address,
+  status: '',
+  platformId: '',
+  assets: [],
+  risks: [],
+  strategyTypeId: '',
+  network: 'arbitrum-one',
+  chain: '',
+  zaps: [],
+  isGovVault: false,
+  oracle: '',
+  oracleId: '',
+  createdAt: 12345,
+  earnedTokenAddress: '0x987654321' as Address,
+  depositTokenAddresses: [],
+  strategy: '' as Address,
+  pricePerFullShare: '120000000',
+}
+
+const mockBeefyVault2: BaseBeefyVault = {
+  id: 'vault2',
+  name: 'Vault 2',
+  type: 'auto',
+  subType: 'concentrated',
+  token: 'vault1Token',
+  tokenAddress: '0x111111111' as Address,
+  tokenDecimals: 2,
+  tokenProviderId: '',
+  earnedToken: '',
+  earnContractAddress: '' as Address,
+  status: '',
+  platformId: '',
+  assets: [],
+  risks: [],
+  strategyTypeId: '',
+  network: 'arbitrum-one',
+  chain: '',
+  zaps: [],
+  isGovVault: false,
+  oracle: '',
+  oracleId: '',
+  createdAt: 135790,
+  earnedTokenAddress: '0x999999999' as Address,
+  depositTokenAddresses: [],
+  strategy: '' as Address,
+  pricePerFullShare: '100000',
+}
+
+const mockBeefyVaults = {
+  vaults: [mockBeefyVault1, mockBeefyVault2],
+  govVaults: [],
+}
+const mockBeefyPrices = { vault1: 1.2, vault2: 1000 }
+const mockApyBreakdown = {
+  vault1: { totalApy: 0.31 },
+  vault2: { totalApy: 0.06 },
+}
+const mockTvls = { vault1: 98765, vault2: 1234567890 }
+const mockGetTokenBalancesResponse: readonly bigint[] = [0n, 10n]
+
+jest.mocked(getBeefyVaults).mockResolvedValue(mockBeefyVaults)
+jest.mocked(getBeefyPrices).mockResolvedValue(mockBeefyPrices)
+jest.mocked(getApyBreakdown).mockResolvedValue(mockApyBreakdown)
+jest.mocked(getTvls).mockResolvedValue(mockTvls)
 
 const apyBreakdownWithCorrectComponents = {
   vaultApr: 0.1,
@@ -33,6 +112,9 @@ const vault: BaseBeefyVault = {
   type: 'gov',
   subType: 'cowcentrated',
 } as BaseBeefyVault
+
+const expectedBeefyVaultWithBalance = {}
+const expectedBeefyVaultWithoutBalance = {}
 
 describe('getDailyYieldRatePercentage', () => {
   it('should return the correct daily yield rate percentage when there are components', () => {
@@ -73,9 +155,9 @@ describe('getDailyYieldRatePercentage', () => {
 })
 
 describe('hook', () => {
-    beforeEach(() => {
-        jest.clearAllMocks()
-    })
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   it('should return the correct hook info', () => {
     expect(hook.getInfo()).toEqual({
       id: 'beefy',
@@ -83,7 +165,35 @@ describe('hook', () => {
       description: 'Beefy vaults',
     })
   })
-  it('should return expected positions when getPositionDefinitions is called with supported networkId and address', async () => {})
-  it('should return expected positions when getPositionDefinitions is called with supported networkId and no address', async () => {})
-  it('should return an empty array when getPositionDefinitions is called with an unsupported networkId', async () => {})
+  it('should return expected positions with balances when getPositionDefinitions is called with supported networkId and address', async () => {
+    mockReadContract.mockResolvedValue(mockGetTokenBalancesResponse)
+    const beefyPositions = await hook.getPositionDefinitions({
+      networkId: NetworkId['arbitrum-one'],
+      address: '0x12345',
+      t: mockT,
+    })
+    expect(beefyPositions.length).toBe(1)
+    expect(beefyPositions[0]).toEqual(expectedBeefyVaultWithBalance)
+  })
+  it('should return all expected positions when getPositionDefinitions is called with supported networkId and no address', async () => {
+    const beefyPositions = await hook.getPositionDefinitions({
+      networkId: NetworkId['arbitrum-one'],
+      address: undefined,
+      t: mockT,
+    })
+    expect(beefyPositions.length).toBe(2)
+    expect(beefyPositions[0]).toEqual(expectedBeefyVaultWithoutBalance)
+    expect(beefyPositions[1]).toEqual({
+      ...expectedBeefyVaultWithBalance,
+      balance: new BigNumber(0),
+    })
+  })
+  it('should return an empty array when getPositionDefinitions is called with an unsupported networkId', async () => {
+    const beefyPositions = await hook.getPositionDefinitions({
+      networkId: NetworkId['celo-alfajores'],
+      address: '0x12345',
+      t: mockT,
+    })
+    expect(beefyPositions).toEqual([])
+  })
 })
