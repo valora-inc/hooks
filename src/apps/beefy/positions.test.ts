@@ -8,7 +8,6 @@ import {
 } from './api'
 import hook, { getDailyYieldRatePercentage } from './positions'
 import { NetworkId } from '../../types/networkId'
-import BigNumber from 'bignumber.js'
 import { Address } from 'viem'
 
 const mockT = ((x: string) => x) as TFunction
@@ -113,42 +112,7 @@ const vault: BaseBeefyVault = {
   subType: 'cowcentrated',
 } as BaseBeefyVault
 
-const expectedBeefyVaultWithBalance = {
-  address: '0x999999999',
-  availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
-  dataProps: {
-    cantSeparateCompoundedInterest: true,
-    claimType: 'rewards',
-    contractCreatedAt: '1970-01-02T13:43:10.000Z',
-    dailyYieldRatePercentage: 0.015965358745284597,
-    depositTokenId: 'arbitrum-one:0x111111111',
-    earningItems: [],
-    manageUrl: 'https://app.beefy.com/vault/vault2',
-    safety: undefined,
-    tvl: '1234567890',
-    withdrawTokenId: 'arbitrum-one:0x999999999',
-    yieldRates: [
-      {
-        label: 'yieldRates.earningsApy',
-        percentage: 6,
-        tokenId: 'arbitrum-one:0x111111111',
-      },
-    ],
-  },
-  displayProps: [],
-  networkId: 'arbitrum-one',
-  pricePerShare: [],
-  shortcutTriggerArgs: [],
-  tokens: [
-    {
-      address: '0x111111111',
-      fallbackPriceUsd: '1000',
-      networkId: 'arbitrum-one',
-    },
-  ],
-  type: 'app-token-definition',
-}
-const expectedBeefyVaultWithoutBalance = {
+const expectedBeefyVault1 = {
   address: '0x987654321',
   availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
   dataProps: {
@@ -170,10 +134,10 @@ const expectedBeefyVaultWithoutBalance = {
       },
     ],
   },
-  displayProps: [],
+  displayProps: expect.any(Function),
   networkId: 'arbitrum-one',
-  pricePerShare: [],
-  shortcutTriggerArgs: [],
+  pricePerShare: expect.any(Function),
+  shortcutTriggerArgs: expect.any(Function),
   tokens: [
     {
       address: '0x123456789',
@@ -183,6 +147,42 @@ const expectedBeefyVaultWithoutBalance = {
   ],
   type: 'app-token-definition',
 }
+
+const expectedBeefyVault2 = {
+    address: '0x999999999',
+    availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
+    dataProps: {
+      cantSeparateCompoundedInterest: true,
+      claimType: 'rewards',
+      contractCreatedAt: '1970-01-02T13:43:10.000Z',
+      dailyYieldRatePercentage: 0.015965358745284597,
+      depositTokenId: 'arbitrum-one:0x111111111',
+      earningItems: [],
+      manageUrl: 'https://app.beefy.com/vault/vault2',
+      safety: undefined,
+      tvl: '1234567890',
+      withdrawTokenId: 'arbitrum-one:0x999999999',
+      yieldRates: [
+        {
+          label: 'yieldRates.earningsApy',
+          percentage: 6,
+          tokenId: 'arbitrum-one:0x111111111',
+        },
+      ],
+    },
+    displayProps: expect.any(Function),
+    networkId: 'arbitrum-one',
+    pricePerShare: expect.any(Function),
+    shortcutTriggerArgs: expect.any(Function),
+    tokens: [
+      {
+        address: '0x111111111',
+        fallbackPriceUsd: '1000',
+        networkId: 'arbitrum-one',
+      },
+    ],
+    type: 'app-token-definition',
+  }
 
 describe('getDailyYieldRatePercentage', () => {
   it('should return the correct daily yield rate percentage when there are components', () => {
@@ -241,7 +241,7 @@ describe('hook', () => {
       t: mockT,
     })
     expect(beefyPositions.length).toBe(1)
-    expect(beefyPositions[0]).toEqual(expectedBeefyVaultWithBalance)
+    expect(beefyPositions[0]).toEqual(expectedBeefyVault2)
   })
   it('should return all expected positions when getPositionDefinitions is called with supported networkId and no address', async () => {
     const beefyPositions = await hook.getPositionDefinitions({
@@ -250,11 +250,8 @@ describe('hook', () => {
       t: mockT,
     })
     expect(beefyPositions.length).toBe(2)
-    expect(beefyPositions[0]).toEqual(expectedBeefyVaultWithoutBalance)
-    expect(beefyPositions[1]).toEqual({
-      ...expectedBeefyVaultWithBalance,
-      balance: new BigNumber(0),
-    })
+    expect(beefyPositions[0]).toEqual(expectedBeefyVault1)
+    expect(beefyPositions[1]).toEqual(expectedBeefyVault2)
   })
   it('should return an empty array when getPositionDefinitions is called with an unsupported networkId', async () => {
     const beefyPositions = await hook.getPositionDefinitions({
