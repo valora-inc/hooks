@@ -149,40 +149,40 @@ const expectedBeefyVault1 = {
 }
 
 const expectedBeefyVault2 = {
-    address: '0x999999999',
-    availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
-    dataProps: {
-      cantSeparateCompoundedInterest: true,
-      claimType: 'rewards',
-      contractCreatedAt: '1970-01-02T13:43:10.000Z',
-      dailyYieldRatePercentage: 0.015965358745284597,
-      depositTokenId: 'arbitrum-one:0x111111111',
-      earningItems: [],
-      manageUrl: 'https://app.beefy.com/vault/vault2',
-      safety: undefined,
-      tvl: '1234567890',
-      withdrawTokenId: 'arbitrum-one:0x999999999',
-      yieldRates: [
-        {
-          label: 'yieldRates.earningsApy',
-          percentage: 6,
-          tokenId: 'arbitrum-one:0x111111111',
-        },
-      ],
-    },
-    displayProps: expect.any(Function),
-    networkId: 'arbitrum-one',
-    pricePerShare: expect.any(Function),
-    shortcutTriggerArgs: expect.any(Function),
-    tokens: [
+  address: '0x999999999',
+  availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
+  dataProps: {
+    cantSeparateCompoundedInterest: true,
+    claimType: 'rewards',
+    contractCreatedAt: '1970-01-02T13:43:10.000Z',
+    dailyYieldRatePercentage: 0.015965358745284597,
+    depositTokenId: 'arbitrum-one:0x111111111',
+    earningItems: [],
+    manageUrl: 'https://app.beefy.com/vault/vault2',
+    safety: undefined,
+    tvl: '1234567890',
+    withdrawTokenId: 'arbitrum-one:0x999999999',
+    yieldRates: [
       {
-        address: '0x111111111',
-        fallbackPriceUsd: '1000',
-        networkId: 'arbitrum-one',
+        label: 'yieldRates.earningsApy',
+        percentage: 6,
+        tokenId: 'arbitrum-one:0x111111111',
       },
     ],
-    type: 'app-token-definition',
-  }
+  },
+  displayProps: expect.any(Function),
+  networkId: 'arbitrum-one',
+  pricePerShare: expect.any(Function),
+  shortcutTriggerArgs: expect.any(Function),
+  tokens: [
+    {
+      address: '0x111111111',
+      fallbackPriceUsd: '1000',
+      networkId: 'arbitrum-one',
+    },
+  ],
+  type: 'app-token-definition',
+}
 
 describe('getDailyYieldRatePercentage', () => {
   it('should return the correct daily yield rate percentage when there are components', () => {
