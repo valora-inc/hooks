@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@^0.1.115":
+"@0xsquid/squid-types@^0.1.116":
   version "0.1.116"
   resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.116.tgz#8bd8baad729c94a8af431487c1f3c2df6252bf5d"
   integrity sha512-9drO6RepTSHLZQEU6/h99+p6xDwxth7DwrcdhlrZfo4gC5A/DhYHTdiT5omgwgSXiH1Y7ssI1WQ0XOuWDveYAg==
