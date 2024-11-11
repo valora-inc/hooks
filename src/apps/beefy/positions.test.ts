@@ -21,12 +21,12 @@ jest.mock('../../runtime/client', () => ({
 
 jest.mock('./api.ts')
 
-const mockBeefyVault1: BaseBeefyVault = {
-  id: 'vault1',
-  name: 'Vault 1',
+const mockBeefyVault: BaseBeefyVault = {
+  id: 'defaultVault',
+  name: 'Default Vault',
   type: 'auto',
   subType: 'concentrated',
-  token: 'vault1Token',
+  token: 'vaultToken',
   tokenAddress: '0x123456789' as Address,
   tokenDecimals: 8,
   tokenProviderId: '',
@@ -50,32 +50,19 @@ const mockBeefyVault1: BaseBeefyVault = {
   pricePerFullShare: '120000000',
 }
 
+const mockBeefyVault1: BaseBeefyVault = {
+  ...mockBeefyVault,
+  id: 'vault1',
+  name: 'Vault 1',
+}
+
 const mockBeefyVault2: BaseBeefyVault = {
+  ...mockBeefyVault,
   id: 'vault2',
   name: 'Vault 2',
-  type: 'auto',
-  subType: 'concentrated',
-  token: 'vault1Token',
   tokenAddress: '0x111111111' as Address,
-  tokenDecimals: 2,
-  tokenProviderId: '',
-  earnedToken: '',
-  earnContractAddress: '' as Address,
-  status: '',
-  platformId: '',
-  assets: [],
-  risks: [],
-  strategyTypeId: '',
-  network: 'arbitrum-one',
-  chain: '',
-  zaps: [],
-  isGovVault: false,
-  oracle: '',
-  oracleId: '',
   createdAt: 135790,
   earnedTokenAddress: '0x999999999' as Address,
-  depositTokenAddresses: [],
-  strategy: '' as Address,
   pricePerFullShare: '100000',
 }
 
@@ -149,17 +136,14 @@ const expectedBeefyVault1 = {
 }
 
 const expectedBeefyVault2 = {
+  ...expectedBeefyVault1,
   address: '0x999999999',
-  availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
   dataProps: {
-    cantSeparateCompoundedInterest: true,
-    claimType: 'rewards',
+    ...expectedBeefyVault1.dataProps,
     contractCreatedAt: '1970-01-02T13:43:10.000Z',
     dailyYieldRatePercentage: 0.015965358745284597,
     depositTokenId: 'arbitrum-one:0x111111111',
-    earningItems: [],
     manageUrl: 'https://app.beefy.com/vault/vault2',
-    safety: undefined,
     tvl: '1234567890',
     withdrawTokenId: 'arbitrum-one:0x999999999',
     yieldRates: [
@@ -170,10 +154,6 @@ const expectedBeefyVault2 = {
       },
     ],
   },
-  displayProps: expect.any(Function),
-  networkId: 'arbitrum-one',
-  pricePerShare: expect.any(Function),
-  shortcutTriggerArgs: expect.any(Function),
   tokens: [
     {
       address: '0x111111111',
@@ -181,7 +161,6 @@ const expectedBeefyVault2 = {
       networkId: 'arbitrum-one',
     },
   ],
-  type: 'app-token-definition',
 }
 
 describe('getDailyYieldRatePercentage', () => {
