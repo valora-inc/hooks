@@ -83,23 +83,12 @@ jest.mocked(getBeefyPrices).mockResolvedValue(mockBeefyPrices)
 jest.mocked(getApyBreakdown).mockResolvedValue(mockApyBreakdown)
 jest.mocked(getTvls).mockResolvedValue(mockTvls)
 
-const apyBreakdownWithCorrectComponents = {
-  vaultApr: 0.1,
-  clmApr: 0.2,
-  tradingApr: 0.3,
-}
-
-const apyBreakdownWithIncorrectComponents = {
-  unsupportedComponent: 0.1,
-  totalApy: 0.5,
-}
-
 const vault: BaseBeefyVault = {
   type: 'gov',
   subType: 'cowcentrated',
 } as BaseBeefyVault
 
-const expectedBeefyVault1 = {
+const expectedBeefyVault = {
   address: '0x987654321',
   availableShortcutIds: ['deposit', 'withdraw', 'swap-deposit'],
   dataProps: {
@@ -109,7 +98,7 @@ const expectedBeefyVault1 = {
     dailyYieldRatePercentage: 0.07400740957195229,
     depositTokenId: 'arbitrum-one:0x123456789',
     earningItems: [],
-    manageUrl: 'https://app.beefy.com/vault/vault1',
+    manageUrl: 'https://app.beefy.com/vault/defaultVault',
     safety: undefined,
     tvl: '98765',
     withdrawTokenId: 'arbitrum-one:0x987654321',
@@ -135,11 +124,19 @@ const expectedBeefyVault1 = {
   type: 'app-token-definition',
 }
 
+const expectedBeefyVault1 = {
+  ...expectedBeefyVault,
+  dataProps: {
+    ...expectedBeefyVault.dataProps,
+    manageUrl: 'https://app.beefy.com/vault/vault1',
+  },
+}
+
 const expectedBeefyVault2 = {
-  ...expectedBeefyVault1,
+  ...expectedBeefyVault,
   address: '0x999999999',
   dataProps: {
-    ...expectedBeefyVault1.dataProps,
+    ...expectedBeefyVault.dataProps,
     contractCreatedAt: '1970-01-02T13:43:10.000Z',
     dailyYieldRatePercentage: 0.015965358745284597,
     depositTokenId: 'arbitrum-one:0x111111111',
@@ -161,6 +158,17 @@ const expectedBeefyVault2 = {
       networkId: 'arbitrum-one',
     },
   ],
+}
+
+const apyBreakdownWithCorrectComponents = {
+  vaultApr: 0.1,
+  clmApr: 0.2,
+  tradingApr: 0.3,
+}
+
+const apyBreakdownWithIncorrectComponents = {
+  unsupportedComponent: 0.1,
+  totalApy: 0.5,
 }
 
 describe('getDailyYieldRatePercentage', () => {
