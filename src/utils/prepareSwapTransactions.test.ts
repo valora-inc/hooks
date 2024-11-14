@@ -85,7 +85,6 @@ describe('prepareSwapTransactions', () => {
       swapFromToken: mockNativeSwapFromToken,
       swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
       postHook: mockPostHook,
-      simulatedGasPadding: [1n, 100n],
     })
 
     expect(transactions).toHaveLength(1)
@@ -95,7 +94,7 @@ describe('prepareSwapTransactions', () => {
       to: '0x12345678',
       data: '0xswapdata',
       value: 111n,
-      gas: 12345n,
+      gas: 14042n,
       estimatedGasUse: 12211n,
     })
     expect(dataProps).toEqual({ swapTransaction })
@@ -111,19 +110,7 @@ describe('prepareSwapTransactions', () => {
           sellNetworkId: NetworkId['arbitrum-one'],
           sellAmount: (1e18).toString(),
           slippagePercentage: '1',
-          postHook: {
-            ...mockPostHook,
-            calls: [
-              {
-                ...mockPostHook.calls[0],
-                estimatedGas: '1000',
-              },
-              {
-                ...mockPostHook.calls[1],
-                estimatedGas: '2000',
-              },
-            ],
-          },
+          postHook: mockPostHook,
           userAddress: mockWalletAddress,
         },
       },
@@ -152,7 +139,7 @@ describe('prepareSwapTransactions', () => {
       to: '0x12345678',
       data: '0xswapdata',
       value: 111n,
-      gas: 12345n,
+      gas: 14042n,
       estimatedGasUse: 12211n,
     })
     expect(dataProps).toEqual({ swapTransaction })
@@ -169,19 +156,7 @@ describe('prepareSwapTransactions', () => {
           sellNetworkId: NetworkId['arbitrum-one'],
           sellAmount: (1e6).toString(),
           slippagePercentage: '1',
-          postHook: {
-            ...mockPostHook,
-            calls: [
-              {
-                ...mockPostHook.calls[0],
-                estimatedGas: '1000',
-              },
-              {
-                ...mockPostHook.calls[1],
-                estimatedGas: '2000',
-              },
-            ],
-          },
+          postHook: mockPostHook,
           userAddress: mockWalletAddress,
         },
       },
@@ -206,48 +181,9 @@ describe('prepareSwapTransactions', () => {
       to: '0x12345678',
       data: '0xswapdata',
       value: 111n,
-      gas: 12345n,
+      gas: 14042n,
       estimatedGasUse: 12211n,
     })
-  })
-
-  it('uses default gas for postHook', async () => {
-    const { transactions } = await prepareSwapTransactions({
-      networkId: NetworkId['arbitrum-one'],
-      walletAddress: '0x2b8441ef13333ffa955c9ea5ab5b3692da95260d',
-      swapFromToken: mockNativeSwapFromToken,
-      swapToTokenAddress: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
-      postHook: mockPostHook,
-      simulatedGasPadding: [1n, 100n],
-    })
-
-    expect(transactions).toHaveLength(1)
-    expect(transactions[0]).toEqual({
-      networkId: NetworkId['arbitrum-one'],
-      from: mockWalletAddress,
-      to: '0x12345678',
-      data: '0xswapdata',
-      value: 111n,
-      gas: 12345n,
-      estimatedGasUse: 12211n,
-    })
-    expect(got.post).toHaveBeenCalledTimes(1)
-    expect(got.post).toHaveBeenCalledWith(
-      'https://api.mainnet.valora.xyz/getSwapQuote',
-      {
-        json: {
-          buyToken: '0x724dc807b04555b71ed48a6896b6f41593b8c637',
-          buyIsNative: false,
-          buyNetworkId: NetworkId['arbitrum-one'],
-          sellIsNative: true,
-          sellNetworkId: NetworkId['arbitrum-one'],
-          sellAmount: (1e18).toString(),
-          slippagePercentage: '1',
-          postHook: mockPostHook,
-          userAddress: mockWalletAddress,
-        },
-      },
-    )
   })
 
   it('throws if getting swap quote fails', async () => {
