@@ -44,7 +44,6 @@ export async function prepareSwapTransactions({
   swapToTokenAddress: Address
   networkId: NetworkId
   walletAddress: Address
-  simulatedGasPadding?: bigint[]
   enableAppFee?: boolean
 }): Promise<TriggerOutputShape<'swap-deposit'>> {
   const amountToSwap = parseUnits(swapFromToken.amount, swapFromToken.decimals)
@@ -137,7 +136,11 @@ export async function prepareSwapTransactions({
     to,
     data,
     value: BigInt(value),
-    gas: BigInt(gas),
+    // estimatedGasUse is from the simulation, gas is from the swap provider
+    // add 15% padding to the simulation
+    gas: estimatedGasUse
+      ? (BigInt(estimatedGasUse) * 115n) / 100n
+      : BigInt(gas),
     estimatedGasUse: estimatedGasUse ? BigInt(estimatedGasUse) : undefined,
   }
 
