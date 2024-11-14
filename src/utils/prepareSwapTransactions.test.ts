@@ -110,19 +110,7 @@ describe('prepareSwapTransactions', () => {
           sellNetworkId: NetworkId['arbitrum-one'],
           sellAmount: (1e18).toString(),
           slippagePercentage: '1',
-          postHook: {
-            ...mockPostHook,
-            calls: [
-              {
-                ...mockPostHook.calls[0],
-                estimatedGas: '1000',
-              },
-              {
-                ...mockPostHook.calls[1],
-                estimatedGas: '2000',
-              },
-            ],
-          },
+          postHook: mockPostHook,
           userAddress: mockWalletAddress,
         },
       },
@@ -168,19 +156,7 @@ describe('prepareSwapTransactions', () => {
           sellNetworkId: NetworkId['arbitrum-one'],
           sellAmount: (1e6).toString(),
           slippagePercentage: '1',
-          postHook: {
-            ...mockPostHook,
-            calls: [
-              {
-                ...mockPostHook.calls[0],
-                estimatedGas: '1000',
-              },
-              {
-                ...mockPostHook.calls[1],
-                estimatedGas: '2000',
-              },
-            ],
-          },
+          postHook: mockPostHook,
           userAddress: mockWalletAddress,
         },
       },
