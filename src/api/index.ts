@@ -150,7 +150,7 @@ function createApp() {
       )
       const baseTokensInfo = await getBaseTokensInfo(
         getConfig().GET_TOKENS_INFO_URL,
-        networkIds
+        networkIds,
       )
       const positions = (
         await Promise.all(
@@ -214,7 +214,7 @@ function createApp() {
 
       const baseTokensInfo = await getBaseTokensInfo(
         getConfig().GET_TOKENS_INFO_URL,
-        networkIds
+        networkIds,
       )
 
       const positions = (
