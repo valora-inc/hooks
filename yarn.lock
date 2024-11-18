@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@^0.1.116":
-  version "0.1.116"
-  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.116.tgz#8bd8baad729c94a8af431487c1f3c2df6252bf5d"
-  integrity sha512-9drO6RepTSHLZQEU6/h99+p6xDwxth7DwrcdhlrZfo4gC5A/DhYHTdiT5omgwgSXiH1Y7ssI1WQ0XOuWDveYAg==
+"@0xsquid/squid-types@^0.1.117":
+  version "0.1.117"
+  resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.117.tgz#0f4df81acd78da064be75d1bbf1152d3bca9638a"
+  integrity sha512-RlfciAvTbTqp3HYn+wDzABDXyK0SeEF/5j7N1gbz+vJ8C3SkfcD9GbHVCh81Zpsgmh7HRtXw4DTUnf+GiN9Y4g==
   dependencies:
     "@axelar-network/axelarjs-sdk" "^0.16.1"
     "@ethersproject/providers" "^5.7.2"
@@ -6633,10 +6633,10 @@ ts-node@^10.9.2:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-tsc-watch@^6.2.0:
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/tsc-watch/-/tsc-watch-6.2.0.tgz#4b191c36c6ed24c2bf6e721013af0825cd73d217"
-  integrity sha512-2LBhf9kjKXnz7KQ/puLHlozMzzUNHAdYBNMkg3eksQJ9GBAgMg8czznM83T5PmsoUvDnXzfIeQn2lNcIYDr8LA==
+tsc-watch@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/tsc-watch/-/tsc-watch-6.2.1.tgz#861801be929b2fd3d597c5f608db2b7ddba503db"
+  integrity sha512-GLwdz5Dy9K3sVm3RzgkLcyDpl5cvU9HEcE1A3gf5rqEwlUe7gDLxNCgcuNEw3zoKOiegMo3LnbF1t6HLqxhrSA==
   dependencies:
     cross-spawn "^7.0.3"
     node-cleanup "^2.1.2"
