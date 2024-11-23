@@ -47,7 +47,7 @@
     "express": "^4.21.1",
     "got": "^11.8.6",
     "i18next": "^23.16.6",
-    "i18next-fs-backend": "^2.3.2",
+    "i18next-fs-backend": "^2.4.0",
     "i18next-http-middleware": "^3.6.0",
     "lru-cache": "^11.0.2",
     "viem": "^2.21.10",
