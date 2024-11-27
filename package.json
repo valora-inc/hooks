@@ -50,7 +50,7 @@
     "i18next-fs-backend": "^2.6.0",
     "i18next-http-middleware": "^3.7.0",
     "lru-cache": "^11.0.2",
-    "viem": "^2.21.10",
+    "viem": "^2.21.50",
     "zod": "^3.23.8"
   },
   "devDependencies": {
