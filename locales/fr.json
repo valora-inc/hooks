@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "Fonctions dangereuses bloquées dans le temps",
     "Platfrm-TimelockShort-Titl": "Les fonctions dangereuses sont bloquées pendant un court délai",
     "Platfrm-TimelockNo-Titl": "La fonction dangereuse n'est pas verrouillée"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "Staking",
+      "description": "{{amount}} WCT verrouillé jusqu'à {{date}}"
+    }
   }
 }
