@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "Niebezpieczne funkcje zablokowane czasowo",
     "Platfrm-TimelockShort-Titl": "Niebezpieczne funkcje zablokowane czasowo z krótkim opóźnieniem",
     "Platfrm-TimelockNo-Titl": "Niebezpieczne funkcje nie są blokowane czasowo"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "Tyczenie",
+      "description": "{{amount}} WCT zablokowane do {{date}}"
+    }
   }
 }
