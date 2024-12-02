@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "ฟังก์ชันอันตรายถูกหน่วงเวลาไว้",
     "Platfrm-TimelockShort-Titl": "ฟังก์ชันอันตรายถูกหน่วงเวลาให้ล่าช้าเล็กน้อย",
     "Platfrm-TimelockNo-Titl": "ฟังก์ชันอันตรายไม่ได้รับการหน่วงเวลาไว้"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "Staking",
+      "description": "{{amount}} WCT locked until {{date}}"
+    }
   }
 }
