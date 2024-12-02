@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "Chức năng nguy hiểm bị khóa thời gian",
     "Platfrm-TimelockShort-Titl": "Chức năng nguy hiểm bị khóa thời gian tạm thời",
     "Platfrm-TimelockNo-Titl": "Chức năng nguy hiểm không bị khóa thời gian"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "Staking",
+      "description": "{{amount}} WCT locked until {{date}}"
+    }
   }
 }
