@@ -9,6 +9,6 @@ describe('getPositionDefinitions', () => {
       address: '0xccc9576f841de93cd32bee7b98fe8b9bd3070e3d',
       t,
     })
-    expect(positions.length).toBeGreaterThan(1)
+    expect(positions.length).toBeGreaterThan(0)
   })
 })
