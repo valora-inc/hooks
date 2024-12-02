@@ -351,8 +351,8 @@ describe('GET /getPositions', () => {
       expect(getPositions).toHaveBeenCalledWith(
         expect.objectContaining({
           appIds: shouldIncludeAave
-            ? expect.arrayContaining(['aave'])
-            : expect.not.arrayContaining(['aave']),
+            ? expect.arrayContaining(['aave']) // eslint-disable-line jest/no-conditional-expect
+            : expect.not.arrayContaining(['aave']), // eslint-disable-line jest/no-conditional-expect
         }),
       )
     })
