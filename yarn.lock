@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@0xsquid/squid-types@^0.1.119":
+"@0xsquid/squid-types@^0.1.122":
   version "0.1.122"
   resolved "https://registry.yarnpkg.com/@0xsquid/squid-types/-/squid-types-0.1.122.tgz#78efb021ccf85042389f83116a71757dbf49fa4a"
   integrity sha512-rO1/a1l6RwzZrQY3V92spGKYzEk8DLl1KSNRqqytUqBZHPkwUSCP/nU4uahkimCLuvXmiVf/n31Xo9d8ytdjyA==
@@ -6772,10 +6772,10 @@ typed-array-length@^1.0.6:
     is-typed-array "^1.1.13"
     possible-typed-array-names "^1.0.0"
 
-typescript@*, typescript@^5.6.3:
-  version "5.6.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.3.tgz#5f3449e31c9d94febb17de03cc081dd56d81db5b"
-  integrity sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==
+typescript@*, typescript@^5.7.2:
+  version "5.7.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.7.2.tgz#3169cf8c4c8a828cde53ba9ecb3d2b1d5dd67be6"
+  integrity sha512-i5t66RHxDvVN40HfDd1PsEThGNnlMCMT3jMUuoh9/0TaqWevNontacunWyN02LA9/fIbEWlcHZcgTKb9QoaLfg==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
@@ -6857,10 +6857,10 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-viem@^2.21.51:
-  version "2.21.52"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.52.tgz#a020f83c1e4df9dde78db3570f4c8c3a22ffb8ab"
-  integrity sha512-O53JhgVhp9CB0T3afy79O5ixNr8XXRGYQtlGYerzttnP56Oh2NBx4+Otz8IFd9N5DVPywf6tmYxHP1RVA99xJA==
+viem@^2.21.52:
+  version "2.21.53"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-2.21.53.tgz#a5ba6da48e5edded27dde286e431ae97034f4fc4"
+  integrity sha512-0pY8clBacAwzc59iV1vY4a6U4xvRlA5tAuhClJCKvqA6rXJzmNMMvxQ0EG79lkHr7WtBEruXz8nAmONXwnq4EQ==
   dependencies:
     "@noble/curves" "1.6.0"
     "@noble/hashes" "1.5.0"
