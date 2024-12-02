@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "Tehlikeli işlevler zaman kilitli",
     "Platfrm-TimelockShort-Titl": "Tehlikeli işlevler, kısa gecikmeyle zaman kilitli",
     "Platfrm-TimelockNo-Titl": "Tehlikeli işlev, zaman kilitli değil"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "Staking",
+      "description": "{{amount}} WCT {{date}}adresine kadar kilitlendi"
+    }
   }
 }
