@@ -157,7 +157,7 @@ yarn triggerShortcut --network <network> --address <address> --app <app-name> --
 
 This will return the transactions that would be executed by Valora, after approval by the user.
 
-You can also optionally pass the `--mnemnonic` and `--derivationPath` (defaults to the Celo derivation path: `m/44'/52752'/0'/0/0`) options to actually sign and send the returned transaction(s).
+You can also optionally pass the `--mnemonic` and `--derivationPath` (defaults to the Celo derivation path: `m/44'/52752'/0'/0/0`) options to actually sign and send the returned transaction(s).
 
 Example for GoodDollar:
 

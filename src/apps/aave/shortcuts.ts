@@ -28,9 +28,8 @@ import { ChainType, SquidCallType } from '@0xsquid/squid-types'
 import { prepareSwapTransactions } from '../../utils/prepareSwapTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
-const GAS = 1_000_000n
-// Padding we add to simulation gas to ensure we specify enough
-const SIMULATED_DEPOSIT_GAS_PADDING = 250_000n
+const DEFAULT_DEPOSIT_GAS = 1_000_000n
+const DEFAULT_APPROVE_GAS = 200_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId, _address?: string) {
@@ -115,13 +114,12 @@ const hook: ShortcutsHook = {
             const supplySimulatedTx =
               simulatedTransactions[simulatedTransactions.length - 1]
 
-            supplyTx.gas =
-              BigInt(supplySimulatedTx.gasNeeded) +
-              SIMULATED_DEPOSIT_GAS_PADDING
+            // 15% buffer on the estimation from the simulation
+            supplyTx.gas = (BigInt(supplySimulatedTx.gasNeeded) * 115n) / 100n
             supplyTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
           } catch (error) {
-            supplyTx.gas = GAS
-            supplyTx.estimatedGasUse = GAS / 3n
+            supplyTx.gas = DEFAULT_DEPOSIT_GAS
+            supplyTx.estimatedGasUse = DEFAULT_DEPOSIT_GAS / 3n
           }
 
           return { transactions }
@@ -277,7 +275,7 @@ const hook: ShortcutsHook = {
                   },
                   // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
-                  estimatedGas: GAS.toString(),
+                  estimatedGas: DEFAULT_APPROVE_GAS.toString(),
                 },
                 {
                   chainType: ChainType.EVM,
@@ -290,7 +288,7 @@ const hook: ShortcutsHook = {
                   },
                   // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
-                  estimatedGas: GAS.toString(),
+                  estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
                 },
               ],
               description: 'Deposit into aave pool',

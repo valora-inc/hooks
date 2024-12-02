@@ -49,12 +49,17 @@ const hook: PositionsHook = {
       abi: identityAbi,
     } as const
 
-    const [isVerified, currentDay, periodStart, claimAmount] =
+    const [isVerified, isNotNewUser, currentDay, periodStart, claimAmount] =
       await client.multicall({
         contracts: [
           {
             ...identityContract,
             functionName: 'isWhitelisted',
+            args: [address as Address],
+          },
+          {
+            ...ubiContract,
+            functionName: 'isNotNewUser',
             args: [address as Address],
           },
           {
@@ -74,7 +79,10 @@ const hook: PositionsHook = {
         allowFailure: false,
       })
 
-    if (!isVerified) {
+    // If the user is not verified and is new, they don't have a position
+    // Note: existing users need to re-verify after some time
+    // in that case, they will have a position but we will tell them to re-verify
+    if (!isVerified && !isNotNewUser) {
       return []
     }
 
@@ -96,7 +104,7 @@ const hook: PositionsHook = {
       displayProps: {
         title: 'Daily UBI',
         description: !isVerified
-          ? 'Verify on the dapp to claim'
+          ? 'Re-verify on the dapp to claim'
           : claimAmount > 0n
           ? 'Claim now'
           : // Claim in X hours
@@ -108,7 +116,7 @@ const hook: PositionsHook = {
             )}`,
         imageUrl:
           'https://raw.githubusercontent.com/valora-inc/dapp-list/main/assets/gooddollar.png',
-        manageUrl: 'https://gooddapp.org/#/stakes',
+        manageUrl: 'https://gooddapp.org/#/claim',
       },
       balances: [toDecimalNumber(claimAmount, G$_DECIMALS)],
     }

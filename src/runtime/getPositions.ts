@@ -52,11 +52,13 @@ type AppPositionDefinition = PositionDefinition & {
 
 export async function getBaseTokensInfo(
   getTokensInfoUrl: string,
+  networkIds: NetworkId[] = [],
 ): Promise<TokensInfo> {
   // Get base tokens
-  const data = await got
-    .get(getTokensInfoUrl)
-    .json<Record<string, RawTokenInfo>>()
+  const url = networkIds.length
+    ? `${getTokensInfoUrl}?networkIds=${networkIds.join(',')}`
+    : getTokensInfoUrl
+  const data = await got.get(url).json<Record<string, RawTokenInfo>>()
 
   // Map to TokenInfo
   const tokensInfo: TokensInfo = {}

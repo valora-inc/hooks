@@ -22,8 +22,7 @@ import { prepareSwapTransactions } from '../../utils/prepareSwapTransactions'
 
 // Hardcoded fallback if simulation isn't enabled
 const DEFAULT_DEPOSIT_GAS = 750_000n
-// Padding we add to simulation gas to ensure we specify enough
-const SIMULATED_DEPOSIT_GAS_PADDING = 200_000n
+const DEFAULT_APPROVE_GAS = 200_000n
 
 const hook: ShortcutsHook = {
   async getShortcutDefinitions(networkId: NetworkId) {
@@ -103,9 +102,8 @@ const hook: ShortcutsHook = {
             const supplySimulatedTx =
               simulatedTransactions[simulatedTransactions.length - 1]
 
-            depositTx.gas =
-              BigInt(supplySimulatedTx.gasNeeded) +
-              SIMULATED_DEPOSIT_GAS_PADDING
+            // 15% buffer on the estimation from the simulation
+            depositTx.gas = (BigInt(supplySimulatedTx.gasNeeded) * 115n) / 100n
             depositTx.estimatedGasUse = BigInt(supplySimulatedTx.gasUsed)
           } catch (error) {
             if (!(error instanceof UnsupportedSimulateRequest)) {
@@ -215,7 +213,6 @@ const hook: ShortcutsHook = {
             swapFromToken,
             swapToTokenAddress: tokenAddress,
             walletAddress,
-            simulatedGasPadding: [0n, SIMULATED_DEPOSIT_GAS_PADDING],
             enableAppFee,
             // based off of https://docs.squidrouter.com/building-with-squid-v2/key-concepts/hooks/build-a-posthook
             postHook: {
@@ -232,7 +229,7 @@ const hook: ShortcutsHook = {
                   },
                   // no native token transfer. this is optional per types, but squid request fails without it
                   value: '0',
-                  estimatedGas: DEFAULT_DEPOSIT_GAS.toString(),
+                  estimatedGas: DEFAULT_APPROVE_GAS.toString(),
                 },
                 {
                   chainType: ChainType.EVM,
