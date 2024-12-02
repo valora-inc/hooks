@@ -39,5 +39,11 @@
     "Platfrm-Timelock-Titl": "定时锁定的危险功能",
     "Platfrm-TimelockShort-Titl": "短时延迟锁定的危险功能",
     "Platfrm-TimelockNo-Titl": "未定时锁定的危险功能"
+  },
+  "walletconnect": {
+    "stakedWct": {
+      "title": "定标",
+      "description": "{{amount}} WCT 锁定，直到 {{date}}"
+    }
   }
 }
