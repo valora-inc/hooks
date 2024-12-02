@@ -60,9 +60,7 @@ export function getConfig(): Config {
   const developmentSchema = sharedSchema.extend({
     GET_TOKENS_INFO_URL: z
       .string()
-      .default(
-        'https://blockchain-api-dot-celo-mobile-mainnet.appspot.com/tokensInfo',
-      ),
+      .default('https://api.mainnet.valora.xyz/getTokensInfoWithPrices'),
     GOOGLE_CLOUD_PROJECT: z.string().default('dev-project'),
     POSITION_IDS: z
       .string()
