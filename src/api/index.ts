@@ -10,6 +10,7 @@ import Backend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
 import path from 'path'
 import { z } from 'zod'
+import semver from 'semver'
 import { getConfig } from '../config'
 import { logger } from '../log'
 import { getBaseTokensInfo, getPositions } from '../runtime/getPositions'
@@ -141,8 +142,8 @@ function createApp() {
       const userAgent = req.header('user-agent')
       const valoraAppVersion = getValoraAppVersion(userAgent)
       const returnAavePositions = valoraAppVersion
-        ? valoraAppVersion >= '1.90.0'
-        : false
+        ? semver.gte(valoraAppVersion, '1.90.0')
+        : true
       const { address } = parsedRequest.query
       const networkIds = getNetworkIds(parsedRequest.query)
       const appIds = config.POSITION_IDS.filter((appId) =>
