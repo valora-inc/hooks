@@ -47,6 +47,7 @@ const clientsCache = new Map<
 
 export function getClient(
   networkId: NetworkId,
+  appName?: string,
 ): PublicClient<ReturnType<typeof http>, Chain> {
   let client = clientsCache.get(networkId)
   if (client) {
@@ -61,12 +62,13 @@ export function getClient(
     return http(url, {
       onFetchRequest: async (request) => {
         const body = await request.json()
+        let message= appName ? `[${appName}]: ` : ''
         if (body.params[0].to === MULTICALL_ADDRESS) {
-          console.log('Multicall fetch')
+          message += `Multicall from client`
         } else {
-          console.log('Normal fetch')
+          message += `Call to ${body.params[0].to}`
         }
-        console.log(body.params[0].data)
+        console.log(message)
         // logger.trace({ msg: 'rpc.http: request', data: await request.json() })
       },
       ...config,
