@@ -20,8 +20,6 @@ describe('getPositionDefinitions', () => {
       baseTokensInfo,
     })
 
-    console.log(positions)
-
     expect(
       positions.filter((p) => p.type === 'app-token').length,
     ).toBeGreaterThan(0)
