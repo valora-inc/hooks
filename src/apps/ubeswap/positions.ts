@@ -1,15 +1,11 @@
-// import BigNumber from 'bignumber.js'
 import got from '../../utils/got'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
-// import { erc20Abi } from '../../abis/erc-20'
 import { getTokenId } from '../../runtime/getTokenId'
 import { NetworkId } from '../../types/networkId'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import {
-  // AppTokenPosition,
   AppTokenPositionDefinition,
-  // ContractPositionDefinition,
   PositionDefinition,
   PositionsHook,
   TokenDefinition,
