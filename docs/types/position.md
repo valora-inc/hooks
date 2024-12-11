@@ -4,18 +4,18 @@ sidebar_position: 1
 
 # Position Pricing Hooks
 
-> The [example position hook](https://github.com/valora-inc/hooks/blob/master/src/apps/example/positions.ts) is an easy way to get started.
+> The [example position hook](https://github.com/mobilestack-xyz/hooks/blob/master/src/apps/example/positions.ts) is an easy way to get started.
 
-A user's Valora wallet invokes position hooks when determining the types, quantity, and value of assets a user owns. If a position hook detects a user owns one or more positions, it provides information about the positions for Valora to show to the user.
+A user's Mobile Stack wallet invokes position hooks when determining the types, quantity, and value of assets a user owns. If a position hook detects a user owns one or more positions, it provides information about the positions for the app to show to the user.
 
 ## Principle
 
-A position pricing hook's main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and not needed by hooks authors.
+A position pricing hook's main job is to return user owned positions and to break them down into underlying base tokens. The pricing of base tokens is done separately and is not needed by hooks authors.
 
 Terms:
 
 - **Base Tokens**: base assets which have a token to represent them (ERC20, ERC721, etc). Examples: CELO, cUSD, cEUR, UBE, MOO, etc.
-- **App Tokens**: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked position.
+- **App Tokens**: tokens which represent more complex positions within a dapp, like liquidity pool (LP) tokens, or staked positions.
 - **Contract Positions**: things that are not represented by a token (example: locked CELO, farming positions, claimable tokens).
 
 For example, a position hook detects that a user owns a position in a liquidity pool. It then provides information about the pool's assets and the user's share of the pool's assets.
@@ -23,15 +23,15 @@ For example, a position hook detects that a user owns a position in a liquidity 
 - The liquidity pool is an app token.
 - The pool's assets are base tokens.
 
-From the information provided by the hook, Valora can show the user the value of their position in the pool.
+From the information provided by the hook, the Mobile Stack app can show the user the value of their position in the pool.
 
 ## Developing a Position Pricing Hook
 
 ### Structure
 
-Hooks are organized by application. For instance Ubeswap hooks are located in [`https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap`](https://github.com/valora-inc/hooks/tree/main/src/apps/ubeswap).
+Hooks are organized by application. For instance Ubeswap hooks are located in [`https://github.com/mobilestack-xyz/hooks/tree/main/src/apps/ubeswap`](https://github.com/mobilestack-xyz/hooks/tree/main/src/apps/ubeswap).
 
-Position pricing hooks must implement the [`PositionsHook`](https://github.com/valora-inc/hooks/blob/main/src/types/positions.ts) TypeScript interface.
+Position pricing hooks must implement the [`PositionsHook`](https://github.com/mobilestack-xyz/hooks/blob/main/src/types/positions.ts) TypeScript interface.
 
 ### Creating a Position Pricing Hook
 
@@ -54,16 +54,16 @@ export default hook
 
 ### Implementing `getPositionDefinitions`
 
-The `getPositionDefinitions` function is called by Valora to get the positions owned by a user.
+The `getPositionDefinitions` function is called by Mobile Stack apps to get the positions owned by a user.
 
 It receives the following arguments:
 
 - `network`: the network for which the positions should be returned.
 - `address`: the address of the user for which the positions should be returned.
 
-It should return an array of [`PositionDefinition`](https://github.com/valora-inc/hooks/blob/main/src/types/positions.ts) objects.
+It should return an array of [`PositionDefinition`](https://github.com/mobilestack-xyz/hooks/blob/main/src/types/positions.ts) objects.
 
-The `PositionDefinition` is either a `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
+The `PositionDefinition` is either an `AppTokenPositionDefinition` or a `ContractPositionDefinition`, representing an app token or a contract position respectively.
 
 #### App Token Position Definition
 
@@ -75,7 +75,7 @@ TODO
 
 Here's a simplified example of a `getPositionDefinitions` implementation for representing locked CELO owned by a user.
 
-Please take a look at the [full implementation](https://github.com/valora-inc/hooks/blob/main/src/apps/locked-celo/positions.ts) for more details.
+Please take a look at the [full implementation](https://github.com/mobilestack-xyz/hooks/blob/main/src/apps/locked-celo/positions.ts) for more details.
 
 ```ts
 const hook: PositionsHook = {
@@ -117,11 +117,11 @@ Here you can see that it contains the following properties:
 
 This is how it fulfills the job of a position pricing hook, by declaratively defining the position with its underlying base tokens.
 
-This is all that is needed for Valora to show the user the value of their locked CELO.
+This is all that is needed for Mobile Stack apps to show the user the value of their locked CELO.
 
 ### Testing a Position Pricing Hook
 
-The [hooks live preview](../live-preview.md) mode in Valora is the easiest way to test your position hook while developing it.
+The [hooks live preview](../live-preview.md) mode in a Mobile Stack app is the easiest way to test your position hook while developing it.
 
 Alternatively, you can use the `getPositions` script via the command line.
 
