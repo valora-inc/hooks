@@ -22,10 +22,12 @@ import {
 } from 'viem/chains'
 import { NetworkId } from '../types/networkId'
 import { getConfig } from '../config'
+import { metrics } from '../metrics'
+import { logger } from '../log'
 
-const MULTICALL_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11'
+const MULTICALL_ADDRESS = '0XCA11BDE05977B3631167028862BE2A173976CA11'
 
-const networkIdToViemChain: Record<NetworkId, Chain> = {
+export const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['celo-mainnet']]: celo,
   [NetworkId['ethereum-mainnet']]: mainnet,
   [NetworkId['arbitrum-one']]: arbitrum,
@@ -62,14 +64,19 @@ export function getClient(
     return http(url, {
       onFetchRequest: async (request) => {
         const body = await request.json()
-        let message= appName ? `[${appName}]: ` : ''
-        if (body.params[0].to === MULTICALL_ADDRESS) {
-          message += `Multicall from client`
-        } else {
-          message += `Call to ${body.params[0].to}`
+        metrics.updateNetwork(networkId)
+        if (appName) {
+          metrics.updateApp(appName)
+        }
+        let  message = `${networkId}: `
+        message += appName ? `[${appName}] ` : ''
+        message += `Call to ${body.params[0].to}`
+        if (body.params[0].to.toUpperCase() === MULTICALL_ADDRESS) {
+          message += `(multicall) `
         }
         console.log(message)
-        // logger.trace({ msg: 'rpc.http: request', data: await request.json() })
+        logger.trace({ msg: message })
+        metrics.save()
       },
       ...config,
     })
