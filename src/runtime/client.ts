@@ -27,7 +27,7 @@ import { logger } from '../log'
 
 const MULTICALL_ADDRESS = '0XCA11BDE05977B3631167028862BE2A173976CA11'
 
-export const networkIdToViemChain: Record<NetworkId, Chain> = {
+const networkIdToViemChain: Record<NetworkId, Chain> = {
   [NetworkId['celo-mainnet']]: celo,
   [NetworkId['ethereum-mainnet']]: mainnet,
   [NetworkId['arbitrum-one']]: arbitrum,
