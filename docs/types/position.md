@@ -42,9 +42,17 @@ import { PositionsHook } from '../../types/positions'
 
 const hook: PositionsHook = {
   getInfo() {
-    return { name: 'MyDapp' }
+    return {
+      id: 'someId',
+      name: 'Some Dapp',
+      description: 'Some short description',
+    }
   },
-  async getPositionDefinitions({ network, address, t }) {
+  async getPositionDefinitions({ networkId, address, t }) {
+    // TODO: implement
+    return []
+  },
+  async getAppTokenDefinition({ networkId, address }) {
     // TODO: implement
   },
 }
