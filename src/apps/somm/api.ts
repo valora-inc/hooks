@@ -51,7 +51,7 @@ export async function getSommStrategiesData(networkId: NetworkId) {
     })
 }
 
-// Derived from the hard coded config in the Sommelier website source code
+// Derived from the hard coded config in the Somm website source code
 // https://github.com/PeggyJV/sommelier-strangelove/blob/ca7bd6605bc868a1393d820f13b341ae5a5f1ead/src/utils/config.ts,
 // filtered by the vaults returned by
 // https://app.somm.finance/api/sommelier-api-all-strategies-data

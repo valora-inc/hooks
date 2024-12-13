@@ -37,9 +37,7 @@ describe('hook', () => {
 
   it('should return the correct hook info', () => {
     expect(hook.getInfo()).toEqual({
-      id: 'sommelier',
-      name: 'Sommelier',
-      description: 'Sommelier vaults',
+      name: 'Somm',
     })
   })
 
@@ -90,7 +88,7 @@ describe('hook', () => {
         title: 'Cellar Name',
         description: 'SYMBOL',
         imageUrl:
-          'https://raw.githubusercontent.com/mobilestack-xyz/hooks/main/src/apps/sommelier/assets/sommelier.png',
+          'https://raw.githubusercontent.com/mobilestack-xyz/hooks/main/src/apps/somm/assets/somm.png',
         manageUrl:
           'https://app.somm.finance/strategies/real-yield-usd-arb/manage',
       })

@@ -9,14 +9,12 @@ import {
   UnknownAppTokenError,
 } from '../../types/positions'
 import { cellarV0821Abi } from './abis/cellar'
-import { getSommStrategiesData } from './sommelierApi'
+import { getSommStrategiesData } from './api'
 
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'somm',
       name: 'Somm',
-      description: '', // Not used anywhere
     }
   },
   async getPositionDefinitions({ networkId }) {
@@ -26,7 +24,7 @@ const hook: PositionsHook = {
 
     const results = await Promise.allSettled(
       cellars.map(async (cellar) => {
-        // Note that according to the hard coded config in the Sommelier website
+        // Note that according to the hard coded config in the Somm website
         // source code
         // https://github.com/PeggyJV/sommelier-strangelove/blob/ca7bd6605bc868a1393d820f13b341ae5a5f1ead/src/utils/config.ts,
         // cellars implement one of 4 ABIs (CellarV0816, CellarV0821,
@@ -75,7 +73,7 @@ const hook: PositionsHook = {
               title: cellarName,
               description: underlyingAssetSymbol,
               imageUrl:
-                'https://raw.githubusercontent.com/mobilestack-xyz/hooks/main/src/apps/sommelier/assets/sommelier.png',
+                'https://raw.githubusercontent.com/mobilestack-xyz/hooks/main/src/apps/somm/assets/somm.png',
               manageUrl: cellar.strategySlug
                 ? `https://app.somm.finance/strategies/${cellar.strategySlug}/manage`
                 : undefined,
@@ -93,7 +91,7 @@ const hook: PositionsHook = {
           {
             error: result.reason,
           },
-          'Failed to fetch Sommelier position definition',
+          'Failed to fetch Somm position definition',
         )
       }
     })
