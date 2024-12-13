@@ -26,6 +26,13 @@ const hook: PositionsHook = {
 
     const results = await Promise.allSettled(
       cellars.map(async (cellar) => {
+        // Note that according to the hard coded config in the Sommelier website
+        // source code
+        // https://github.com/PeggyJV/sommelier-strangelove/blob/ca7bd6605bc868a1393d820f13b341ae5a5f1ead/src/utils/config.ts,
+        // cellars implement one of 4 ABIs (CellarV0816, CellarV0821,
+        // CellarV0821MultiDeposit, CellarV0815). All of these ABIs have the
+        // 'asset', 'symbol', and 'name' functions so for simplicity, we are
+        // using the CellarV0821 ABI for all cellars in the below rpc calls.
         const [underlyingAsset, underlyingAssetSymbol, cellarName] =
           await Promise.all([
             client.readContract({
