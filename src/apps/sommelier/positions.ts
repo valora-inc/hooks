@@ -14,9 +14,9 @@ import { getSommStrategiesData } from './sommelierApi'
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'sommelier',
-      name: 'Sommelier',
-      description: 'Sommelier vaults',
+      id: 'somm',
+      name: 'Somm',
+      description: '', // Not used anywhere
     }
   },
   async getPositionDefinitions({ networkId }) {
