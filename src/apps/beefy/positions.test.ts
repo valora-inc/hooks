@@ -215,9 +215,7 @@ describe('hook', () => {
   })
   it('should return the correct hook info', () => {
     expect(hook.getInfo()).toEqual({
-      id: 'beefy',
       name: 'Beefy',
-      description: 'Beefy vaults',
     })
   })
   it('should return expected positions with balances when getPositionDefinitions is called with supported networkId and address', async () => {
