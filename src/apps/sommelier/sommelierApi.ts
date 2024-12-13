@@ -55,7 +55,7 @@ export async function getSommStrategiesData(networkId: NetworkId) {
 // https://github.com/PeggyJV/sommelier-strangelove/blob/ca7bd6605bc868a1393d820f13b341ae5a5f1ead/src/utils/config.ts,
 // filtered by the vaults returned by
 // https://app.somm.finance/api/sommelier-api-all-strategies-data
-export const cellarAddressToSlug: Record<string, string> = {
+export const cellarAddressToSlug: Record<string, string | undefined> = {
   '0x0274a704a6d9129f90a62ddc6f6024b33ecdad36': 'Real-Yield-BTC',
   '0x03df2a53cbed19b824347d6a45d09016c2d1676a': 'DeFi-Stars',
   '0x05641a27c82799aaf22b436f20a3110410f29652': 'Steady-MATIC',
