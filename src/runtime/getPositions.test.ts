@@ -40,9 +40,7 @@ for (const [tokenId, tokenInfo] of Object.entries(mockTokensInfo)) {
 const lockedCeloTestHook: PositionsHook = {
   getInfo() {
     return {
-      id: 'locked-celo-test',
       name: 'Locked CELO Test',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId }) {
@@ -72,9 +70,7 @@ const lockedCeloTestHook: PositionsHook = {
 const failingTestHook: PositionsHook = {
   getInfo() {
     return {
-      id: 'failing-hook',
       name: 'Failing Hook',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId: _networkId }) {
@@ -115,9 +111,7 @@ describe(getPositions, () => {
     const testHook: PositionsHook = {
       getInfo() {
         return {
-          id: 'test-hook',
           name: 'Test Hook',
-          description: '',
         }
       },
       async getPositionDefinitions({ networkId }) {
@@ -167,9 +161,7 @@ describe(getPositions, () => {
     const testHook: PositionsHook = {
       getInfo() {
         return {
-          id: 'beefy-price-escape',
           name: 'Beefy Price Escape',
-          description: 'Beefy with price escape hatch for underlying tokens',
         }
       },
 
@@ -260,9 +252,7 @@ describe(getPositions, () => {
     const testHook: PositionsHook = {
       getInfo() {
         return {
-          id: 'test-hook',
           name: 'Test Hook',
-          description: '',
         }
       },
       async getPositionDefinitions({ networkId }) {

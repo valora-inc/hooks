@@ -40,9 +40,7 @@ function zip<A, B>(as: readonly A[], bs: readonly B[]) {
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'locked-celo',
       name: 'Locked CELO',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

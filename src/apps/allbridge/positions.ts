@@ -29,9 +29,7 @@ import { getPositionId } from '../../runtime/getPositionId'
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'allbridge',
       name: 'Allbridge',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address, t }) {

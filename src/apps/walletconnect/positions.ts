@@ -96,9 +96,7 @@ async function getStakedWctPositionDefinition(
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'walletconnect',
       name: 'WalletConnect',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address, t }) {

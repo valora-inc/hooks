@@ -150,9 +150,7 @@ export async function getUniswapV3PositionDefinitions(
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'uniswap',
       name: 'Uniswap',
-      description: 'Uniswap pools',
     }
   },
   async getPositionDefinitions({ networkId, address }) {
