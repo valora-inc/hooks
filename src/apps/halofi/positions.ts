@@ -13,10 +13,7 @@ import { getTokenId } from '../../runtime/getTokenId'
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'halofi',
       name: 'HaloFi',
-      description:
-        'Grow wealth with crypto, earn rewards, badges & more. We make personal finance fun.',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

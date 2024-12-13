@@ -9,12 +9,11 @@ const CUSD_ADDRESS: Address = '0x765de816845861e75a25fca122bb6898b8b1282a'
 export const DEFAULT_IMG_URL =
   'https://raw.githubusercontent.com/valora-inc/address-metadata/main/assets/tokens/CELO.png'
 
+// Example position for developers
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'example',
       name: 'Example',
-      description: 'Example position for developers',
     }
   },
 

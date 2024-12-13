@@ -14,9 +14,7 @@ import { getClient } from '../../runtime/client'
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'hedgey',
       name: 'Hedgey',
-      description: 'Hedgey vesting plans',
     }
   },
 

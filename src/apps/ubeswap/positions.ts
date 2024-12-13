@@ -326,9 +326,7 @@ async function getV3Positions(networkId: NetworkId, address: Address) {
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'ubeswap',
       name: 'Ubeswap',
-      description: 'Decentralized exchange on Celo',
     }
   },
   async getPositionDefinitions({ networkId, address }) {
