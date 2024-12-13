@@ -104,11 +104,11 @@ const hook: PositionsHook = {
           positionDefinitions.push(result.value)
         }
       } else {
-        logger.warn(
+        logger.error(
           {
             error: result.reason,
           },
-          'Failed to fetch Somm position definition',
+          'Skipping Somm position that failed to resolve',
         )
       }
     })
