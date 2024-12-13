@@ -5,10 +5,7 @@ import {
 } from '@valora/http-handler'
 import { createLoggingMiddleware } from '@valora/logging'
 import express from 'express'
-import i18next from 'i18next'
-import Backend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
-import path from 'path'
 import { z } from 'zod'
 import semver from 'semver'
 import { getConfig } from '../config'
@@ -22,6 +19,7 @@ import {
 } from '../types/networkId'
 import { Transaction } from '../types/shortcuts'
 import { parseRequest } from './parseRequest'
+import { createI18Next } from '../utils/i18next'
 
 const DEFAULT_EARN_SUPPORTED_APP_IDS = ['aave', 'allbridge']
 const DEFAULT_EARN_SUPPORTED_POSITION_IDS = new Set([
@@ -31,23 +29,6 @@ const DEFAULT_EARN_SUPPORTED_POSITION_IDS = new Set([
   // Allbridge USDT
   `${NetworkId['celo-mainnet']}:0xfb2c7c10e731ebe96dabdf4a96d656bfe8e2b5af`,
 ])
-
-const DEFAULT_LANGUAGE = 'base'
-
-i18next
-  .use(Backend)
-  .use(i18nextMiddleware.LanguageDetector)
-  .init({
-    backend: {
-      // eslint-disable-next-line no-path-concat
-      loadPath: path.join(__dirname, '../../locales/{{lng}}.json'),
-    },
-    fallbackLng: DEFAULT_LANGUAGE,
-    preload: [DEFAULT_LANGUAGE],
-  })
-  .catch((error) => {
-    throw new Error(`Failed to initialize i18next: ${error}`)
-  })
 
 // Copied over from https://github.com/valora-inc/valora-rest-api/blob/main/src/middleware/requestMetadata.ts#L65
 function getValoraAppVersion(userAgent: string | undefined) {
@@ -112,6 +93,7 @@ function createApp() {
       projectId: config.GOOGLE_CLOUD_PROJECT,
     }),
   )
+  const i18next = createI18Next()
   app.use(i18nextMiddleware.handle(i18next))
 
   const getHooksRequestSchema = z.object({
