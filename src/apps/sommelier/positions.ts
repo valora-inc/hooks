@@ -1,7 +1,9 @@
+import { logger } from '../../log'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
 import { toDecimalNumber } from '../../types/numbers'
 import {
+  PositionDefinition,
   PositionsHook,
   PricePerShareContext,
   UnknownAppTokenError,
@@ -20,9 +22,9 @@ const hook: PositionsHook = {
   async getPositionDefinitions({ networkId }) {
     const client = getClient(networkId)
     const cellars = await getSommStrategiesData(networkId)
+    const positionDefinitions: PositionDefinition[] = []
 
-    // TODO: use all settled?
-    const results = await Promise.all(
+    const results = await Promise.allSettled(
       cellars.map(async (cellar) => {
         const [underlyingAsset, underlyingAssetSymbol, cellarName] =
           await Promise.all([
@@ -76,7 +78,20 @@ const hook: PositionsHook = {
       }),
     )
 
-    return results
+    results.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        positionDefinitions.push(result.value)
+      } else {
+        logger.warn(
+          {
+            error: result.reason,
+          },
+          'Failed to fetch Sommelier position definition',
+        )
+      }
+    })
+
+    return positionDefinitions
   },
   async getAppTokenDefinition({ networkId, address }) {
     throw new UnknownAppTokenError({ networkId, address })

@@ -1,6 +1,6 @@
-import got from 'got'
 import { Address } from 'viem'
 import { NetworkId } from '../../types/networkId'
+import got from '../../utils/got'
 
 const NETWORK_ID_TO_SOMM_CHAIN: Record<NetworkId, string | null> = {
   [NetworkId['celo-mainnet']]: null,
