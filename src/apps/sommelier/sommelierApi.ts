@@ -1,4 +1,5 @@
 import { Address } from 'viem'
+import { logger } from '../../log'
 import { NetworkId } from '../../types/networkId'
 import got from '../../utils/got'
 
@@ -36,11 +37,16 @@ export async function getSommStrategiesData(networkId: NetworkId) {
   return result.data.cellars
     .filter((cellar) => cellar.chain === NETWORK_ID_TO_SOMM_CHAIN[networkId])
     .map((cellar) => {
-      const cellarAddress = cellar.id.split('-')[0] as Address // some cellars have a suffix to the address (e.g. `-arbitrum`), which we do not need
+      const address = cellar.id.split('-')[0].toLowerCase() as Address // some cellars have a suffix to the address (e.g. `-arbitrum`), which we do not need
+      const strategySlug = cellarAddressToSlug[address]
+      if (!strategySlug) {
+        logger.warn(`No strategy slug found for cellar address ${address}`)
+      }
+
       return {
         ...cellar,
-        address: cellarAddress,
-        strategySlug: cellarAddressToSlug[cellarAddress.toLowerCase()], // used to generate the manageUrl
+        address,
+        strategySlug, // used to generate the manageUrl
       }
     })
 }
