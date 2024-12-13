@@ -18,21 +18,26 @@ describe('hook', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    mockReadContract.mockImplementation(async ({ functionName, address }) => {
-      if (address !== '0x392b1e6905bb8449d26af701cdea6ff47bf6e5a8') {
-        throw new Error('Unexpected address')
-      }
-      if (functionName === 'asset') {
-        return '0xUnderlyingAsset'
-      }
-      if (functionName === 'symbol') {
-        return 'SYMBOL'
-      }
-      if (functionName === 'name') {
-        return 'Cellar Name'
-      }
-      throw new Error('Unexpected function')
-    })
+    mockReadContract.mockImplementation(
+      async ({ functionName, address, args }) => {
+        if (address !== '0x392b1e6905bb8449d26af701cdea6ff47bf6e5a8') {
+          throw new Error('Unexpected address')
+        }
+        if (functionName === 'asset') {
+          return '0xUnderlyingAsset'
+        }
+        if (functionName === 'symbol') {
+          return 'SYMBOL'
+        }
+        if (functionName === 'name') {
+          return 'Cellar Name'
+        }
+        if (functionName === 'balanceOf') {
+          return args[0] === '0x12345' ? 1n : 0n
+        }
+        throw new Error('Unexpected function')
+      },
+    )
   })
 
   it('should return the correct hook info', () => {
@@ -42,7 +47,7 @@ describe('hook', () => {
   })
 
   describe('getPositionDefinitions', () => {
-    it('should return expected positions when called with supported networkId', async () => {
+    it('should return expected positions when called with supported networkId and address with position', async () => {
       jest.mocked(got).get = jest.fn().mockReturnValue({
         json: () =>
           Promise.resolve({
@@ -63,11 +68,11 @@ describe('hook', () => {
 
       const sommPositions = await hook.getPositionDefinitions({
         networkId: NetworkId['arbitrum-one'],
-        address: '0x12345', // actually the address doesn't matter for this test
+        address: '0x12345',
         t: mockT,
       })
 
-      expect(mockReadContract).toHaveBeenCalledTimes(3)
+      expect(mockReadContract).toHaveBeenCalledTimes(4)
       expect(sommPositions).toEqual([
         {
           type: 'app-token-definition',
@@ -104,6 +109,35 @@ describe('hook', () => {
       expect(sommPositions).toEqual([])
     })
 
+    it('should return an empty array when called with an address that has no balance', async () => {
+      jest.mocked(got).get = jest.fn().mockReturnValue({
+        json: () =>
+          Promise.resolve({
+            result: {
+              data: {
+                cellars: [
+                  {
+                    id: '0x392b1e6905bb8449d26af701cdea6ff47bf6e5a8-arb',
+                    shareValue: '1050000',
+                    tvlTotal: 10000000,
+                    chain: 'arbitrum',
+                  },
+                ],
+              },
+            },
+          }),
+      })
+
+      const sommPositions = await hook.getPositionDefinitions({
+        networkId: NetworkId['arbitrum-one'],
+        address: '0xabcde',
+        t: mockT,
+      })
+
+      expect(mockReadContract).toHaveBeenCalledTimes(1)
+      expect(sommPositions).toEqual([])
+    })
+
     it('should return definitions for positions even if some positions cannot be resolved', async () => {
       jest.mocked(got).get = jest.fn().mockReturnValue({
         json: () =>
@@ -131,11 +165,10 @@ describe('hook', () => {
 
       const sommPositions = await hook.getPositionDefinitions({
         networkId: NetworkId['arbitrum-one'],
-        address: '0x12345', // actually the address doesn't matter for this test
+        address: '0x12345',
         t: mockT,
       })
 
-      expect(mockReadContract).toHaveBeenCalledTimes(6)
       expect(sommPositions).toEqual([
         {
           type: 'app-token-definition',

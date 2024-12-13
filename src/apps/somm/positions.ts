@@ -1,3 +1,4 @@
+import { Address } from 'viem'
 import { logger } from '../../log'
 import { getClient } from '../../runtime/client'
 import { getTokenId } from '../../runtime/getTokenId'
@@ -17,7 +18,7 @@ const hook: PositionsHook = {
       name: 'Somm',
     }
   },
-  async getPositionDefinitions({ networkId }) {
+  async getPositionDefinitions({ networkId, address }) {
     const client = getClient(networkId)
     const cellars = await getSommStrategiesData(networkId)
     const positionDefinitions: PositionDefinition[] = []
@@ -31,6 +32,20 @@ const hook: PositionsHook = {
         // CellarV0821MultiDeposit, CellarV0815). All of these ABIs have the
         // 'asset', 'symbol', and 'name' functions so for simplicity, we are
         // using the CellarV0821 ABI for all cellars in the below rpc calls.
+        if (address) {
+          const balance = await client.readContract({
+            address: cellar.address,
+            abi: cellarV0821Abi,
+            functionName: 'balanceOf',
+            args: [address as Address],
+          })
+
+          if (balance === 0n) {
+            // Only return positions with a non-zero balance when an address is provided
+            return null
+          }
+        }
+
         const [underlyingAsset, underlyingAssetSymbol, cellarName] =
           await Promise.all([
             client.readContract({
@@ -85,7 +100,9 @@ const hook: PositionsHook = {
 
     results.forEach((result) => {
       if (result.status === 'fulfilled') {
-        positionDefinitions.push(result.value)
+        if (result.value) {
+          positionDefinitions.push(result.value)
+        }
       } else {
         logger.warn(
           {
