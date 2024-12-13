@@ -37,9 +37,7 @@ function getAppTokenPositionDefinition(
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'moola',
       name: 'Moola',
-      description: 'Moola debt tokens',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

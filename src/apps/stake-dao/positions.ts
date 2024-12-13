@@ -158,9 +158,7 @@ async function getVaultPositionDefinitions(
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'stake-dao',
       name: 'Stake DAO',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

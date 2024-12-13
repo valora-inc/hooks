@@ -64,9 +64,7 @@ const MARKETS: { networkId: NetworkId; address: Address }[] = [
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'compound',
       name: 'Compound',
-      description: 'Compound markets',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

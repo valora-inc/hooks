@@ -47,9 +47,7 @@ function getApyFromRayApr(apr: bigint) {
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'aave',
       name: 'Aave',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address, t }) {

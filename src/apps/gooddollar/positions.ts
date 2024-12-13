@@ -29,9 +29,7 @@ const client = createPublicClient({
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'gooddollar',
       name: 'GoodDollar',
-      description: '',
     }
   },
   async getPositionDefinitions({ networkId, address }) {

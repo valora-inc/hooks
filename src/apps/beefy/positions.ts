@@ -483,9 +483,7 @@ const beefyGovVaultsPositions = async (
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'beefy',
       name: 'Beefy',
-      description: 'Beefy vaults',
     }
   },
   async getPositionDefinitions({ networkId, address, t }) {

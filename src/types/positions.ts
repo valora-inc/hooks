@@ -172,9 +172,7 @@ export type PositionDefinition =
 // Generic info about the app
 // Note: this could be used for dapp listing too
 export interface AppInfo {
-  id: string // Example: ubeswap
   name: string // Example: Ubeswap
-  description: string // Example: Decentralized exchange on Celo
 }
 
 export interface AbstractPosition {

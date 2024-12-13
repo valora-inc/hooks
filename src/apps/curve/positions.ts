@@ -190,9 +190,7 @@ async function getPoolPositionDefinition(
 const hook: PositionsHook = {
   getInfo() {
     return {
-      id: 'curve',
       name: 'Curve',
-      description: 'Curve pools',
     }
   },
   async getPositionDefinitions({ networkId, address }) {
