@@ -52,7 +52,7 @@
     "lru-cache": "^11.0.2",
     "semver": "^7.6.3",
     "viem": "^2.21.54",
-    "zod": "^3.24.0"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
