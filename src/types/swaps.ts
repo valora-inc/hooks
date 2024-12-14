@@ -1,25 +1,39 @@
 import { Address } from './address'
 
-export interface SwapTransaction {
-  swapType: 'same-chain' // only supporting same-chain swaps for now
+export type SwapTransaction =
+  | SameChainSwapTransaction
+  | CrossChainSwapTransaction
+
+interface SameChainSwapTransaction extends BaseSwapTransaction {
+  swapType: 'same-chain'
+}
+
+interface CrossChainSwapTransaction extends BaseSwapTransaction {
+  swapType: 'cross-chain'
+  // Swap duration estimation in seconds
+  estimatedDuration: number
+  maxCrossChainFee: string
+  estimatedCrossChainFee: string
+}
+
+interface BaseSwapTransaction {
+  swapType: 'same-chain' | 'cross-chain'
   chainId: number
   buyAmount: string
   sellAmount: string
-  buyTokenAddress: string
-  sellTokenAddress: string
-  // be careful -- price means different things when using sellAmount vs buyAmount
+  buyTokenAddress: Address
+  sellTokenAddress: Address
   price: string
   guaranteedPrice: string
-  appFeePercentageIncludedInPrice: string | undefined
-  /**
-   * In percentage, between 0 and 100
-   */
+  appFeePercentageIncludedInPrice?: string
   estimatedPriceImpact: string | null
   gas: string
-  estimatedGasUse: string | null | undefined
-  to: Address
-  value: string
-  data: `0x${string}`
-  from: Address
+  gasPrice: string
+  to: string
+  value: string // Needed for native asset swaps
+  data: string
+  from: string
   allowanceTarget: Address
+  estimatedGasUse: string
+  simulationStatus?: 'success' | 'failure'
 }
