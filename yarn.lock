@@ -909,19 +909,19 @@
     retry-request "^6.0.0"
     teeny-request "^9.0.0"
 
-"@google-cloud/functions-framework@^3.1.3", "@google-cloud/functions-framework@^3.4.2":
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/@google-cloud/functions-framework/-/functions-framework-3.4.2.tgz#20c78a3309a77f21b4b56384a023603435e405b7"
-  integrity sha512-yJcxfVgjLoKFO3p6Wy6Fc+Gi6l3PFSwJg4m0mjebx/UHdLeXLYYxgKMP8RCODaApXEWXbSITIjXO0m5kSv2Ilw==
+"@google-cloud/functions-framework@^3.1.3", "@google-cloud/functions-framework@^3.4.3":
+  version "3.4.3"
+  resolved "https://registry.yarnpkg.com/@google-cloud/functions-framework/-/functions-framework-3.4.3.tgz#3d887fa390bc7a06b9023c3883f42d802ddd5e0f"
+  integrity sha512-NR9r3cAcuE35bW+23jRrYXWY7QFwK4UlLtmf6y+JgKzplt7s50gPrROuD2yqB9JKXynXfdRAC0EwwHZ+4Q0jsQ==
   dependencies:
-    "@types/express" "4.17.21"
+    "@types/express" "^5.0.0"
     body-parser "^1.18.3"
-    cloudevents "^8.0.0"
-    express "^4.16.4"
-    minimist "^1.2.7"
+    cloudevents "^8.0.2"
+    express "^4.21.2"
+    minimist "^1.2.8"
     on-finished "^2.3.0"
     read-pkg-up "^7.0.1"
-    semver "^7.3.5"
+    semver "^7.6.3"
 
 "@google-cloud/logging-bunyan@^5.1.0":
   version "5.1.0"
@@ -1558,23 +1558,23 @@
   dependencies:
     "@types/ms" "*"
 
-"@types/express-serve-static-core@^4.17.33":
-  version "4.17.35"
-  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.35.tgz#c95dd4424f0d32e525d23812aa8ab8e4d3906c4f"
-  integrity sha512-wALWQwrgiB2AWTT91CB62b6Yt0sNHpznUXeZEcnPU3DRdlDIz74x8Qg1UUYKSVFi+va5vKOLYRBI1bRKiLLKIg==
+"@types/express-serve-static-core@^5.0.0":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-5.0.2.tgz#812d2871e5eea17fb0bd5214dda7a7b748c0e12a"
+  integrity sha512-vluaspfvWEtE4vcSDlKRNer52DvOGrB2xv6diXy6UKyKW0lqZiWHGNApSyxOv+8DE5Z27IzVvE7hNkxg7EXIcg==
   dependencies:
     "@types/node" "*"
     "@types/qs" "*"
     "@types/range-parser" "*"
     "@types/send" "*"
 
-"@types/express@4.17.21":
-  version "4.17.21"
-  resolved "https://registry.yarnpkg.com/@types/express/-/express-4.17.21.tgz#c26d4a151e60efe0084b23dc3369ebc631ed192d"
-  integrity sha512-ejlPM315qwLpaQlQDTjPdsUFSc6ZsP4AN6AlWnogPjQ7CVi7PYF3YVz+CY3jE2pwYf7E/7HlDAN0rV2GxTG0HQ==
+"@types/express@^5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@types/express/-/express-5.0.0.tgz#13a7d1f75295e90d19ed6e74cab3678488eaa96c"
+  integrity sha512-DvZriSMehGHL1ZNLzi6MidnsDhUZM/x2pRdDIKdwbUNqqwHxMlRdkxtn6/EPKyqKpHqTl/4nRZsRNLpZxZRpPQ==
   dependencies:
     "@types/body-parser" "*"
-    "@types/express-serve-static-core" "^4.17.33"
+    "@types/express-serve-static-core" "^5.0.0"
     "@types/qs" "*"
     "@types/serve-static" "*"
 
@@ -2610,10 +2610,10 @@ clone@^1.0.2:
   resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-cloudevents@^8.0.0:
-  version "8.0.0"
-  resolved "https://registry.yarnpkg.com/cloudevents/-/cloudevents-8.0.0.tgz#d5e3f9f56fc70aad5a97f3ea272559d8b7d74317"
-  integrity sha512-G1Z/r8QMFAsP+F1PuZSHzx1ocPy4vrdQMTHD3orjDaM5kccmPU6nMmpVrF07b53aaxcrLbORUmRepY/DgvdhVw==
+cloudevents@^8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/cloudevents/-/cloudevents-8.0.2.tgz#034bde4e1a0ee21a8a34b8fe837e7d98c8bbdf8d"
+  integrity sha512-93KKRR61D2NNE+2lg2HmLbl17beVTKpf1UYd/8BcXpuiDxbU2fb8gAfriSmVGmj1xX/Oh2t5Fh/xGOWFdu6F4A==
   dependencies:
     ajv "^8.11.0"
     ajv-formats "^2.1.1"
@@ -3518,7 +3518,7 @@ expect@^29.0.0, expect@^29.7.0:
     jest-message-util "^29.7.0"
     jest-util "^29.7.0"
 
-express@^4.16.4, express@^4.21.2:
+express@^4.21.2:
   version "4.21.2"
   resolved "https://registry.yarnpkg.com/express/-/express-4.21.2.tgz#cf250e48362174ead6cea4a566abef0162c1ec32"
   integrity sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==
@@ -5283,7 +5283,7 @@ minimatch@^9.0.4:
   dependencies:
     brace-expansion "^2.0.1"
 
-minimist@^1.2.0, minimist@^1.2.6, minimist@^1.2.7:
+minimist@^1.2.0, minimist@^1.2.6, minimist@^1.2.8:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
   integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
@@ -6123,7 +6123,7 @@ semver@^6.0.0, semver@^6.3.0, semver@^6.3.1:
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
-semver@^7.3.5, semver@^7.3.7, semver@^7.3.8, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.3:
+semver@^7.3.7, semver@^7.3.8, semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.6.3:
   version "7.6.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.3.tgz#980f7b5550bc175fb4dc09403085627f9eb33143"
   integrity sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==
