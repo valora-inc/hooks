@@ -1,5 +1,6 @@
 import { Address } from './address'
 
+// Types based on the response from `getSwapQuote` endpoint
 export type SwapTransaction =
   | SameChainSwapTransaction
   | CrossChainSwapTransaction
@@ -29,10 +30,10 @@ interface BaseSwapTransaction {
   estimatedPriceImpact: string | null
   gas: string
   gasPrice: string
-  to: string
+  to: Address
   value: string // Needed for native asset swaps
   data: string
-  from: string
+  from: Address
   allowanceTarget: Address
   estimatedGasUse: string
   simulationStatus?: 'success' | 'failure'
