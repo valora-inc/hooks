@@ -93,7 +93,7 @@ export async function getSommStrategiesData(networkId: NetworkId) {
       // add the new cellar.
       const address = cellar.id.split('-')[0].toLowerCase()
       const config = cellarConfig[address]
-      if (!config) {
+      if (cellar.chain === NETWORK_ID_TO_SOMM_CHAIN[networkId] && !config) {
         logger.warn(
           `No config found for cellar address ${address}, this is likely a new cellar that we should add support for`,
         )
