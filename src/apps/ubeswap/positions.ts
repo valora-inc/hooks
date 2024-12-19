@@ -1,3 +1,4 @@
+import BigNumberJs from 'bignumber.js'
 import got from '../../utils/got'
 import { Address, createPublicClient, http } from 'viem'
 import { celo } from 'viem/chains'
@@ -5,13 +6,17 @@ import { getTokenId } from '../../runtime/getTokenId'
 import { NetworkId } from '../../types/networkId'
 import { DecimalNumber, toDecimalNumber } from '../../types/numbers'
 import {
+  AppTokenPosition,
   AppTokenPositionDefinition,
+  ContractPositionDefinition,
   PositionDefinition,
   PositionsHook,
   TokenDefinition,
 } from '../../types/positions'
 import { getUniswapV3PositionDefinitions } from '../uniswap/positions'
+import { stakingRewardsAbi } from './abis/staking-rewards'
 import { uniswapV2PairAbi } from './abis/uniswap-v2-pair'
+import farms from './data/farms.json'
 import { logger } from '../../log'
 import * as dotenv from 'dotenv'
 import { BigNumber } from '@ethersproject/bignumber'
@@ -26,6 +31,7 @@ import {
   TokenData,
 } from './interface'
 import { hexToUint8Array } from '../../utils/numbers'
+import { erc20Abi } from '../../abis/erc-20'
 
 dotenv.config()
 
@@ -265,7 +271,7 @@ const fetchStakedTokenIds = async (address: string, incentiveIds: string[]) => {
 }
 
 // Calculate unclamed rewards for each pool (currently 1, UBE/CELO)
-async function getFarmPositionDefinitions(
+async function getV3FarmPositionDefinitions(
   networkId: NetworkId,
   address: string,
 ): Promise<PositionDefinition[]> {
@@ -393,6 +399,137 @@ async function getFarmPositionDefinitions(
   ).filter((pd) => !!pd)
 }
 
+async function getFarmPositionDefinitions(
+  networkId: NetworkId,
+  address: string,
+): Promise<PositionDefinition[]> {
+  // Call balanceOf and totalSupply for each farm stakingAddress
+  const data = await client.multicall({
+    contracts: farms.flatMap((farm) => [
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'balanceOf',
+        args: [address as Address],
+      },
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'totalSupply',
+      },
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'rewardsToken',
+      },
+      {
+        address: farm.stakingAddress as Address,
+        abi: stakingRewardsAbi,
+        functionName: 'earned',
+        args: [address as Address],
+      },
+    ]),
+    allowFailure: false,
+  })
+
+  // Farms for which the user has a balance
+  // Note: this captures "single reward" farms,
+  // but there are dual and triple reward farms as well
+  // which I haven't wrapped my head around yet
+  // See https://github.com/Ubeswap/ubeswap-interface/blob/48049267f7160441070ff21ea6c9fedc3a55cfef/src/state/stake/hooks.ts#L144-L171
+  const userFarms = farms
+    .map((farm, i) => ({
+      ...farm,
+      balance: data[4 * i] as bigint,
+      totalSupply: data[4 * i + 1] as bigint,
+      rewardsTokenAddress: data[4 * i + 2] as Address,
+      rewardsEarned: data[4 * i + 3] as bigint,
+    }))
+    .filter((farm) => farm.balance > 0)
+
+  const positions = await Promise.all(
+    userFarms.map(async (farm) => {
+      const position: ContractPositionDefinition = {
+        type: 'contract-position-definition',
+        networkId,
+        address: farm.stakingAddress.toLowerCase(),
+        tokens: [
+          { address: farm.lpAddress.toLowerCase(), networkId },
+          {
+            address: farm.rewardsTokenAddress.toLowerCase(),
+            networkId,
+            category: 'claimable',
+          },
+        ],
+        displayProps: ({ resolvedTokensByTokenId }) => {
+          const poolToken = resolvedTokensByTokenId[
+            getTokenId({
+              networkId,
+              address: farm.lpAddress,
+              isNative: false,
+            })
+          ] as AppTokenPosition
+          return {
+            title: poolToken.displayProps.title,
+            description: 'Farm',
+            imageUrl: poolToken.displayProps.imageUrl,
+            manageUrl: 'https://app.ubeswap.org/#/earn',
+          }
+        },
+        availableShortcutIds: ['claim-reward'],
+        balances: async ({ resolvedTokensByTokenId }) => {
+          const poolToken =
+            resolvedTokensByTokenId[
+              getTokenId({
+                address: farm.lpAddress,
+                networkId,
+                isNative: false,
+              })
+            ]
+          const share = new BigNumberJs(farm.balance.toString()).div(
+            farm.totalSupply.toString(),
+          )
+
+          const poolContract = {
+            address: farm.lpAddress as Address,
+            abi: erc20Abi,
+          } as const
+          const [poolBalance] = await client.multicall({
+            contracts: [
+              {
+                ...poolContract,
+                functionName: 'balanceOf',
+                args: [farm.stakingAddress as Address],
+              },
+            ],
+            allowFailure: false,
+          })
+
+          const balance = share.times(
+            toDecimalNumber(poolBalance, poolToken.decimals),
+          ) as DecimalNumber
+
+          const rewardsTokenId = getTokenId({
+            address: farm.rewardsTokenAddress,
+            networkId,
+          })
+          const rewardsToken = resolvedTokensByTokenId[rewardsTokenId]
+          const rewardsBalance = toDecimalNumber(
+            farm.rewardsEarned,
+            rewardsToken.decimals,
+          )
+
+          return [balance, rewardsBalance]
+        },
+      }
+
+      return position
+    }),
+  )
+
+  return positions
+}
+
 const UBESWAP_V3_NFT_MANAGER = '0x897387c7b996485c3aaa85c94272cd6c506f8c8f'
 const UBESWAP_V3_FACTORY = '0x67FEa58D5a5a4162cED847E13c2c81c73bf8aeC4'
 const UNI_V3_MULTICALL = '0xDD1dC48fEA48B3DE667dD3595624d5af4Fb04694'
@@ -421,15 +558,20 @@ const hook: PositionsHook = {
       // dapp is only on Celo, and implementation is hardcoded to Celo mainnet (contract addresses in particular)
       return []
     }
-    const [poolDefinitions, farmDefinitions, v3Definitions] = await Promise.all(
-      [
+    const [poolDefinitions, farmDefinitions, v3FarmDefinitions, v3Definitions] =
+      await Promise.all([
         getPoolPositionDefinitions(networkId, address),
         getFarmPositionDefinitions(networkId, address),
+        getV3FarmPositionDefinitions(networkId, address),
         getV3Positions(networkId, address as Address),
-      ],
-    )
+      ])
 
-    return [...poolDefinitions, ...farmDefinitions, ...v3Definitions]
+    return [
+      ...poolDefinitions,
+      ...farmDefinitions,
+      ...v3FarmDefinitions,
+      ...v3Definitions,
+    ]
   },
   getAppTokenDefinition({ networkId, address }: TokenDefinition) {
     // Assume that the address is a pool address
